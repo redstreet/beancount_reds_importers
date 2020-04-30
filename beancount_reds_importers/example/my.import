@@ -1,0 +1,40 @@
+#!/usr/bin/env python3
+"""Import configuration."""
+
+import sys
+from os import path
+
+sys.path.insert(0, path.join(path.dirname(__file__)))
+
+from beancount_reds_importers import vanguard
+from fund_info import *
+
+# Setting this variable provides a list of importer instances.
+CONFIG = [
+
+    # Investments
+    # --------------------------------------------------------------------------------------
+
+    vanguard.Importer({
+        'main_account'   : 'Assets:Investments:TradIRA',
+        'account_number' : '1234567',
+        'transfer'       : 'Assets:Zero-Sum-Accounts:Transfers:Bank-Account',
+        'dividends'      : 'Income:Dividends:TradIRA',
+        'cg'             : 'Income:Capital-Gains:TradIRA',
+        'fees'           : 'Expenses:Brokerage-Fees:TradIRA',
+        'rounding_error' : 'Equity:Rounding-Errors:Imports',
+        'fund_info'       : fund_info,
+    }),
+
+    vanguard.Importer({
+        'main_account'   : 'Assets:Investments:RothIRA',
+        'account_number' : '654321',
+        'transfer'       : 'Assets:Zero-Sum-Accounts:Transfers:Bank-Account',
+        'dividends'      : 'Income:Dividends:RothIRA',
+        'cg'             : 'Income:Capital-Gains:RothIRA',
+        'fees'           : 'Expenses:Brokerage-Fees:RothIRA',
+        'rounding_error' : 'Equity:Rounding-Errors:Imports',
+        'fund_info'       : fund_info,
+    }),
+
+]

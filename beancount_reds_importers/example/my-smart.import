@@ -4,9 +4,10 @@
 import sys
 from os import path
 
+from smart_importer import apply_hooks, PredictPayees, PredictPostings
 sys.path.insert(0, path.join(path.dirname(__file__)))
 
-from importers import vanguard
+from beancount_reds_importers import vanguard, ally, discover
 from fund_info import *
 
 # Setting this variable provides a list of importer instances.
@@ -36,5 +37,17 @@ CONFIG = [
         'rounding_error' : 'Equity:Rounding-Errors:Imports',
         'fund_info'       : fund_info,
     }),
+
+    # Banks and credit cards
+    # --------------------------------------------------------------------------------------
+    apply_hooks(ally.Importer({
+        'account_number'  : '12345678',
+        'main_account'    : 'Assets:Banks:Checking',
+        }), [PredictPostings()]),
+
+    apply_hooks(discover.Importer({
+        'account_number'  : '45678',
+        'main_account'    : 'Liabilities:Credit-Cards:Discover',
+        }), [PredictPostings()]),
 
 ]

@@ -10,7 +10,7 @@ from beancount.core import amount
 from beancount.ingest import importer
 from beancount.core.position import CostSpec
 
-from importers.libimport import common
+from beancount_reds_importers.libimport import common
 
 class Importer(importer.ImporterProtocol):
     def __init__(self, config):
