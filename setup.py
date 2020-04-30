@@ -6,7 +6,8 @@ with open(path.join(path.dirname(__file__), 'README.md')) as readme:
 
 setup(
     name='beancount_reds_importers',
-    version='0.1.0.dev',
+    use_scm_version=True,
+    setup_requires=['setuptools_scm'],
     description='Importers for various institutions for Beancount',
     long_description=LONG_DESCRIPTION,
     url='https://github.com/redstreet/beancount_reds_ingestor',
