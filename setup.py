@@ -15,7 +15,6 @@ setup(
     author_email='redstreet@users.noreply.github.com',
     keywords='importer ingestor beancount accounting',
     license='GPL-3.0',
-    license_files='LICENSE',
     packages=find_packages(),
     include_package_data=True,
     install_requires=[
