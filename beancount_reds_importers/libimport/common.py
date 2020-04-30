@@ -8,24 +8,25 @@ from beancount.core.number import D
 
 
 def create_simple_posting_with_price(entry, account,
-                                    number, currency,
-                                    price_number, price_currency):
+                                     number, currency,
+                                     price_number, price_currency):
     return create_simple_posting_with_cost_or_price(entry, account,
-            number, currency,
-            price_number=price_number, price_currency=price_currency)
+                                                    number, currency,
+                                                    price_number=price_number, price_currency=price_currency)
 
 
 def create_simple_posting_with_cost(entry, account,
                                     number, currency,
                                     cost_number, cost_currency):
     return create_simple_posting_with_cost_or_price(entry, account,
-            number, currency,
-            cost_number=cost_number, cost_currency=cost_currency)
+                                                    number, currency,
+                                                    cost_number=cost_number, cost_currency=cost_currency)
+
 
 def create_simple_posting_with_cost_or_price(entry, account,
-                                    number, currency,
-                                    price_number=None, price_currency=None,
-                                    cost_number=None, cost_currency=None, costspec=None):
+                                             number, currency,
+                                             price_number=None, price_currency=None,
+                                             cost_number=None, cost_currency=None, costspec=None):
     """Create a simple posting on the entry, with a cost (for purchases) or price (for sell transactions).
 
     Args:
@@ -49,7 +50,8 @@ def create_simple_posting_with_cost_or_price(entry, account,
 
     if not (price_number or cost_number):
         print("Either price ({}) or cost ({}) must be specified ({})".format(price_number, cost_number, entry))
-        import pdb; pdb.set_trace() 
+        import pdb
+        pdb.set_trace()
         raise Exception("Either price ({}) or cost ({}) must be specified".format(price_number, cost_number))
 
     price = Amount(price_number, price_currency) if price_number else None
@@ -60,5 +62,3 @@ def create_simple_posting_with_cost_or_price(entry, account,
     if entry is not None:
         entry.postings.append(posting)
     return posting
-
-

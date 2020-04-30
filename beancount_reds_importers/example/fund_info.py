@@ -6,17 +6,17 @@
 # include a list here.
 
 cusip_map = {
-        '808524805' : 'SCHF',
+    '808524805': 'SCHF',
 }
 
 ticker_map = {
-   'Schwab International Equity ETF':   'SCHF',
+    'Schwab International Equity ETF':   'SCHF',
 }
 
-money_market = [ 'VMFXX' ]
+money_market = ['VMFXX']
 
 fund_info = {
-        'money_market' : money_market,
-        'cusip_map' : cusip_map,
-        'ticker_map' : ticker_map,
-        }
+    'money_market': money_market,
+    'cusip_map': cusip_map,
+    'ticker_map': ticker_map,
+}

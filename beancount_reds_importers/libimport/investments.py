@@ -12,6 +12,7 @@ from beancount.core.position import CostSpec
 
 from beancount_reds_importers.libimport import common
 
+
 class Importer(importer.ImporterProtocol):
     def __init__(self, config):
         self.config = config
@@ -35,7 +36,7 @@ class Importer(importer.ImporterProtocol):
             self.ofx_account = None
             for acc in self.ofx.accounts:
                 # account identifying info fieldname varies across institutions
-                if getattr(acc, self.account_number_field)  == self.config['account_number']:
+                if getattr(acc, self.account_number_field) == self.config['account_number']:
                     self.ofx_account = acc
             if self.ofx_account is not None:
                 self.money_market_funds = self.config['fund_info']['money_market']
@@ -47,16 +48,16 @@ class Importer(importer.ImporterProtocol):
     def build_account_map(self):
         # transaction types: {'buymf', 'sellmf', 'buystock', 'sellstock', 'other', 'reinvest', 'income'}
         self.target_account_map = {
-                "buymf":     self.config['main_account'],
-                "sellmf":    self.config['main_account'],
-                "buystock":  self.config['main_account'],
-                "sellstock": self.config['main_account'],
-                "reinvest":  self.config['dividends'],
-                "income":    self.config['dividends'],
-                "other":     self.config['transfer'],
-                "credit":    self.config['transfer'],
-                "debit":    self.config['transfer'],
-                "transfer":     self.config['transfer'],
+            "buymf":     self.config['main_account'],
+            "sellmf":    self.config['main_account'],
+            "buystock":  self.config['main_account'],
+            "sellstock": self.config['main_account'],
+            "reinvest":  self.config['dividends'],
+            "income":    self.config['dividends'],
+            "other":     self.config['transfer'],
+            "credit":    self.config['transfer'],
+            "debit":    self.config['transfer'],
+            "transfer":     self.config['transfer'],
         }
 
     def custom_init(self):
@@ -68,7 +69,7 @@ class Importer(importer.ImporterProtocol):
 
     def identify(self, file):
         self.custom_init()
-        if not self.filename_identifier_substring in file.name:
+        if self.filename_identifier_substring not in file.name:
             return False
         self.initialize(file)
         return self.ofx_account is not None
@@ -139,45 +140,51 @@ class Importer(importer.ImporterProtocol):
 
                 # Build transaction entry
                 entry = data.Transaction(metadata, ot.tradeDate.date(), self.FLAG,
-                       ot.memo, description, data.EMPTY_SET, data.EMPTY_SET, [])
+                                         ot.memo, description, data.EMPTY_SET, data.EMPTY_SET, [])
 
                 # Build postings
-                if ot.type == 'income': # cash
+                if ot.type == 'income':  # cash
                     data.create_simple_posting(entry, config['main_account'], ot.total, self.currency)
                     data.create_simple_posting(entry, target_acct, -1 * ot.total, self.currency)
-                else: # stock/fund
+                else:  # stock/fund
                     if is_money_market:
                         common.create_simple_posting_with_price(entry, config['main_account'],
-                                ot.units, ticker, ot.unit_price, self.currency)
+                                                                ot.units, ticker, ot.unit_price, self.currency)
                     elif 'sell' in ot.type:
                         common.create_simple_posting_with_cost_or_price(entry, config['main_account'],
-                                ot.units, ticker, price_number=ot.unit_price, price_currency=self.currency,
-                                costspec=CostSpec(None, None, None, None, None, None))
-                        data.create_simple_posting(entry, self.config['cg'], None, None)
-                    else: # buy stock/fund
+                                                                        ot.units, ticker, price_number=ot.unit_price,
+                                                                        price_currency=self.currency,
+                                                                        costspec=CostSpec(None, None, None, None, None, None))
+                        data.create_simple_posting(
+                            entry, self.config['cg'], None, None)
+                    else:  # buy stock/fund
                         common.create_simple_posting_with_cost(entry, config['main_account'],
-                                ot.units, ticker, ot.unit_price, self.currency)
-                    data.create_simple_posting(entry, target_acct, ot.total, self.currency)
+                                                               ot.units, ticker, ot.unit_price, self.currency)
+                    data.create_simple_posting(
+                        entry, target_acct, ot.total, self.currency)
 
                     # Rounding errors
-                    rounding_error = ot.total +  (ot.unit_price * ot.units)
+                    rounding_error = ot.total + (ot.unit_price * ot.units)
                     if 0.0005 <= abs(rounding_error) <= self.max_rounding_error:
-                        data.create_simple_posting(entry, config['rounding_error'], -1 * rounding_error, 'USD')
+                        data.create_simple_posting(
+                            entry, config['rounding_error'], -1 * rounding_error, 'USD')
                     # if abs(rounding_error) > self.max_rounding_error:
                     #     print("Transactions legs do not sum up! Difference: {}. Entry: {}, ot: {}".format(
                     #         rounding_error, entry, ot))
 
-            elif ot.type in ['other', 'credit', 'debit', 'transfer']: # cash or in-kind transfers
+            # cash or in-kind transfers
+            elif ot.type in ['other', 'credit', 'debit', 'transfer']:
                 # Build metadata
                 metadata = data.new_metadata(file.name, next(counter))
                 target_acct = self.get_target_acct(ot)
 
-                if ot.type == 'transfer': # in-kind transfer
-                    ticker, ticker_long_name = self.get_ticker_info(ot.security)
+                if ot.type == 'transfer':  # in-kind transfer
+                    ticker, ticker_long_name = self.get_ticker_info(
+                        ot.security)
                     description = '[' + ticker + '] ' + ticker_long_name
                     date = ot.tradeDate.date()
                     units = ot.units
-                else: # cash transfer
+                else:  # cash transfer
                     description = 'TRANSFER'
                     date = ot.date.date()
                     units = ot.amount
@@ -185,11 +192,13 @@ class Importer(importer.ImporterProtocol):
 
                 # Build transaction entry
                 entry = data.Transaction(metadata, date, self.FLAG,
-                       ot.memo, description, data.EMPTY_SET, data.EMPTY_SET, [])
+                                         ot.memo, description, data.EMPTY_SET, data.EMPTY_SET, [])
 
                 # Build postings
-                data.create_simple_posting(entry, config['main_account'], units, ticker)
-                data.create_simple_posting(entry, target_acct, -1*units, ticker)
+                data.create_simple_posting(
+                    entry, config['main_account'], units, ticker)
+                data.create_simple_posting(
+                    entry, target_acct, -1*units, ticker)
 
             else:
                 print("ERROR: unknown entry type:", ot.type)
@@ -197,9 +206,11 @@ class Importer(importer.ImporterProtocol):
 
             if hasattr(ot, 'fees') or hasattr(ot, 'commission'):
                 if ot.fees != 0:
-                    data.create_simple_posting(entry, config['fees'], ot.fees, self.currency)
+                    data.create_simple_posting(
+                        entry, config['fees'], ot.fees, self.currency)
                 if ot.commission != 0:
-                    data.create_simple_posting(entry, config['fees'], ot.commission, self.currency)
+                    data.create_simple_posting(
+                        entry, config['fees'], ot.commission, self.currency)
             new_entries.append(entry)
 
         # balance assertions
@@ -213,7 +224,7 @@ class Importer(importer.ImporterProtocol):
             # downloaded) transactions in this gap will get downloaded the next time we do a download in the
             # future, and cause the balance assertions to be invalid.
             date = max(ot.tradeDate if hasattr(ot, 'tradeDate') else ot.date
-                    for ot in self.ofx_account.statement.transactions).date()
+                       for ot in self.ofx_account.statement.transactions).date()
         except Exception as err:
             print("ERROR: no end_date. SKIPPING input.")
             traceback.print_tb(err.__traceback__)
@@ -233,15 +244,15 @@ class Importer(importer.ImporterProtocol):
             # extract price info if available
             if hasattr(pos, 'unit_price') and hasattr(pos, 'date'):
                 meta = data.new_metadata(file.name, next(counter))
-                price_entry = data.Price(meta, pos.date.date(), ticker, 
-                        amount.Amount(pos.unit_price, self.currency))
+                price_entry = data.Price(meta, pos.date.date(), ticker,
+                                         amount.Amount(pos.unit_price, self.currency))
                 new_entries.append(price_entry)
 
         # we want trade date balance, which is reflected as USD
-        # 
+        #
         # trade date balance: The net dollar amount in your account that has not swept to or from your
         # settlement fund.
-        # 
+        #
         # available cash combines settlement fund and trade date balance
         balance = self.ofx_account.statement.available_cash - settlement_fund_balance
         meta = data.new_metadata(file.name, next(counter))

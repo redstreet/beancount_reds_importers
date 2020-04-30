@@ -3,6 +3,7 @@
 import ntpath
 import beancount_reds_importers.libimport.investments
 
+
 class Importer(beancount_reds_importers.libimport.investments.Importer):
     def custom_init(self):
         self.max_rounding_error = 0.04
