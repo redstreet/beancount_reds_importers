@@ -3,6 +3,7 @@
 import datetime
 import itertools
 import ntpath
+import sys
 import traceback
 from ofxparse import OfxParser
 from beancount.core import data
@@ -87,14 +88,27 @@ class Importer(importer.ImporterProtocol):
     def get_ticker_info(self, security):
         return security, 'UNKNOWN'
 
+    def get_ticker_info_cusip(self, security):
+        try:
+            ticker = self.cusip_map[security]
+            ticker_long_name = self.inv_ticker_map[ticker]
+        except KeyError:
+            tickers = self.get_ticker_list()
+            tickers_missing = [t for t in tickers if t not in self.cusip_map]
+            names_missing = [n for n in self.cusip_map.values() if n not in self.inv_ticker_map]
+            print("Error: cusip_map not found for: {tickers_missing}. Names not found for: {names_missing}".format(
+                tickers_missing=tickers_missing, names_missing=names_missing), file=sys.stderr)
+            sys.exit(1)
+        return ticker, ticker_long_name
+
     def get_target_acct(self, transaction):
         return self.target_account_map.get(transaction.type, None)
 
     def get_ticker_list(self):
-        tickers = []
+        tickers = set()
         for ot in self.ofx_account.statement.transactions:
             if ot.type in ['buymf', 'sellmf', 'buystock', 'sellstock', 'reinvest', 'income']:
-                tickers.append(ot.security)
+                tickers.add(ot.security)
         return tickers
 
     # --------------------------------------------------------------------------------
