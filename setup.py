@@ -10,6 +10,7 @@ setup(
     setup_requires=['setuptools_scm'],
     description='Importers for various institutions for Beancount',
     long_description=LONG_DESCRIPTION,
+    long_description_content_type='text/markdown',
     url='https://github.com/redstreet/beancount_reds_ingestor',
     author='Red Street',
     author_email='redstreet@users.noreply.github.com',
