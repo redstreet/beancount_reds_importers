@@ -7,10 +7,12 @@
 
 cusip_map = {
     '808524805': 'SCHF',
+    '012345678' : 'VGTEST',
 }
 
 ticker_map = {
     'Schwab International Equity ETF':   'SCHF',
+    'Vanguard Test Fund' : 'VGTEST',
 }
 
 money_market = ['VMFXX']

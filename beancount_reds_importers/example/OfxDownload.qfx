@@ -1,0 +1,112 @@
+OFXHEADER:100
+DATA:OFXSGML
+VERSION:102
+SECURITY:NONE
+ENCODING:USASCII
+CHARSET:1252
+COMPRESSION:NONE
+OLDFILEUID:NONE
+NEWFILEUID:aoisdfiljks
+
+<OFX>
+  <SIGNONMSGSRSV1>
+    <SONRS>
+      <STATUS>
+        <CODE>0
+        <SEVERITY>INFO
+        <MESSAGE>Successful Sign On
+      </STATUS>
+      <DTSERVER>20190331001702[-7:PST]
+      <LANGUAGE>ENG
+      <DTPROFUP>20010101071000
+      <FI>
+        <ORG>The Vanguard Group
+      </FI>
+    </SONRS>
+  </SIGNONMSGSRSV1>
+  <INVSTMTMSGSRSV1>
+    <INVSTMTTRNRS>
+      <TRNUID>asdflkzjxcv
+      <STATUS>
+        <CODE>0
+        <SEVERITY>INFO
+      </STATUS>
+      <CLTCOOKIE>4
+      <INVSTMTRS>
+        <DTASOF>20190331
+        <CURDEF>USD
+        <INVACCTFROM>
+          <BROKERID>vanguard.com
+          <ACCTID>1234567
+        </INVACCTFROM>
+        <INVTRANLIST>
+          <DTSTART>20190625160000.000[-7:PST]
+          <DTEND>20190331160000.000[-7:PST]
+          <BUYMF>
+            <INVBUY>
+              <INVTRAN>
+                <FITID>123456.11
+                <DTTRADE>20190227160000.000[-7:PST]
+                <DTSETTLE>20190227160000.000[-7:PST]
+                <MEMO>Sell mutual fund
+              </INVTRAN>
+              <SECID>
+                <UNIQUEID>012345678
+                <UNIQUEIDTYPE>CUSIP
+              </SECID>
+              <UNITS>400.1234
+              <UNITPRICE>200.00
+              <TOTAL>-80024.68
+              <SUBACCTSEC>CASH
+              <SUBACCTFUND>OTHER
+            </INVBUY>
+            <BUYTYPE>BUY
+          </BUYMF>
+          <SELLMF>
+            <INVSELL>
+              <INVTRAN>
+                <FITID>123456.11
+                <DTTRADE>20190228160000.000[-7:PST]
+                <DTSETTLE>20190228160000.000[-7:PST]
+                <MEMO>Sell mutual fund
+              </INVTRAN>
+              <SECID>
+                <UNIQUEID>012345678
+                <UNIQUEIDTYPE>CUSIP
+              </SECID>
+              <UNITS>-12.1234
+              <UNITPRICE>200.00
+              <TOTAL>2424.68
+              <SUBACCTSEC>CASH
+              <SUBACCTFUND>OTHER
+            </INVSELL>
+            <SELLTYPE>SELL
+          </SELLMF>
+        </INVTRANLIST>
+        <INVPOSLIST>
+          <POSMF>
+            <INVPOS>
+              <SECID>
+                <UNIQUEID>012345678
+                <UNIQUEIDTYPE>CUSIP
+              </SECID>
+              <HELDINACCT>OTHER
+              <POSTYPE>LONG
+              <UNITS>388.00
+              <UNITPRICE>200.00
+              <MKTVAL>10200.0
+              <DTPRICEASOF>20190331120000.000[-7:PST]
+            </INVPOS>
+            <REINVDIV>Y
+            <REINVCG>Y
+          </POSMF>
+        </INVPOSLIST>
+        <INVBAL>
+          <AVAILCASH>6543.21
+          <MARGINBALANCE>0.00
+          <SHORTBALANCE>0.0
+        </INVBAL>
+      </INVSTMTRS>
+    </INVSTMTTRNRS>
+  </INVSTMTMSGSRSV1>
+</OFX>
