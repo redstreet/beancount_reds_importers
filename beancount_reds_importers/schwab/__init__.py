@@ -14,3 +14,11 @@ class Importer(beancount_reds_importers.libimport.investments.Importer):
 
     def file_name(self, file):
         return ntpath.basename(file.name)
+
+    def get_target_acct(self, transaction):
+        if transaction.type == 'credit' and "BANK INT" in transaction.memo:
+            return self.config['interest']
+        return self.target_account_map.get(transaction.type, None)
+
+    def get_description(self, ot, ticker, ticker_long_name):
+        return '[' + ticker + ']'

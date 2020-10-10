@@ -53,8 +53,8 @@ class Importer(importer.ImporterProtocol):
             "sellmf":    self.config['main_account'],
             "buystock":  self.config['main_account'],
             "sellstock": self.config['main_account'],
+            "buyother":  self.config['main_account'],
             "reinvest":  self.config['dividends'],
-            "buyother":  self.config['dividends'],
             "income":    self.config['dividends'],
             "other":     self.config['transfer'],
             "credit":    self.config['transfer'],
@@ -106,6 +106,9 @@ class Importer(importer.ImporterProtocol):
     def get_target_acct(self, transaction):
         return self.target_account_map.get(transaction.type, None)
 
+    def get_description(self, ot, ticker, ticker_long_name):
+        return '[' + ticker + '] ' + ticker_long_name
+
     def get_ticker_list(self):
         tickers = set()
         for ot in self.ofx_account.statement.transactions:
@@ -151,7 +154,7 @@ class Importer(importer.ImporterProtocol):
                     ot.units = -1 * abs(ot.units)
                 if ot.type in ['reinvest', 'dividends']:
                     ot.total = -1 * abs(ot.total)
-                description = '[' + ticker + '] ' + ticker_long_name
+                description = self.get_description(ot, ticker, ticker_long_name)
                 target_acct = self.get_target_acct(ot)
 
                 # Build transaction entry
