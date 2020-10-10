@@ -54,11 +54,13 @@ class Importer(importer.ImporterProtocol):
             "buystock":  self.config['main_account'],
             "sellstock": self.config['main_account'],
             "reinvest":  self.config['dividends'],
+            "buyother":  self.config['dividends'],
             "income":    self.config['dividends'],
             "other":     self.config['transfer'],
             "credit":    self.config['transfer'],
-            "debit":    self.config['transfer'],
-            "transfer":     self.config['transfer'],
+            "debit":     self.config['transfer'],
+            "transfer":  self.config['transfer'],
+            "dep":       self.config['transfer'],
         }
 
     def custom_init(self):
@@ -133,7 +135,7 @@ class Importer(importer.ImporterProtocol):
         self.initialize(file)
         counter = itertools.count()
         for ot in self.ofx_account.statement.transactions:
-            if ot.type in ['buymf', 'sellmf', 'buystock', 'sellstock', 'reinvest', 'income']:
+            if ot.type in ['buymf', 'sellmf', 'buystock', 'sellstock', 'reinvest', 'buyother', 'income']:
                 # Build metadata
                 ticker, ticker_long_name = self.get_ticker_info(ot.security)
                 is_money_market = ticker in self.money_market_funds
@@ -187,7 +189,7 @@ class Importer(importer.ImporterProtocol):
                     #         rounding_error, entry, ot))
 
             # cash or in-kind transfers
-            elif ot.type in ['other', 'credit', 'debit', 'transfer']:
+            elif ot.type in ['other', 'credit', 'debit', 'transfer', 'dep']:
                 # Build metadata
                 metadata = data.new_metadata(file.name, next(counter))
                 target_acct = self.get_target_acct(ot)
@@ -199,7 +201,7 @@ class Importer(importer.ImporterProtocol):
                     date = ot.tradeDate.date()
                     units = ot.units
                 else:  # cash transfer
-                    description = 'TRANSFER'
+                    description = ot.type
                     date = ot.date.date()
                     units = ot.amount
                     ticker = self.currency
