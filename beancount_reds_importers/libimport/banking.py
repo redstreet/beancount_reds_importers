@@ -8,8 +8,6 @@ from beancount.core import data
 from beancount.core import amount
 from beancount.ingest import importer
 
-from beancount_reds_importers.libimport import common
-
 class Importer(importer.ImporterProtocol):
     def __init__(self, config):
         self.config = config
