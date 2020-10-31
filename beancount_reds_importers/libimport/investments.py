@@ -25,7 +25,7 @@ class Importer(importer.ImporterProtocol):
         #     'cg'               : 'Account to book capital gains/losses',
         #     'fees'             : 'Account to book fees to',
         #     'rounding_error'   : 'Account to book rounding errors to',
-        #     'fund_info '       : 'dictionary of fund info (fund_map, money_market)'
+        #     'fund_info '       : 'dictionary of fund info (by_id, money_market)'
         # }
 
     def initialize(self, file):
@@ -40,7 +40,8 @@ class Importer(importer.ImporterProtocol):
             if self.ofx_account is not None:
                 self.money_market_funds = self.config['fund_info']['money_market']
                 self.currency = self.ofx_account.statement.currency.upper()
-                self.inv_ticker_map = {v: k for k, v in self.config['fund_info']['ticker_map'].items()}
+                self.fund_data = self.config['fund_info']['fund_data'] # [(ticker, id, long_name), ...]
+                self.funds_by_id = {i: (ticker, desc) for ticker, i, desc in self.fund_data}
                 self.build_account_map()
             self.initialized = True
 
@@ -84,26 +85,24 @@ class Importer(importer.ImporterProtocol):
         "Get the maximum date from the file."
         self.ofx_account.statement.end_date
 
-    def get_ticker_info(self, security):
-        return security, 'UNKNOWN'
+    def get_ticker_info(self, security_id):
+        return security_id, 'UNKNOWN'
 
-    def get_ticker_info_cusip(self, security):
+    def get_ticker_info_from_id(self, security_id):
         try:
-            ticker = self.cusip_map[security]
-            ticker_long_name = self.inv_ticker_map[ticker]
+            ticker, ticker_long_name = self.funds_by_id[security_id]
         except KeyError:
-            tickers = self.get_ticker_list()
-            tickers_missing = [t for t in tickers if t not in self.cusip_map]
-            names_missing = [n for n in self.cusip_map.values() if n not in self.inv_ticker_map]
-            print("Error: cusip_map not found for: {tickers_missing}. Names not found for: {names_missing}".format(
-                tickers_missing=tickers_missing, names_missing=names_missing), file=sys.stderr)
+            securities = self.get_security_list()
+            securities_missing = [s for s in securities if s not in self.funds_by_id]
+            print(f"Error: fund info not found for: {securities_missing}", file=sys.stderr)
+            import pdb; pdb.set_trace()
             sys.exit(1)
         return ticker, ticker_long_name
 
     def get_target_acct(self, transaction):
         return self.target_account_map.get(transaction.type, None)
 
-    def get_ticker_list(self):
+    def get_security_list(self):
         tickers = set()
         for ot in self.ofx_account.statement.transactions:
             if ot.type in ['buymf', 'sellmf', 'buystock', 'sellstock', 'reinvest', 'income']:
