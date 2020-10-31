@@ -10,9 +10,7 @@ from beancount.core import data
 from beancount.core import amount
 from beancount.ingest import importer
 from beancount.core.position import CostSpec
-
 from beancount_reds_importers.libimport import common
-
 
 class Importer(importer.ImporterProtocol):
     def __init__(self, config):
@@ -27,7 +25,7 @@ class Importer(importer.ImporterProtocol):
         #     'cg'               : 'Account to book capital gains/losses',
         #     'fees'             : 'Account to book fees to',
         #     'rounding_error'   : 'Account to book rounding errors to',
-        #     'fund_info '       : 'dictionary of fund info (ticker_map, money_market, etc.)'
+        #     'fund_info '       : 'dictionary of fund info (fund_map, money_market)'
         # }
 
     def initialize(self, file):
@@ -57,8 +55,9 @@ class Importer(importer.ImporterProtocol):
             "income":    self.config['dividends'],
             "other":     self.config['transfer'],
             "credit":    self.config['transfer'],
-            "debit":    self.config['transfer'],
-            "transfer":     self.config['transfer'],
+            "debit":     self.config['transfer'],
+            "transfer":  self.config['transfer'],
+            "dep":       self.config['transfer'],
         }
 
     def custom_init(self):
@@ -173,12 +172,16 @@ class Importer(importer.ImporterProtocol):
                             entry, self.config['cg'], None, None)
                     else:  # buy stock/fund
                         common.create_simple_posting_with_cost(entry, config['main_account'],
-                                                               ot.units, ticker, ot.unit_price, self.currency)
-                    data.create_simple_posting(
-                        entry, target_acct, ot.total, self.currency)
+                                ot.units, ticker, ot.unit_price, self.currency)
+
+                    # TODO: resolve/remove this ugly hack
+                    reverser = 1
+                    if ot.units > 0 and ot.total > 0: #hack for some brokerages which have incorrect number signs
+                        reverser = -1
+                    data.create_simple_posting(entry, target_acct, reverser * ot.total, self.currency)
 
                     # Rounding errors
-                    rounding_error = ot.total + (ot.unit_price * ot.units)
+                    rounding_error = (reverser * ot.total) +  (ot.unit_price * ot.units)
                     if 0.0005 <= abs(rounding_error) <= self.max_rounding_error:
                         data.create_simple_posting(
                             entry, config['rounding_error'], -1 * rounding_error, 'USD')
@@ -187,19 +190,18 @@ class Importer(importer.ImporterProtocol):
                     #         rounding_error, entry, ot))
 
             # cash or in-kind transfers
-            elif ot.type in ['other', 'credit', 'debit', 'transfer']:
+            elif ot.type in ['other', 'credit', 'debit', 'transfer', 'dep']:
                 # Build metadata
                 metadata = data.new_metadata(file.name, next(counter))
                 target_acct = self.get_target_acct(ot)
 
                 if ot.type == 'transfer':  # in-kind transfer
-                    ticker, ticker_long_name = self.get_ticker_info(
-                        ot.security)
+                    ticker, ticker_long_name = self.get_ticker_info(ot.security)
                     description = '[' + ticker + '] ' + ticker_long_name
                     date = ot.tradeDate.date()
                     units = ot.units
                 else:  # cash transfer
-                    description = 'TRANSFER'
+                    description = ot.type
                     date = ot.date.date()
                     units = ot.amount
                     ticker = self.currency
@@ -209,10 +211,8 @@ class Importer(importer.ImporterProtocol):
                                          ot.memo, description, data.EMPTY_SET, data.EMPTY_SET, [])
 
                 # Build postings
-                data.create_simple_posting(
-                    entry, config['main_account'], units, ticker)
-                data.create_simple_posting(
-                    entry, target_acct, -1*units, ticker)
+                data.create_simple_posting(entry, config['main_account'], units, ticker)
+                data.create_simple_posting(entry, target_acct, -1*units, ticker)
 
             else:
                 print("ERROR: unknown entry type:", ot.type)
@@ -220,11 +220,9 @@ class Importer(importer.ImporterProtocol):
 
             if hasattr(ot, 'fees') or hasattr(ot, 'commission'):
                 if ot.fees != 0:
-                    data.create_simple_posting(
-                        entry, config['fees'], ot.fees, self.currency)
+                    data.create_simple_posting(entry, config['fees'], ot.fees, self.currency)
                 if ot.commission != 0:
-                    data.create_simple_posting(
-                        entry, config['fees'], ot.commission, self.currency)
+                    data.create_simple_posting(entry, config['fees'], ot.commission, self.currency)
             new_entries.append(entry)
 
         # balance assertions
