@@ -60,6 +60,7 @@ class Importer(importer.ImporterProtocol):
             "transfer":  self.config['transfer'],
             "dep":       self.config['transfer'],
         }
+        self.cash_account = f"{self.config['main_account']}:{self.currency}"
 
     def custom_init(self):
         if not self.custom_init_run:
@@ -152,6 +153,10 @@ class Importer(importer.ImporterProtocol):
                     ot.total = -1 * abs(ot.total)
                 description = '[' + ticker + '] ' + ticker_long_name
                 target_acct = self.get_target_acct(ot)
+                if ot.type in ['reinvest', 'dividends', 'income']:
+                    target_acct += f':{ticker}'
+                else:
+                    target_acct += f':{self.currency}'
 
                 # Build transaction entry
                 entry = data.Transaction(metadata, ot.tradeDate.date(), self.FLAG,
@@ -159,21 +164,22 @@ class Importer(importer.ImporterProtocol):
 
                 # Build postings
                 if ot.type == 'income':  # cash
-                    data.create_simple_posting(entry, config['main_account'], ot.total, self.currency)
+                    data.create_simple_posting(entry, self.cash_account, ot.total, self.currency)
                     data.create_simple_posting(entry, target_acct, -1 * ot.total, self.currency)
                 else:  # stock/fund
+                    ticker_acct = f"{config['main_account']}:{ticker}"
                     if is_money_market:
-                        common.create_simple_posting_with_price(entry, config['main_account'],
+                        common.create_simple_posting_with_price(entry, ticker_acct,
                                                                 ot.units, ticker, ot.unit_price, self.currency)
                     elif 'sell' in ot.type:
-                        common.create_simple_posting_with_cost_or_price(entry, config['main_account'],
+                        common.create_simple_posting_with_cost_or_price(entry, ticker_acct,
                                                                         ot.units, ticker, price_number=ot.unit_price,
                                                                         price_currency=self.currency,
                                                                         costspec=CostSpec(None, None, None, None, None, None))
                         data.create_simple_posting(
                             entry, self.config['cg'], None, None)
                     else:  # buy stock/fund
-                        common.create_simple_posting_with_cost(entry, config['main_account'],
+                        common.create_simple_posting_with_cost(entry, ticker_acct,
                                 ot.units, ticker, ot.unit_price, self.currency)
 
                     # TODO: resolve/remove this ugly hack
@@ -213,7 +219,7 @@ class Importer(importer.ImporterProtocol):
                                          ot.memo, description, data.EMPTY_SET, data.EMPTY_SET, [])
 
                 # Build postings
-                data.create_simple_posting(entry, config['main_account'], units, ticker)
+                data.create_simple_posting(entry, config['main_account']+f':{ticker}', units, ticker)
                 data.create_simple_posting(entry, target_acct, -1*units, ticker)
 
             else:
@@ -248,7 +254,7 @@ class Importer(importer.ImporterProtocol):
         for pos in self.ofx_account.statement.positions:
             ticker, ticker_long_name = self.get_ticker_info(pos.security)
             meta = data.new_metadata(file.name, next(counter))
-            balance_entry = data.Balance(meta, date, self.config['main_account'],
+            balance_entry = data.Balance(meta, date, self.config['main_account']+f':{ticker}',
                                          amount.Amount(pos.units, ticker),
                                          None, None)
             new_entries.append(balance_entry)
@@ -270,7 +276,7 @@ class Importer(importer.ImporterProtocol):
         # available cash combines settlement fund and trade date balance
         balance = self.ofx_account.statement.available_cash - settlement_fund_balance
         meta = data.new_metadata(file.name, next(counter))
-        balance_entry = data.Balance(meta, date, self.config['main_account'],
+        balance_entry = data.Balance(meta, date, self.cash_account,
                                      amount.Amount(balance, self.currency),
                                      None, None)
         new_entries.append(balance_entry)
