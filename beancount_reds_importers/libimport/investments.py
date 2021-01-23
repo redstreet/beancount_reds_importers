@@ -155,8 +155,6 @@ class Importer(importer.ImporterProtocol):
                 target_acct = self.get_target_acct(ot)
                 if ot.type in ['reinvest', 'dividends', 'income']:
                     target_acct += f':{ticker}'
-                else:
-                    target_acct += f':{self.currency}'
 
                 # Build transaction entry
                 entry = data.Transaction(metadata, ot.tradeDate.date(), self.FLAG,
@@ -192,7 +190,7 @@ class Importer(importer.ImporterProtocol):
                     rounding_error = (reverser * ot.total) +  (ot.unit_price * ot.units)
                     if 0.0005 <= abs(rounding_error) <= self.max_rounding_error:
                         data.create_simple_posting(
-                            entry, config['rounding_error'], -1 * rounding_error, 'USD')
+                            entry, config['rounding_error'], -1 * rounding_error, self.currency)
                     # if abs(rounding_error) > self.max_rounding_error:
                     #     print("Transactions legs do not sum up! Difference: {}. Entry: {}, ot: {}".format(
                     #         rounding_error, entry, ot))
@@ -268,7 +266,7 @@ class Importer(importer.ImporterProtocol):
                                          amount.Amount(pos.unit_price, self.currency))
                 new_entries.append(price_entry)
 
-        # we want trade date balance, which is reflected as USD
+        # we want trade date balance, which is reflected as USD (primary currency)
         #
         # trade date balance: The net dollar amount in your account that has not swept to or from your
         # settlement fund.
