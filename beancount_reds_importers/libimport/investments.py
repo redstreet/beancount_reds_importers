@@ -155,6 +155,8 @@ class Importer(importer.ImporterProtocol):
                 target_acct = self.get_target_acct(ot)
                 if ot.type in ['reinvest', 'dividends', 'income']:
                     target_acct += f':{ticker}'
+                else:
+                    target_acct += f':{self.currency}'
 
                 # Build transaction entry
                 entry = data.Transaction(metadata, ot.tradeDate.date(), self.FLAG,
