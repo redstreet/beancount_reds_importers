@@ -46,10 +46,12 @@ class Importer(importer.ImporterProtocol):
         if not self.custom_init_run:
             self.max_rounding_error = 0.04
             self.account_number_field = 'account_id'
-            self.filename_identifier_substring = 'transactions'
+            self.filename_identifier_substring = ''
             self.custom_init_run = True
 
     def identify(self, file):
+        if not file.name.endswith('fx'):
+            return False
         self.custom_init()
         if not self.filename_identifier_substring in file.name:
             return False

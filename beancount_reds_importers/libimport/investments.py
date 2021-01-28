@@ -69,6 +69,9 @@ class Importer(importer.ImporterProtocol):
             self.custom_init_run = True
 
     def identify(self, file):
+        # quick check to filter out files that are not qfx/ofx
+        if not file.name.endswith('fx'):
+            return False
         self.custom_init()
         if self.filename_identifier_substring not in file.name:
             return False
