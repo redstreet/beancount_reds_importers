@@ -205,23 +205,21 @@ class Importer(importer.ImporterProtocol):
 
     def extract_balances_and_prices(self, file, counter):
         new_entries = []
-        # balance assertions
-        # The Balance assertion occurs at the beginning of the date, so move
-        # it to the following day.
         try:
             # date = self.ofx_account.statement.end_date.date() # this is the date of ofx download
-
-            # we find the last transaction's date. If we use the ofx download date, we could end up with a gap
-            # in time between the last transaction's date and balance assertion. Pending (but not yet
-            # downloaded) transactions in this gap will get downloaded the next time we do a download in the
-            # future, and cause the balance assertions to be invalid.
+            # we find the last transaction's date. If we use the ofx download date (if our source is ofx), we
+            # could end up with a gap in time between the last transaction's date and balance assertion.
+            # Pending (but not yet downloaded) transactions in this gap will get downloaded the next time we
+            # do a download in the future, and cause the balance assertions to be invalid.
             date = max(ot.tradeDate if hasattr(ot, 'tradeDate') else ot.date
                        for ot in self.get_transactions()).date()
         except Exception as err:
             print("ERROR: no end_date. SKIPPING input.")
             traceback.print_tb(err.__traceback__)
             return []
+        # balance assertions are evaluated at the beginning of the date, so move it to the following day
         date += datetime.timedelta(days=1)
+
         settlement_fund_balance = 0
         for pos in self.get_balance_positions():
             ticker, ticker_long_name = self.get_ticker_info(pos.security)
@@ -246,7 +244,7 @@ class Importer(importer.ImporterProtocol):
         # settlement fund.
         #
         # available cash combines settlement fund and trade date balance
-        balance = self.ofx_account.statement.available_cash - settlement_fund_balance
+        balance = self.get_available_cash() - settlement_fund_balance
         meta = data.new_metadata(file.name, next(counter))
         balance_entry = data.Balance(meta, date, self.config['main_account'],
                                      amount.Amount(balance, self.currency),
