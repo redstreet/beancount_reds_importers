@@ -23,8 +23,10 @@ class Importer(importer.ImporterProtocol):
                 # account identifying info fieldname varies across institutions
                 if getattr(acc, self.account_number_field) == self.config['account_number']:
                     self.ofx_account = acc
-            if self.ofx_account is not None:
+                    self.reader_ready = True
+            if self.reader_ready:
                 self.currency = self.ofx_account.statement.currency.upper()
+                self.includes_balances = True
             self.initialized_reader = True
 
     def identify(self, file):
@@ -50,3 +52,7 @@ class Importer(importer.ImporterProtocol):
     def get_transactions(self):
         for ot in self.ofx_account.statement.transactions:
             yield ot
+
+    def get_balance_positions(self):
+        for pos in self.ofx_account.statement.positions:
+            yield pos

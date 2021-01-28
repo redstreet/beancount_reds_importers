@@ -1,4 +1,5 @@
-"""Generic investment ofx importer for beancount."""
+"""Generic investment importer module for beancount. Needs a reader module (eg: ofx, csv, etc.) from
+beancount_reads_importers to work."""
 
 import datetime
 import itertools
@@ -16,7 +17,9 @@ class Importer(importer.ImporterProtocol):
         self.config = config
         self.initialized = False
         self.initialized_reader = False
+        self.reader_ready = False
         self.custom_init_run = False
+        self.includes_balances = False
         # REQUIRED_CONFIG = {
         #     'account_number'   : 'account number',
         #     'main_account'     : 'Destination account of import',
@@ -32,7 +35,7 @@ class Importer(importer.ImporterProtocol):
         if not self.initialized:
             self.custom_init()
             self.initialize_reader(file)
-            if self.ofx_account is not None:
+            if self.reader_ready:
                 self.money_market_funds = self.config['fund_info']['money_market']
                 self.fund_data = self.config['fund_info']['fund_data'] # [(ticker, id, long_name), ...]
                 self.funds_by_id = {i: (ticker, desc) for ticker, i, desc in self.fund_data}
@@ -88,25 +91,10 @@ class Importer(importer.ImporterProtocol):
 
     # --------------------------------------------------------------------------------
 
-    def extract(self, file):
-        config = self.config
-        # Example:
-        # {'type': 'buymf',
-        # 'tradeDate': datetime.datetime(2018, 6, 25, 19, 0),
-        # 'settleDate': datetime.datetime(2018, 6, 25, 19, 0),
-        # 'memo': 'MONEY FUND PURCHASE',
-        # 'security': 'XXYYYZZ',
-        # 'income_type': '', ('', None, DIV)
-        # 'units': Decimal('2345.67'),
-        # 'unit_price': Decimal('1.0'),
-        # 'commission': Decimal('0'),
-        # 'fees': Decimal('0'),
-        # 'total': Decimal('-2345.67'),
-        # 'tferaction': None, 'id': '10293842'}
-
-        new_entries = []
-        self.initialize(file)
+    def extract_transactions(self, file):
         counter = itertools.count()
+        new_entries = []
+        config = self.config
         for ot in self.get_transactions():
             if ot.type in ['buymf', 'sellmf', 'buystock', 'sellstock', 'reinvest', 'income']:
                 # Build metadata
@@ -199,7 +187,31 @@ class Importer(importer.ImporterProtocol):
                     data.create_simple_posting(entry, config['fees'], ot.fees, self.currency)
                 if ot.commission != 0:
                     data.create_simple_posting(entry, config['fees'], ot.commission, self.currency)
+
             new_entries.append(entry)
+        return new_entries
+
+
+    def extract(self, file):
+        # Example:
+        # {'type': 'buymf',
+        # 'tradeDate': datetime.datetime(2018, 6, 25, 19, 0),
+        # 'settleDate': datetime.datetime(2018, 6, 25, 19, 0),
+        # 'memo': 'MONEY FUND PURCHASE',
+        # 'security': 'XXYYYZZ',
+        # 'income_type': '', ('', None, DIV)
+        # 'units': Decimal('2345.67'),
+        # 'unit_price': Decimal('1.0'),
+        # 'commission': Decimal('0'),
+        # 'fees': Decimal('0'),
+        # 'total': Decimal('-2345.67'),
+        # 'tferaction': None, 'id': '10293842'}
+
+        self.initialize(file)
+        new_entries = []
+        new_entries += self.extract_transactions(file)
+        counter = itertools.count(len(new_entries))
+
 
         # balance assertions
         # The Balance assertion occurs at the beginning of the date, so move
@@ -219,7 +231,7 @@ class Importer(importer.ImporterProtocol):
             return []
         date += datetime.timedelta(days=1)
         settlement_fund_balance = 0
-        for pos in self.ofx_account.statement.positions:
+        for pos in self.get_balance_positions():
             ticker, ticker_long_name = self.get_ticker_info(pos.security)
             meta = data.new_metadata(file.name, next(counter))
             balance_entry = data.Balance(meta, date, self.config['main_account'],
