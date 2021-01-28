@@ -92,19 +92,21 @@ class Importer(importer.ImporterProtocol):
     # --------------------------------------------------------------------------------
 
     def extract_transactions(self, file, counter):
-        # Example:
-        # {'type': 'buymf',
+        # Required transaction fields:
+        # 'type': 'buymf',
         # 'tradeDate': datetime.datetime(2018, 6, 25, 19, 0),
-        # 'settleDate': datetime.datetime(2018, 6, 25, 19, 0),
+        # 'date': datetime.datetime(2018, 6, 25, 19, 0),
         # 'memo': 'MONEY FUND PURCHASE',
         # 'security': 'XXYYYZZ',
-        # 'income_type': '', ('', None, DIV)
         # 'units': Decimal('2345.67'),
         # 'unit_price': Decimal('1.0'),
+
+        # Optional transaction fields:
+        # 'settleDate': datetime.datetime(2018, 6, 25, 19, 0),
         # 'commission': Decimal('0'),
         # 'fees': Decimal('0'),
-        # 'total': Decimal('-2345.67'),
-        # 'tferaction': None, 'id': '10293842'}
+        # 'total': Decimal('-2345.67')
+
         new_entries = []
         config = self.config
         for ot in self.get_transactions():
@@ -113,7 +115,7 @@ class Importer(importer.ImporterProtocol):
                 ticker, ticker_long_name = self.get_ticker_info(ot.security)
                 is_money_market = ticker in self.money_market_funds
                 metadata = data.new_metadata(file.name, next(counter))
-                if ot.settleDate is not None:
+                if getattr(ot, 'settleDate', None) is not None:
                     metadata['settlement_date'] = str(ot.settleDate.date())
                 # Optional metadata, useful for debugging
                 # metadata['type'] = ot.type
@@ -195,9 +197,9 @@ class Importer(importer.ImporterProtocol):
                 raise Exception('Unknown entry type')
 
             if hasattr(ot, 'fees') or hasattr(ot, 'commission'):
-                if ot.fees != 0:
+                if getattr(ot, 'fees', 0) != 0:
                     data.create_simple_posting(entry, config['fees'], ot.fees, self.currency)
-                if ot.commission != 0:
+                if getattr(ot, 'commission', 0) != 0:
                     data.create_simple_posting(entry, config['fees'], ot.commission, self.currency)
 
             new_entries.append(entry)
