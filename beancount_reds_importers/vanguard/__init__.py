@@ -3,9 +3,11 @@
 import sys
 import ntpath
 import beancount_reds_importers.libimport.investments
+import beancount_reds_importers.libimport.ofx
 
 
-class Importer(beancount_reds_importers.libimport.investments.Importer):
+class Importer(beancount_reds_importers.libimport.investments.Importer,
+        beancount_reds_importers.libimport.ofx.Importer):
     def custom_init(self):
         self.max_rounding_error = 0.04
         self.account_number_field = 'number'

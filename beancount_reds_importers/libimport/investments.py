@@ -5,7 +5,6 @@ import itertools
 import ntpath
 import sys
 import traceback
-from ofxparse import OfxParser
 from beancount.core import data
 from beancount.core import amount
 from beancount.ingest import importer
@@ -16,6 +15,7 @@ class Importer(importer.ImporterProtocol):
     def __init__(self, config):
         self.config = config
         self.initialized = False
+        self.initialized_reader = False
         self.custom_init_run = False
         # REQUIRED_CONFIG = {
         #     'account_number'   : 'account number',
@@ -31,18 +31,12 @@ class Importer(importer.ImporterProtocol):
     def initialize(self, file):
         if not self.initialized:
             self.custom_init()
-            self.ofx = OfxParser.parse(open(file.name))
-            self.ofx_account = None
-            for acc in self.ofx.accounts:
-                # account identifying info fieldname varies across institutions
-                if getattr(acc, self.account_number_field) == self.config['account_number']:
-                    self.ofx_account = acc
+            self.initialize_reader(file)
             if self.ofx_account is not None:
                 self.money_market_funds = self.config['fund_info']['money_market']
-                self.currency = self.ofx_account.statement.currency.upper()
                 self.fund_data = self.config['fund_info']['fund_data'] # [(ticker, id, long_name), ...]
                 self.funds_by_id = {i: (ticker, desc) for ticker, i, desc in self.fund_data}
-                self.build_account_map()
+                self.build_account_map() #TODO: avoid for identify()
             self.initialized = True
 
     def build_account_map(self):
@@ -68,26 +62,6 @@ class Importer(importer.ImporterProtocol):
             self.filename_identifier_substring = 'bank_specific_filename.qfx'
             self.custom_init_run = True
 
-    def identify(self, file):
-        # quick check to filter out files that are not qfx/ofx
-        if not file.name.endswith('fx'):
-            return False
-        self.custom_init()
-        if self.filename_identifier_substring not in file.name:
-            return False
-        self.initialize(file)
-        return self.ofx_account is not None
-
-    def file_name(self, file):
-        return 'account-{}'.format(ntpath.basename(file.name))
-
-    def file_account(self, _):
-        return self.config['main_account']
-
-    def file_date(self, file):
-        "Get the maximum date from the file."
-        self.ofx_account.statement.end_date
-
     def get_ticker_info(self, security_id):
         return security_id, 'UNKNOWN'
 
@@ -107,7 +81,7 @@ class Importer(importer.ImporterProtocol):
 
     def get_security_list(self):
         tickers = set()
-        for ot in self.ofx_account.statement.transactions:
+        for ot in self.get_transactions():
             if ot.type in ['buymf', 'sellmf', 'buystock', 'sellstock', 'reinvest', 'income']:
                 tickers.add(ot.security)
         return tickers
@@ -133,7 +107,7 @@ class Importer(importer.ImporterProtocol):
         new_entries = []
         self.initialize(file)
         counter = itertools.count()
-        for ot in self.ofx_account.statement.transactions:
+        for ot in self.get_transactions():
             if ot.type in ['buymf', 'sellmf', 'buystock', 'sellstock', 'reinvest', 'income']:
                 # Build metadata
                 ticker, ticker_long_name = self.get_ticker_info(ot.security)
@@ -238,7 +212,7 @@ class Importer(importer.ImporterProtocol):
             # downloaded) transactions in this gap will get downloaded the next time we do a download in the
             # future, and cause the balance assertions to be invalid.
             date = max(ot.tradeDate if hasattr(ot, 'tradeDate') else ot.date
-                       for ot in self.ofx_account.statement.transactions).date()
+                       for ot in self.get_transactions()).date()
         except Exception as err:
             print("ERROR: no end_date. SKIPPING input.")
             traceback.print_tb(err.__traceback__)
