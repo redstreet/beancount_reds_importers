@@ -91,8 +91,20 @@ class Importer(importer.ImporterProtocol):
 
     # --------------------------------------------------------------------------------
 
-    def extract_transactions(self, file):
-        counter = itertools.count()
+    def extract_transactions(self, file, counter):
+        # Example:
+        # {'type': 'buymf',
+        # 'tradeDate': datetime.datetime(2018, 6, 25, 19, 0),
+        # 'settleDate': datetime.datetime(2018, 6, 25, 19, 0),
+        # 'memo': 'MONEY FUND PURCHASE',
+        # 'security': 'XXYYYZZ',
+        # 'income_type': '', ('', None, DIV)
+        # 'units': Decimal('2345.67'),
+        # 'unit_price': Decimal('1.0'),
+        # 'commission': Decimal('0'),
+        # 'fees': Decimal('0'),
+        # 'total': Decimal('-2345.67'),
+        # 'tferaction': None, 'id': '10293842'}
         new_entries = []
         config = self.config
         for ot in self.get_transactions():
@@ -191,28 +203,8 @@ class Importer(importer.ImporterProtocol):
             new_entries.append(entry)
         return new_entries
 
-
-    def extract(self, file):
-        # Example:
-        # {'type': 'buymf',
-        # 'tradeDate': datetime.datetime(2018, 6, 25, 19, 0),
-        # 'settleDate': datetime.datetime(2018, 6, 25, 19, 0),
-        # 'memo': 'MONEY FUND PURCHASE',
-        # 'security': 'XXYYYZZ',
-        # 'income_type': '', ('', None, DIV)
-        # 'units': Decimal('2345.67'),
-        # 'unit_price': Decimal('1.0'),
-        # 'commission': Decimal('0'),
-        # 'fees': Decimal('0'),
-        # 'total': Decimal('-2345.67'),
-        # 'tferaction': None, 'id': '10293842'}
-
-        self.initialize(file)
+    def extract_balances_and_prices(self, file, counter):
         new_entries = []
-        new_entries += self.extract_transactions(file)
-        counter = itertools.count(len(new_entries))
-
-
         # balance assertions
         # The Balance assertion occurs at the beginning of the date, so move
         # it to the following day.
@@ -261,9 +253,15 @@ class Importer(importer.ImporterProtocol):
                                      None, None)
         new_entries.append(balance_entry)
 
-        return(new_entries)
+        return new_entries
 
-# TODO
-# -----------------------------------------------------------------------------------------------------------
-# Feature improvements:
-# - CG: book gains and losses to separate accounts, and short-term/long-term to separate accounts
+    def extract(self, file):
+        self.initialize(file)
+        counter = itertools.count()
+        new_entries = []
+
+        new_entries += self.extract_transactions(file, counter)
+        if self.includes_balances:
+            new_entries += self.extract_balances_and_prices(file, counter)
+
+        return(new_entries)
