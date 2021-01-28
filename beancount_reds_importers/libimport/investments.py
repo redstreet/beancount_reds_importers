@@ -90,6 +90,93 @@ class Importer(importer.ImporterProtocol):
         return tickers
 
     # --------------------------------------------------------------------------------
+    def generate_trade_entry(self, ot, file, counter):
+        """ One of: ['buymf', 'sellmf', 'buystock', 'sellstock', 'reinvest', 'income']"""
+        config = self.config
+        # Build metadata
+        ticker, ticker_long_name = self.get_ticker_info(ot.security)
+        is_money_market = ticker in self.money_market_funds
+        metadata = data.new_metadata(file.name, next(counter))
+        if getattr(ot, 'settleDate', None) is not None:
+            metadata['settlement_date'] = str(ot.settleDate.date())
+        # Optional metadata, useful for debugging
+        # metadata['type'] = ot.type
+
+        if 'sell' in ot.type and not is_money_market:
+            metadata['todo'] = 'TODO: this entry is incomplete until lots are selected (bean-doctor context <filename> <lineno>)'
+        if 'sell' in ot.type:
+            ot.units = -1 * abs(ot.units)
+        if ot.type in ['reinvest', 'dividends']:
+            ot.total = -1 * abs(ot.total)
+        description = '[' + ticker + '] ' + ticker_long_name
+        target_acct = self.get_target_acct(ot)
+
+        # Build transaction entry
+        entry = data.Transaction(metadata, ot.tradeDate.date(), self.FLAG,
+                                 ot.memo, description, data.EMPTY_SET, data.EMPTY_SET, [])
+
+        # Build postings
+        if ot.type == 'income':  # cash
+            data.create_simple_posting(entry, config['main_account'], ot.total, self.currency)
+            data.create_simple_posting(entry, target_acct, -1 * ot.total, self.currency)
+        else:  # stock/fund
+            if is_money_market:
+                common.create_simple_posting_with_price(entry, config['main_account'],
+                                                        ot.units, ticker, ot.unit_price, self.currency)
+            elif 'sell' in ot.type:
+                common.create_simple_posting_with_cost_or_price(entry, config['main_account'],
+                                                                ot.units, ticker, price_number=ot.unit_price,
+                                                                price_currency=self.currency,
+                                                                costspec=CostSpec(None, None, None, None, None, None))
+                data.create_simple_posting(
+                    entry, self.config['cg'], None, None)
+            else:  # buy stock/fund
+                common.create_simple_posting_with_cost(entry, config['main_account'],
+                        ot.units, ticker, ot.unit_price, self.currency)
+
+            # TODO: resolve/remove this ugly hack
+            reverser = 1
+            if ot.units > 0 and ot.total > 0: #hack for some brokerages which have incorrect number signs
+                reverser = -1
+            data.create_simple_posting(entry, target_acct, reverser * ot.total, self.currency)
+
+            # Rounding errors
+            rounding_error = (reverser * ot.total) +  (ot.unit_price * ot.units)
+            if 0.0005 <= abs(rounding_error) <= self.max_rounding_error:
+                data.create_simple_posting(
+                    entry, config['rounding_error'], -1 * rounding_error, 'USD')
+            # if abs(rounding_error) > self.max_rounding_error:
+            #     print("Transactions legs do not sum up! Difference: {}. Entry: {}, ot: {}".format(
+            #         rounding_error, entry, ot))
+
+        return entry
+
+    def generate_transfer_entry(self, ot, file, counter):
+        """ Cash or in-kind transfers. One of: ['other', 'credit', 'debit', 'transfer', 'dep']"""
+        config = self.config
+        # Build metadata
+        metadata = data.new_metadata(file.name, next(counter))
+        target_acct = self.get_target_acct(ot)
+
+        if ot.type == 'transfer':  # in-kind transfer
+            ticker, ticker_long_name = self.get_ticker_info(ot.security)
+            description = '[' + ticker + '] ' + ticker_long_name
+            date = ot.tradeDate.date()
+            units = ot.units
+        else:  # cash transfer
+            description = ot.type
+            date = ot.date.date()
+            units = ot.amount
+            ticker = self.currency
+
+        # Build transaction entry
+        entry = data.Transaction(metadata, date, self.FLAG,
+                                 ot.memo, description, data.EMPTY_SET, data.EMPTY_SET, [])
+
+        # Build postings
+        data.create_simple_posting(entry, config['main_account'], units, ticker)
+        data.create_simple_posting(entry, target_acct, -1*units, ticker)
+        return entry
 
     def extract_transactions(self, file, counter):
         # Required transaction fields:
@@ -108,100 +195,15 @@ class Importer(importer.ImporterProtocol):
         # 'total': Decimal('-2345.67')
 
         new_entries = []
-        config = self.config
         for ot in self.get_transactions():
             if ot.type in ['buymf', 'sellmf', 'buystock', 'sellstock', 'reinvest', 'income']:
-                # Build metadata
-                ticker, ticker_long_name = self.get_ticker_info(ot.security)
-                is_money_market = ticker in self.money_market_funds
-                metadata = data.new_metadata(file.name, next(counter))
-                if getattr(ot, 'settleDate', None) is not None:
-                    metadata['settlement_date'] = str(ot.settleDate.date())
-                # Optional metadata, useful for debugging
-                # metadata['type'] = ot.type
-
-                if 'sell' in ot.type and not is_money_market:
-                    metadata['todo'] = 'TODO: this entry is incomplete until lots are selected (bean-doctor context <filename> <lineno>)'
-                if 'sell' in ot.type:
-                    ot.units = -1 * abs(ot.units)
-                if ot.type in ['reinvest', 'dividends']:
-                    ot.total = -1 * abs(ot.total)
-                description = '[' + ticker + '] ' + ticker_long_name
-                target_acct = self.get_target_acct(ot)
-
-                # Build transaction entry
-                entry = data.Transaction(metadata, ot.tradeDate.date(), self.FLAG,
-                                         ot.memo, description, data.EMPTY_SET, data.EMPTY_SET, [])
-
-                # Build postings
-                if ot.type == 'income':  # cash
-                    data.create_simple_posting(entry, config['main_account'], ot.total, self.currency)
-                    data.create_simple_posting(entry, target_acct, -1 * ot.total, self.currency)
-                else:  # stock/fund
-                    if is_money_market:
-                        common.create_simple_posting_with_price(entry, config['main_account'],
-                                                                ot.units, ticker, ot.unit_price, self.currency)
-                    elif 'sell' in ot.type:
-                        common.create_simple_posting_with_cost_or_price(entry, config['main_account'],
-                                                                        ot.units, ticker, price_number=ot.unit_price,
-                                                                        price_currency=self.currency,
-                                                                        costspec=CostSpec(None, None, None, None, None, None))
-                        data.create_simple_posting(
-                            entry, self.config['cg'], None, None)
-                    else:  # buy stock/fund
-                        common.create_simple_posting_with_cost(entry, config['main_account'],
-                                ot.units, ticker, ot.unit_price, self.currency)
-
-                    # TODO: resolve/remove this ugly hack
-                    reverser = 1
-                    if ot.units > 0 and ot.total > 0: #hack for some brokerages which have incorrect number signs
-                        reverser = -1
-                    data.create_simple_posting(entry, target_acct, reverser * ot.total, self.currency)
-
-                    # Rounding errors
-                    rounding_error = (reverser * ot.total) +  (ot.unit_price * ot.units)
-                    if 0.0005 <= abs(rounding_error) <= self.max_rounding_error:
-                        data.create_simple_posting(
-                            entry, config['rounding_error'], -1 * rounding_error, 'USD')
-                    # if abs(rounding_error) > self.max_rounding_error:
-                    #     print("Transactions legs do not sum up! Difference: {}. Entry: {}, ot: {}".format(
-                    #         rounding_error, entry, ot))
-
-            # cash or in-kind transfers
+                entry = self.generate_trade_entry(ot, file, counter)
             elif ot.type in ['other', 'credit', 'debit', 'transfer', 'dep']:
-                # Build metadata
-                metadata = data.new_metadata(file.name, next(counter))
-                target_acct = self.get_target_acct(ot)
-
-                if ot.type == 'transfer':  # in-kind transfer
-                    ticker, ticker_long_name = self.get_ticker_info(ot.security)
-                    description = '[' + ticker + '] ' + ticker_long_name
-                    date = ot.tradeDate.date()
-                    units = ot.units
-                else:  # cash transfer
-                    description = ot.type
-                    date = ot.date.date()
-                    units = ot.amount
-                    ticker = self.currency
-
-                # Build transaction entry
-                entry = data.Transaction(metadata, date, self.FLAG,
-                                         ot.memo, description, data.EMPTY_SET, data.EMPTY_SET, [])
-
-                # Build postings
-                data.create_simple_posting(entry, config['main_account'], units, ticker)
-                data.create_simple_posting(entry, target_acct, -1*units, ticker)
-
+                entry = self.generate_transfer_entry(ot, file, counter)
             else:
                 print("ERROR: unknown entry type:", ot.type)
                 raise Exception('Unknown entry type')
-
-            if hasattr(ot, 'fees') or hasattr(ot, 'commission'):
-                if getattr(ot, 'fees', 0) != 0:
-                    data.create_simple_posting(entry, config['fees'], ot.fees, self.currency)
-                if getattr(ot, 'commission', 0) != 0:
-                    data.create_simple_posting(entry, config['fees'], ot.commission, self.currency)
-
+            self.add_fee_postings(entry, ot)
             new_entries.append(entry)
         return new_entries
 
@@ -252,8 +254,15 @@ class Importer(importer.ImporterProtocol):
                                      amount.Amount(balance, self.currency),
                                      None, None)
         new_entries.append(balance_entry)
-
         return new_entries
+
+    def add_fee_postings(self, entry, ot):
+        config = self.config
+        if hasattr(ot, 'fees') or hasattr(ot, 'commission'):
+            if getattr(ot, 'fees', 0) != 0:
+                data.create_simple_posting(entry, config['fees'], ot.fees, self.currency)
+            if getattr(ot, 'commission', 0) != 0:
+                data.create_simple_posting(entry, config['fees'], ot.commission, self.currency)
 
     def extract(self, file):
         self.initialize(file)
