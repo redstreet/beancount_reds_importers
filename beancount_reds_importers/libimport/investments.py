@@ -169,7 +169,7 @@ class Importer(importer.ImporterProtocol):
         return entry
 
     def generate_transfer_entry(self, ot, file, counter):
-        """ Cash or in-kind transfers. One of: ['other', 'credit', 'debit', 'transfer', 'dep', 'income', 'dividends']"""
+        """ Cash or in-kind transfers. One of: [credit, debit, dep, transfer, income, dividends, other]"""
         config = self.config
         # Build metadata
         metadata = data.new_metadata(file.name, next(counter))
@@ -182,7 +182,7 @@ class Importer(importer.ImporterProtocol):
         try:
             if ot.type in ['transfer']:
                 units = ot.units
-            elif ot.type in ['other', 'credit', 'debit']:
+            elif ot.type in ['other', 'credit', 'debit', 'dep']:
                 units = ot.amount
             else:
                 units = ot.total
