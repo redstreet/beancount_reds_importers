@@ -7,6 +7,7 @@ from os import path
 sys.path.insert(0, path.join(path.dirname(__file__)))
 
 from beancount_reds_importers import vanguard
+from beancount_reds_importers import schwab_csv
 from fund_info import *
 
 # Setting this variable provides a list of importer instances.
@@ -33,6 +34,18 @@ CONFIG = [
         'dividends'      : 'Income:Dividends:RothIRA',
         'cg'             : 'Income:Capital-Gains:RothIRA',
         'fees'           : 'Expenses:Brokerage-Fees:RothIRA',
+        'rounding_error' : 'Equity:Rounding-Errors:Imports',
+        'fund_info'       : fund_info,
+    }),
+
+    schwab_csv.Importer({
+        'main_account'   : 'Assets:Investments:Schwab',
+        'account_number' : '18181',
+        'transfer'       : 'Assets:Zero-Sum-Accounts:Transfers:Bank-Account',
+        'dividends'      : 'Income:Dividends:Schwab',
+        'income'         : 'Income:Interest:Schwab',
+        'cg'             : 'Income:Capital-Gains:Schwab',
+        'fees'           : 'Expenses:Brokerage-Fees:Schwab',
         'rounding_error' : 'Equity:Rounding-Errors:Imports',
         'fund_info'       : fund_info,
     }),

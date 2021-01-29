@@ -6,6 +6,7 @@ import itertools
 import ntpath
 import sys
 import traceback
+from functools import partial
 from beancount.core import data
 from beancount.core import amount
 from beancount.ingest import importer
@@ -39,6 +40,8 @@ class Importer(importer.ImporterProtocol):
                 self.money_market_funds = self.config['fund_info']['money_market']
                 self.fund_data = self.config['fund_info']['fund_data'] # [(ticker, id, long_name), ...]
                 self.funds_by_id = {i: (ticker, desc) for ticker, i, desc in self.fund_data}
+                self.funds_by_ticker = {ticker: (ticker, desc) for ticker, _, desc in self.fund_data}
+                self.funds_db = getattr(self, self.funds_db_txt, 'funds_by_id')
                 self.build_account_map() #TODO: avoid for identify()
             self.initialized = True
 
@@ -50,7 +53,8 @@ class Importer(importer.ImporterProtocol):
             "buystock":  self.config['main_account'],
             "sellstock": self.config['main_account'],
             "reinvest":  self.config['dividends'],
-            "income":    self.config['dividends'],
+            "dividends": self.config['dividends'],
+            "income":    self.config['income'],
             "other":     self.config['transfer'],
             "credit":    self.config['transfer'],
             "debit":     self.config['transfer'],
@@ -70,10 +74,10 @@ class Importer(importer.ImporterProtocol):
 
     def get_ticker_info_from_id(self, security_id):
         try:
-            ticker, ticker_long_name = self.funds_by_id[security_id]
+            ticker, ticker_long_name = self.funds_db[security_id]
         except KeyError:
             securities = self.get_security_list()
-            securities_missing = [s for s in securities if s not in self.funds_by_id]
+            securities_missing = [s for s in securities if s not in self.funds_db]
             print(f"Error: fund info not found for: {securities_missing}", file=sys.stderr)
             import pdb; pdb.set_trace()
             sys.exit(1)
@@ -104,10 +108,12 @@ class Importer(importer.ImporterProtocol):
 
         if 'sell' in ot.type and not is_money_market:
             metadata['todo'] = 'TODO: this entry is incomplete until lots are selected (bean-doctor context <filename> <lineno>)'
+        units = ot.units
+        total = ot.total
         if 'sell' in ot.type:
-            ot.units = -1 * abs(ot.units)
+            units = -1 * abs(ot.units)
         if ot.type in ['reinvest', 'dividends']:
-            ot.total = -1 * abs(ot.total)
+            total = -1 * abs(ot.total)
         description = '[' + ticker + '] ' + ticker_long_name
         target_acct = self.get_target_acct(ot)
 
@@ -117,31 +123,31 @@ class Importer(importer.ImporterProtocol):
 
         # Build postings
         if ot.type == 'income':  # cash
-            data.create_simple_posting(entry, config['main_account'], ot.total, self.currency)
-            data.create_simple_posting(entry, target_acct, -1 * ot.total, self.currency)
+            data.create_simple_posting(entry, config['main_account'], total, self.currency)
+            data.create_simple_posting(entry, target_acct, -1 * total, self.currency)
         else:  # stock/fund
             if is_money_market:
                 common.create_simple_posting_with_price(entry, config['main_account'],
-                                                        ot.units, ticker, ot.unit_price, self.currency)
+                                                        units, ticker, ot.unit_price, self.currency)
             elif 'sell' in ot.type:
                 common.create_simple_posting_with_cost_or_price(entry, config['main_account'],
-                                                                ot.units, ticker, price_number=ot.unit_price,
+                                                                units, ticker, price_number=ot.unit_price,
                                                                 price_currency=self.currency,
                                                                 costspec=CostSpec(None, None, None, None, None, None))
                 data.create_simple_posting(
                     entry, self.config['cg'], None, None)
             else:  # buy stock/fund
                 common.create_simple_posting_with_cost(entry, config['main_account'],
-                        ot.units, ticker, ot.unit_price, self.currency)
+                        units, ticker, ot.unit_price, self.currency)
 
             # TODO: resolve/remove this ugly hack
             reverser = 1
-            if ot.units > 0 and ot.total > 0: #hack for some brokerages which have incorrect number signs
+            if units > 0 and total > 0: #hack for some brokerages which have incorrect number signs
                 reverser = -1
-            data.create_simple_posting(entry, target_acct, reverser * ot.total, self.currency)
+            data.create_simple_posting(entry, target_acct, reverser * total, self.currency)
 
             # Rounding errors
-            rounding_error = (reverser * ot.total) +  (ot.unit_price * ot.units)
+            rounding_error = (reverser * total) +  (ot.unit_price * units)
             if 0.0005 <= abs(rounding_error) <= self.max_rounding_error:
                 data.create_simple_posting(
                     entry, config['rounding_error'], -1 * rounding_error, 'USD')
@@ -152,13 +158,13 @@ class Importer(importer.ImporterProtocol):
         return entry
 
     def generate_transfer_entry(self, ot, file, counter):
-        """ Cash or in-kind transfers. One of: ['other', 'credit', 'debit', 'transfer', 'dep']"""
+        """ Cash or in-kind transfers. One of: ['other', 'credit', 'debit', 'transfer', 'dep', 'income', 'dividends']"""
         config = self.config
         # Build metadata
         metadata = data.new_metadata(file.name, next(counter))
         target_acct = self.get_target_acct(ot)
 
-        if ot.type == 'transfer':  # in-kind transfer
+        if ot.type == 'transfer' and ot.security:  # in-kind transfer
             ticker, ticker_long_name = self.get_ticker_info(ot.security)
             description = '[' + ticker + '] ' + ticker_long_name
             date = ot.tradeDate.date()
@@ -187,18 +193,19 @@ class Importer(importer.ImporterProtocol):
         # 'security': 'XXYYYZZ',
         # 'units': Decimal('2345.67'),
         # 'unit_price': Decimal('1.0'),
+        # 'total': Decimal('-2345.67')
 
         # Optional transaction fields:
         # 'settleDate': datetime.datetime(2018, 6, 25, 19, 0),
         # 'commission': Decimal('0'),
         # 'fees': Decimal('0'),
-        # 'total': Decimal('-2345.67')
 
         new_entries = []
+        self.read_file(file)
         for ot in self.get_transactions():
-            if ot.type in ['buymf', 'sellmf', 'buystock', 'sellstock', 'reinvest', 'income']:
+            if ot.type in ['buymf', 'sellmf', 'buystock', 'sellstock', 'reinvest']:
                 entry = self.generate_trade_entry(ot, file, counter)
-            elif ot.type in ['other', 'credit', 'debit', 'transfer', 'dep']:
+            elif ot.type in ['other', 'credit', 'debit', 'transfer', 'dep', 'income', 'dividends']:
                 entry = self.generate_transfer_entry(ot, file, counter)
             else:
                 print("ERROR: unknown entry type:", ot.type)
