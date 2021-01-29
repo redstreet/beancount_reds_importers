@@ -20,6 +20,7 @@ class Importer(importer.ImporterProtocol):
         self.reader_ready = False
         self.custom_init_run = False
         self.includes_balances = False
+        self.use_commodity_leaf = True
         # REQUIRED_CONFIG = {
         #     'account_number'   : 'account number',
         #     'main_account'     : 'Destination account of import',
@@ -93,6 +94,15 @@ class Importer(importer.ImporterProtocol):
                 tickers.add(ot.security)
         return tickers
 
+    def commodity_leaf(self, account, ticker):
+        if self.use_commodity_leaf:
+            return account + f':{ticker}'
+        else:
+            return account
+
+
+
+    # extract() and supporting methods
     # --------------------------------------------------------------------------------
     def generate_trade_entry(self, ot, file, counter):
         """ Involves a commodity. One of: ['buymf', 'sellmf', 'buystock', 'sellstock', 'reinvest']"""
@@ -116,7 +126,7 @@ class Importer(importer.ImporterProtocol):
         description = f'{ot.type}: [{ticker}] {ticker_long_name}'
         target_acct = self.get_target_acct(ot)
         if ot.type in ['reinvest']:
-            target_acct += f':{ticker}'
+            target_acct = self.commodity_leaf(target_acct, ticker)
         else:
             target_acct += f':{self.currency}'
 
@@ -125,7 +135,8 @@ class Importer(importer.ImporterProtocol):
                                  ot.memo, description, data.EMPTY_SET, data.EMPTY_SET, [])
 
         # Build postings
-        ticker_acct = f"{config['main_account']}:{ticker}"
+        ticker_acct = self.commodity_leaf(config['main_account'], ticker)
+
         if is_money_market:
             common.create_simple_posting_with_price(entry, ticker_acct,
                                                     units, ticker, ot.unit_price, self.currency)
@@ -174,7 +185,7 @@ class Importer(importer.ImporterProtocol):
             description = f'{ot.type}: [{ticker}] {ticker_long_name}'
             date = ot.date.date()
             units = ot.amount
-            target_acct += f':{ticker}'
+            target_acct = self.commodity_leaf(target_acct, ticker)
         else:  # cash transfer
             description = ot.type
             date = ot.date.date()
@@ -191,7 +202,8 @@ class Importer(importer.ImporterProtocol):
             data.create_simple_posting(entry, self.cash_account, ot.total, self.currency)
             data.create_simple_posting(entry, target_acct, -1 * ot.total, self.currency)
         else:
-            data.create_simple_posting(entry, config['main_account']+f':{ticker}', units, ticker)
+            ticker_acct = self.commodity_leaf(config['main_account'], ticker)
+            data.create_simple_posting(entry, ticker_acct, units, ticker)
             data.create_simple_posting(entry, target_acct, -1 * units, ticker)
         return entry
 
@@ -246,7 +258,7 @@ class Importer(importer.ImporterProtocol):
         for pos in self.get_balance_positions():
             ticker, ticker_long_name = self.get_ticker_info(pos.security)
             meta = data.new_metadata(file.name, next(counter))
-            balance_entry = data.Balance(meta, date, self.config['main_account']+f':{ticker}',
+            balance_entry = data.Balance(meta, date, self.commodity_leaf(config['main_account'], ticker),
                                          amount.Amount(pos.units, ticker),
                                          None, None)
             new_entries.append(balance_entry)
