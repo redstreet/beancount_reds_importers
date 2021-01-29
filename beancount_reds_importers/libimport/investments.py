@@ -125,10 +125,10 @@ class Importer(importer.ImporterProtocol):
             units = -1 * abs(ot.units)
         description = f'[{ticker}] {ticker_long_name}'
         target_acct = self.get_target_acct(ot)
-        if ot.type in ['reinvest']:
+        if ot.type in ['reinvest']: # dividends are booked to commodity_leaf. Eg: Income:Dividends:HOOLI
             target_acct = self.commodity_leaf(target_acct, ticker)
         else:
-            target_acct += f':{self.currency}'
+            target_acct = self.commodity_leaf(target_acct, self.currency)
 
         # Build transaction entry
         entry = data.Transaction(metadata, ot.tradeDate.date(), self.FLAG,
