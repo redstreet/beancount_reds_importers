@@ -189,7 +189,7 @@ class Importer(importer.ImporterProtocol):
         except:
             import pdb; pdb.set_trace()
 
-        if ot.type in ['income', 'dividends'] or (hasattr(ot, 'security') and ot.security):
+        if ot.type in ['income', 'dividends', 'transfer'] and (hasattr(ot, 'security') and ot.security):
             ticker, ticker_long_name = self.get_ticker_info(ot.security)
             description = f'[{ticker}] {ticker_long_name}'
             if ot.type in ['income', 'dividends']: # no need to do this for transfers
