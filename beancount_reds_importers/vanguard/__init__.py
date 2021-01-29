@@ -5,7 +5,6 @@ import ntpath
 import beancount_reds_importers.libimport.investments
 import beancount_reds_importers.libimport.ofxreader
 
-
 class Importer(beancount_reds_importers.libimport.investments.Importer,
         beancount_reds_importers.libimport.ofxreader.Importer):
     def custom_init(self):

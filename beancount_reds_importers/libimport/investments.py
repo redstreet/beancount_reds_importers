@@ -41,7 +41,7 @@ class Importer(importer.ImporterProtocol):
                 self.fund_data = self.config['fund_info']['fund_data'] # [(ticker, id, long_name), ...]
                 self.funds_by_id = {i: (ticker, desc) for ticker, i, desc in self.fund_data}
                 self.funds_by_ticker = {ticker: (ticker, desc) for ticker, _, desc in self.fund_data}
-                self.funds_db = getattr(self, self.funds_db_txt, 'funds_by_id')
+                self.funds_db = getattr(self, getattr(self, 'funds_db_txt', 'funds_by_id'))
                 self.build_account_map() #TODO: avoid for identify()
             self.initialized = True
 
@@ -174,24 +174,30 @@ class Importer(importer.ImporterProtocol):
         # Build metadata
         metadata = data.new_metadata(file.name, next(counter))
         target_acct = self.get_target_acct(ot)
+        date = getattr(ot, 'tradeDate', None)
+        if not date:
+            date = ot.date
+        date = date.date()
 
-        if ot.type == 'transfer' and ot.security:  # in-kind transfer
+        try:
+            if ot.type in ['transfer']:
+                units = ot.units
+            elif ot.type in ['other', 'credit', 'debit']:
+                units = ot.amount
+            else:
+                units = ot.total
+        except:
+            import pdb; pdb.set_trace()
+
+        if ot.type in ['income', 'dividends']:
             ticker, ticker_long_name = self.get_ticker_info(ot.security)
             description = f'{ot.type}: [{ticker}] {ticker_long_name}'
-            date = ot.tradeDate.date()
-            units = ot.units
-        elif ot.type in ['dividends']:
-            ticker, ticker_long_name = self.get_ticker_info(ot.security)
-            description = f'{ot.type}: [{ticker}] {ticker_long_name}'
-            date = ot.date.date()
-            units = ot.amount
+
+        if ot.type in ['dividends']:
             target_acct = self.commodity_leaf(target_acct, ticker)
         else:  # cash transfer
             description = ot.type
-            date = ot.date.date()
-            units = ot.amount
             ticker = self.currency
-
 
         # Build transaction entry
         entry = data.Transaction(metadata, date, self.FLAG,
@@ -258,7 +264,7 @@ class Importer(importer.ImporterProtocol):
         for pos in self.get_balance_positions():
             ticker, ticker_long_name = self.get_ticker_info(pos.security)
             meta = data.new_metadata(file.name, next(counter))
-            balance_entry = data.Balance(meta, date, self.commodity_leaf(config['main_account'], ticker),
+            balance_entry = data.Balance(meta, date, self.commodity_leaf(self.config['main_account'], ticker),
                                          amount.Amount(pos.units, ticker),
                                          None, None)
             new_entries.append(balance_entry)
