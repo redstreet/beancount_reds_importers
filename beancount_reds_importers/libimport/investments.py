@@ -121,9 +121,9 @@ class Importer(importer.ImporterProtocol):
             metadata['todo'] = 'TODO: this entry is incomplete until lots are selected (bean-doctor context <filename> <lineno>)'
         units = ot.units
         total = ot.total
-        if 'sell' in ot.type or ot.type in ['reinvest']:
+        if 'sell' in ot.type:
             units = -1 * abs(ot.units)
-        description = f'{ot.type}: [{ticker}] {ticker_long_name}'
+        description = f'[{ticker}] {ticker_long_name}'
         target_acct = self.get_target_acct(ot)
         if ot.type in ['reinvest']:
             target_acct = self.commodity_leaf(target_acct, ticker)
@@ -191,9 +191,7 @@ class Importer(importer.ImporterProtocol):
 
         if ot.type in ['income', 'dividends']:
             ticker, ticker_long_name = self.get_ticker_info(ot.security)
-            description = f'{ot.type}: [{ticker}] {ticker_long_name}'
-
-        if ot.type in ['dividends']:
+            description = f'[{ticker}] {ticker_long_name}'
             target_acct = self.commodity_leaf(target_acct, ticker)
         else:  # cash transfer
             description = ot.type
