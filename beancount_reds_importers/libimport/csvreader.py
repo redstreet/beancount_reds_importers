@@ -8,7 +8,7 @@ from beancount.core.number import D
 import petl as etl
 from beancount_reds_importers.libimport import reader
 
-# This csv importer uses petl to read a .csv into a table for maniupulation. The output of this reader is a list
+# This csv reader uses petl to read a .csv into a table for maniupulation. The output of this reader is a list
 # of namedtuples corresponding roughly to ofx transactions. The following steps achieve this. When writing
 # your own importer, you only should need to:
 # - override prepare_raw_columns()
@@ -16,6 +16,7 @@ from beancount_reds_importers.libimport import reader
 #       - header_map
 #       - transaction_type_map
 #       - skip_transaction_types
+# See the schwab_csv importer for an example
 #
 # The steps this importer follow are:
 # - read csv into petl table
