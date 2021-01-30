@@ -16,8 +16,5 @@ class Importer(beancount_reds_importers.libimport.investments.Importer,
     def file_name(self, file):
         return 'vanguard-all-{}'.format(ntpath.basename(file.name))
 
-    def get_target_acct(self, transaction):
-        m = transaction.memo
-        if 'DIVIDEND' in m:
-            return self.config['dividends']
+    def get_target_acct_custom(self, transaction):
         return self.target_account_map.get(transaction.type, None)

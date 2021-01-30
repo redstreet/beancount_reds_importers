@@ -84,8 +84,13 @@ class Importer(importer.ImporterProtocol):
             sys.exit(1)
         return ticker, ticker_long_name
 
-    def get_target_acct(self, transaction):
+    def get_target_acct_custom(self, transaction):
         return self.target_account_map.get(transaction.type, None)
+
+    def get_target_acct(self, transaction):
+        if transaction.type == 'income' and transaction.income_type == 'DIV':
+            return self.target_account_map.get('dividends', None)
+        return self.get_target_acct_custom(transaction)
 
     def get_security_list(self):
         tickers = set()
@@ -108,11 +113,12 @@ class Importer(importer.ImporterProtocol):
         """ Involves a commodity. One of: ['buymf', 'sellmf', 'buystock', 'sellstock', 'reinvest']"""
 
         config = self.config
-        # Build metadata
         ticker, ticker_long_name = self.get_ticker_info(ot.security)
         is_money_market = ticker in self.money_market_funds
+
+        # Build metadata
         metadata = data.new_metadata(file.name, next(counter))
-        if getattr(ot, 'settleDate', None) is not None:
+        if getattr(ot, 'settleDate', None) is not None and ot.settleDate != ot.tradeDate:
             metadata['settlement_date'] = str(ot.settleDate.date())
         # Optional metadata, useful for debugging
         # metadata['type'] = ot.type
@@ -187,6 +193,7 @@ class Importer(importer.ImporterProtocol):
             else:
                 units = ot.total
         except:
+            print("Could not determine field for transaction amount")
             import pdb; pdb.set_trace()
 
         if ot.type in ['income', 'dividends', 'transfer'] and (hasattr(ot, 'security') and ot.security):
@@ -283,12 +290,16 @@ class Importer(importer.ImporterProtocol):
         # settlement fund.
         #
         # available cash combines settlement fund and trade date balance
-        balance = self.get_available_cash() - settlement_fund_balance
-        meta = data.new_metadata(file.name, next(counter))
-        balance_entry = data.Balance(meta, date, self.cash_account,
-                                     amount.Amount(balance, self.currency),
-                                     None, None)
-        new_entries.append(balance_entry)
+        try:
+            balance = self.get_available_cash() - settlement_fund_balance
+            meta = data.new_metadata(file.name, next(counter))
+            balance_entry = data.Balance(meta, date, self.cash_account,
+                                         amount.Amount(balance, self.currency),
+                                         None, None)
+            new_entries.append(balance_entry)
+        except AttributeError:  # self.get_available_cash()
+            pass
+
         return new_entries
 
     def add_fee_postings(self, entry, ot):
