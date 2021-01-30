@@ -18,7 +18,7 @@ class Reader():
         return self.reader_ready
 
     def file_name(self, file):
-        return 'account-{}'.format(ntpath.basename(file.name))
+        return '{}'.format(ntpath.basename(file.name))
 
     def file_account(self, _):
         return self.config['main_account']

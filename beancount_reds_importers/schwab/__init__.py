@@ -11,5 +11,8 @@ class Importer(investments.Importer, ofxreader.Importer):
         self.filename_identifier_substring = 'schwab.ofx'
         self.get_ticker_info = self.get_ticker_info_from_id
 
-    def file_name(self, file):
-        return ntpath.basename(file.name)
+    # def get_ticker_info(self, security):
+    #     ticker = self.cusip_map[security]
+    #     ticker_long_name = self.inv_ticker_map[ticker]
+    #     return ticker, ticker_long_name
+
