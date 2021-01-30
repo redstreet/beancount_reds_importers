@@ -1,11 +1,9 @@
 """ Schwab csv importer."""
 
-import beancount_reds_importers.libimport.investments
-import beancount_reds_importers.libimport.csvreader
+from beancount_reds_importers.libimport import investments, csvreader
 
 
-class Importer(beancount_reds_importers.libimport.investments.Importer,
-               beancount_reds_importers.libimport.csvreader.Importer):
+class Importer(investments.Importer, csvreader.Importer):
     def custom_init(self):
         self.max_rounding_error = 0.04
         self.account_number_field = 'number'
