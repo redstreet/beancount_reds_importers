@@ -29,7 +29,8 @@ class Importer(importer.ImporterProtocol):
         #     'cg'               : 'Account to book capital gains/losses',
         #     'fees'             : 'Account to book fees to',
         #     'rounding_error'   : 'Account to book rounding errors to',
-        #     'fund_info '       : 'dictionary of fund info (by_id, money_market)'
+        #     'fund_info '       : 'dictionary of fund info (by_id, money_market)',
+        #     'commodity_leaf '  : True/False # uses Assets:Brokerage:HOOLI vs Assets:Brokerage
         # }
 
     def initialize(self, file):
@@ -46,7 +47,7 @@ class Importer(importer.ImporterProtocol):
             self.initialized = True
 
     def build_account_map(self):
-        # transaction types: {'buymf', 'sellmf', 'buystock', 'sellstock', 'other', 'reinvest', 'income'}
+        # map transaction types to target posting accounts
         self.target_account_map = {
             "buymf":     self.config['main_account'],
             "sellmf":    self.config['main_account'],
@@ -141,24 +142,24 @@ class Importer(importer.ImporterProtocol):
                                  ot.memo, description, data.EMPTY_SET, data.EMPTY_SET, [])
 
         # Main posting(s):
-        ticker_acct = self.commodity_leaf(config['main_account'], ticker)
+        main_acct = self.commodity_leaf(config['main_account'], ticker)
 
         if is_money_market: # Use price conversions instead of holding these at cost
-            common.create_simple_posting_with_price(entry, ticker_acct,
+            common.create_simple_posting_with_price(entry, main_acct,
                                                     units, ticker, ot.unit_price, self.currency)
         elif 'sell' in ot.type:
-            common.create_simple_posting_with_cost_or_price(entry, ticker_acct,
+            common.create_simple_posting_with_cost_or_price(entry, main_acct,
                                                             units, ticker, price_number=ot.unit_price,
                                                             price_currency=self.currency,
                                                             costspec=CostSpec(None, None, None, None, None, None))
             data.create_simple_posting(entry, self.config['cg'], None, None) # capital gains posting
         else:  # buy stock/fund
-            common.create_simple_posting_with_cost(entry, ticker_acct,
+            common.create_simple_posting_with_cost(entry, main_acct,
                     units, ticker, ot.unit_price, self.currency)
 
         # "Other" account posting
-        reverser = 1  # TODO: resolve/remove this ugly hack
-        if units > 0 and total > 0: #hack for some brokerages which have incorrect number signs
+        reverser = 1
+        if units > 0 and total > 0: # (ugly) hack for some brokerages with incorrect signs (TODO: remove)
             reverser = -1
         data.create_simple_posting(entry, target_acct, reverser * total, self.currency)
 
@@ -176,7 +177,6 @@ class Importer(importer.ImporterProtocol):
     def generate_transfer_entry(self, ot, file, counter):
         """ Cash or in-kind transfers. One of: [credit, debit, dep, transfer, income, dividends, other]"""
         config = self.config
-        # Build metadata
         metadata = data.new_metadata(file.name, next(counter))
         target_acct = self.get_target_acct(ot)
         date = getattr(ot, 'tradeDate', None)
@@ -199,7 +199,7 @@ class Importer(importer.ImporterProtocol):
             ticker, ticker_long_name = self.get_ticker_info(ot.security)
             description = f'[{ticker}] {ticker_long_name}'
             if ot.type in ['income', 'dividends']: # no need to do this for transfers
-                target_acct = self.commodity_leaf(target_acct, ticker)
+                target_acct = self.commodity_leaf(target_acct, ticker) # book to Income:Dividends:HOOLI
         else:  # cash transfer
             description = ot.type
             ticker = self.currency
@@ -213,13 +213,13 @@ class Importer(importer.ImporterProtocol):
             data.create_simple_posting(entry, self.cash_account, ot.total, self.currency)
             data.create_simple_posting(entry, target_acct, -1 * ot.total, self.currency)
         else:
-            ticker_acct = self.commodity_leaf(config['main_account'], ticker)
-            data.create_simple_posting(entry, ticker_acct, units, ticker)
+            main_acct = self.commodity_leaf(config['main_account'], ticker)
+            data.create_simple_posting(entry, main_acct, units, ticker)
             data.create_simple_posting(entry, target_acct, -1 * units, ticker)
         return entry
 
     def extract_transactions(self, file, counter):
-        # Required transaction fields:
+        # Required transaction fields: ({ofx, csv, ...}reader.py need to provide these fields)
         # 'type': 'buymf',
         # 'tradeDate': datetime.datetime(2018, 6, 25, 19, 0),
         # 'date': datetime.datetime(2018, 6, 25, 19, 0),
