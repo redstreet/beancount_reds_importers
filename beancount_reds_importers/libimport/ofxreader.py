@@ -1,12 +1,14 @@
 """Ofx importer module for beancount to be used along with investment/banking/other importer modules in
 beancount_reds_importers."""
 
-import ntpath
 from beancount.ingest import importer
 from ofxparse import OfxParser
+from beancount_reds_importers.libimport import reader
 
 
-class Importer(importer.ImporterProtocol):
+class Importer(reader.Reader, importer.ImporterProtocol):
+    FILE_EXT = 'fx'
+
     def initialize_reader(self, file):
         if not self.initialized_reader:
             self.ofx = OfxParser.parse(open(file.name))
@@ -25,22 +27,6 @@ class Importer(importer.ImporterProtocol):
     def match_account_number(self, file_account, config_account):
         """We don't want to store entire credit card numbers in our config, so just use the last 4"""
         return file_account == config_account
-
-    def identify(self, file):
-        # quick check to filter out files that are not qfx/ofx
-        if not file.name.lower().endswith('fx'):
-            return False
-        self.custom_init()
-        if self.filename_identifier_substring not in file.name:
-            return False
-        self.initialize_reader(file)
-        return self.reader_ready
-
-    def file_name(self, file):
-        return 'account-{}'.format(ntpath.basename(file.name))
-
-    def file_account(self, _):
-        return self.config['main_account']
 
     def file_date(self, file):
         "Get the maximum date from the file."

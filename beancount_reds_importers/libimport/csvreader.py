@@ -2,20 +2,18 @@
 beancount_reds_importers."""
 
 import datetime
-import ntpath
 import re
-from os import path
 from beancount.ingest import importer
 from beancount.core.number import D
 import petl as etl
 
 
 class Importer(importer.ImporterProtocol):
+    FILE_EXT = 'csv'
+
     def initialize_reader(self, file):
         if not self.initialized_reader:
-            # TODO: move to custom_init
-            self.header = '"Transactions  for account ' + self.config.get('custom_header', '')
-            self.reader_ready = re.match(self.header, file.head())
+            self.reader_ready = re.match(self.header_identifier, file.head())
             if self.reader_ready:
                 # TODO: move out elsewhere?
                 # self.currency = self.ofx_account.statement.currency.upper()
@@ -23,23 +21,6 @@ class Importer(importer.ImporterProtocol):
                 self.includes_balances = False
             self.initialized_reader = True
             self.file_read_done = False
-
-    # TODO: factor out into reader class
-    def identify(self, file):
-        # quick check to filter out files that are not the right format
-        if not file.name.lower().endswith('csv'):
-            return False
-        self.custom_init()
-        if self.filename_identifier_substring not in path.basename(file.name):
-            return False
-        self.initialize_reader(file)
-        return self.reader_ready
-
-    def file_name(self, file):
-        return 'account-{}'.format(ntpath.basename(file.name))
-
-    def file_account(self, _):
-        return self.config['main_account']
 
     def file_date(self, file):
         "Get the maximum date from the file."
