@@ -20,7 +20,7 @@ class Importer(importer.ImporterProtocol):
         self.reader_ready = False
         self.custom_init_run = False
         self.includes_balances = False
-        self.use_commodity_leaf = True
+        self.use_commodity_leaf = config.get('commodity_leaf', True)
         # REQUIRED_CONFIG = {
         #     'account_number'   : 'account number',
         #     'main_account'     : 'Destination account of import',
@@ -61,7 +61,7 @@ class Importer(importer.ImporterProtocol):
             "transfer":  self.config['transfer'],
             "dep":       self.config['transfer'],
         }
-        self.cash_account = f"{self.config['main_account']}:{self.currency}"
+        self.cash_account = self.commodity_leaf(self.config['main_account'], self.currency)
 
     def custom_init(self):
         if not self.custom_init_run:
@@ -120,17 +120,17 @@ class Importer(importer.ImporterProtocol):
         metadata = data.new_metadata(file.name, next(counter))
         if getattr(ot, 'settleDate', None) is not None and ot.settleDate != ot.tradeDate:
             metadata['settlement_date'] = str(ot.settleDate.date())
-        # Optional metadata, useful for debugging
-        # metadata['type'] = ot.type
 
-        if 'sell' in ot.type and not is_money_market:
-            metadata['todo'] = 'TODO: this entry is incomplete until lots are selected (bean-doctor context <filename> <lineno>)'
-        units = ot.units
-        total = ot.total
-        if 'sell' in ot.type:
-            units = -1 * abs(ot.units)
         description = f'[{ticker}] {ticker_long_name}'
         target_acct = self.get_target_acct(ot)
+        units = ot.units
+        total = ot.total
+
+        # special cases
+        if 'sell' in ot.type:
+            units = -1 * abs(ot.units)
+            if not is_money_market:
+                metadata['todo'] = 'TODO: this entry is incomplete until lots are selected (bean-doctor context <filename> <lineno>)'
         if ot.type in ['reinvest']: # dividends are booked to commodity_leaf. Eg: Income:Dividends:HOOLI
             target_acct = self.commodity_leaf(target_acct, ticker)
         else:
@@ -140,10 +140,10 @@ class Importer(importer.ImporterProtocol):
         entry = data.Transaction(metadata, ot.tradeDate.date(), self.FLAG,
                                  ot.memo, description, data.EMPTY_SET, data.EMPTY_SET, [])
 
-        # Build postings
+        # Main posting(s):
         ticker_acct = self.commodity_leaf(config['main_account'], ticker)
 
-        if is_money_market:
+        if is_money_market: # Use price conversions instead of holding these at cost
             common.create_simple_posting_with_price(entry, ticker_acct,
                                                     units, ticker, ot.unit_price, self.currency)
         elif 'sell' in ot.type:
@@ -151,19 +151,18 @@ class Importer(importer.ImporterProtocol):
                                                             units, ticker, price_number=ot.unit_price,
                                                             price_currency=self.currency,
                                                             costspec=CostSpec(None, None, None, None, None, None))
-            data.create_simple_posting(
-                entry, self.config['cg'], None, None)
+            data.create_simple_posting(entry, self.config['cg'], None, None) # capital gains posting
         else:  # buy stock/fund
             common.create_simple_posting_with_cost(entry, ticker_acct,
                     units, ticker, ot.unit_price, self.currency)
 
-        # TODO: resolve/remove this ugly hack
-        reverser = 1
+        # "Other" account posting
+        reverser = 1  # TODO: resolve/remove this ugly hack
         if units > 0 and total > 0: #hack for some brokerages which have incorrect number signs
             reverser = -1
         data.create_simple_posting(entry, target_acct, reverser * total, self.currency)
 
-        # Rounding errors
+        # Rounding errors posting
         rounding_error = (reverser * total) +  (ot.unit_price * units)
         if 0.0005 <= abs(rounding_error) <= self.max_rounding_error:
             data.create_simple_posting(
