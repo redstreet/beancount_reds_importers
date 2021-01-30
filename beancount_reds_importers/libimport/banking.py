@@ -8,6 +8,7 @@ from beancount.core import data
 from beancount.core import amount
 from beancount.ingest import importer
 
+
 class Importer(importer.ImporterProtocol):
     def __init__(self, config):
         self.config = config
@@ -53,7 +54,7 @@ class Importer(importer.ImporterProtocol):
         if not file.name.endswith('fx'):
             return False
         self.custom_init()
-        if not self.filename_identifier_substring in file.name:
+        if self.filename_identifier_substring not in file.name:
             return False
         self.initialize(file)
         return self.ofx_account is not None
@@ -87,7 +88,7 @@ class Importer(importer.ImporterProtocol):
 
             # Build transaction entry
             entry = data.Transaction(metadata, ot.date.date(), self.FLAG,
-                   None, ot.payee, data.EMPTY_SET, data.EMPTY_SET, [])
+                                     None, ot.payee, data.EMPTY_SET, data.EMPTY_SET, [])
             data.create_simple_posting(entry, config['main_account'], ot.amount, self.currency)
 
             # Commented out so smart_importer can fill this in
@@ -103,8 +104,8 @@ class Importer(importer.ImporterProtocol):
         date += datetime.timedelta(days=1)
         meta = data.new_metadata(file.name, next(counter))
         balance_entry = data.Balance(meta, date.date(), self.config['main_account'],
-                amount.Amount(self.ofx_account.statement.balance, self.currency),
-                None, None)
+                                     amount.Amount(self.ofx_account.statement.balance, self.currency),
+                                     None, None)
         new_entries.append(balance_entry)
 
         return(new_entries)

@@ -5,8 +5,8 @@ import ntpath
 from beancount.ingest import importer
 from ofxparse import OfxParser
 
-class Importer(importer.ImporterProtocol):
 
+class Importer(importer.ImporterProtocol):
     def initialize_reader(self, file):
         if not self.initialized_reader:
             self.ofx = OfxParser.parse(open(file.name))

@@ -3,7 +3,6 @@ beancount_reads_importers to work."""
 
 import datetime
 import itertools
-import ntpath
 import sys
 import traceback
 from beancount.core import data
@@ -11,6 +10,7 @@ from beancount.core import amount
 from beancount.ingest import importer
 from beancount.core.position import CostSpec
 from beancount_reds_importers.libimport import common
+
 
 class Importer(importer.ImporterProtocol):
     def __init__(self, config):
@@ -39,11 +39,11 @@ class Importer(importer.ImporterProtocol):
             self.initialize_reader(file)
             if self.reader_ready:
                 self.money_market_funds = self.config['fund_info']['money_market']
-                self.fund_data = self.config['fund_info']['fund_data'] # [(ticker, id, long_name), ...]
+                self.fund_data = self.config['fund_info']['fund_data']  # [(ticker, id, long_name), ...]
                 self.funds_by_id = {i: (ticker, desc) for ticker, i, desc in self.fund_data}
                 self.funds_by_ticker = {ticker: (ticker, desc) for ticker, _, desc in self.fund_data}
                 self.funds_db = getattr(self, getattr(self, 'funds_db_txt', 'funds_by_id'))
-                self.build_account_map() #TODO: avoid for identify()
+                self.build_account_map()  # TODO: avoid for identify()
             self.initialized = True
 
     def build_account_map(self):
@@ -106,10 +106,9 @@ class Importer(importer.ImporterProtocol):
         else:
             return account
 
-
-
     # extract() and supporting methods
     # --------------------------------------------------------------------------------
+
     def generate_trade_entry(self, ot, file, counter):
         """ Involves a commodity. One of: ['buymf', 'sellmf', 'buystock', 'sellstock', 'reinvest']"""
 
@@ -132,7 +131,7 @@ class Importer(importer.ImporterProtocol):
             units = -1 * abs(ot.units)
             if not is_money_market:
                 metadata['todo'] = 'TODO: this entry is incomplete until lots are selected (bean-doctor context <filename> <lineno>)'
-        if ot.type in ['reinvest']: # dividends are booked to commodity_leaf. Eg: Income:Dividends:HOOLI
+        if ot.type in ['reinvest']:  # dividends are booked to commodity_leaf. Eg: Income:Dividends:HOOLI
             target_acct = self.commodity_leaf(target_acct, ticker)
         else:
             target_acct = self.commodity_leaf(target_acct, self.currency)
@@ -144,7 +143,7 @@ class Importer(importer.ImporterProtocol):
         # Main posting(s):
         main_acct = self.commodity_leaf(config['main_account'], ticker)
 
-        if is_money_market: # Use price conversions instead of holding these at cost
+        if is_money_market:  # Use price conversions instead of holding these at cost
             common.create_simple_posting_with_price(entry, main_acct,
                                                     units, ticker, ot.unit_price, self.currency)
         elif 'sell' in ot.type:
@@ -152,19 +151,18 @@ class Importer(importer.ImporterProtocol):
                                                             units, ticker, price_number=ot.unit_price,
                                                             price_currency=self.currency,
                                                             costspec=CostSpec(None, None, None, None, None, None))
-            data.create_simple_posting(entry, self.config['cg'], None, None) # capital gains posting
+            data.create_simple_posting(entry, self.config['cg'], None, None)  # capital gains posting
         else:  # buy stock/fund
-            common.create_simple_posting_with_cost(entry, main_acct,
-                    units, ticker, ot.unit_price, self.currency)
+            common.create_simple_posting_with_cost(entry, main_acct, units, ticker, ot.unit_price, self.currency)
 
         # "Other" account posting
         reverser = 1
-        if units > 0 and total > 0: # (ugly) hack for some brokerages with incorrect signs (TODO: remove)
+        if units > 0 and total > 0:  # (ugly) hack for some brokerages with incorrect signs (TODO: remove)
             reverser = -1
         data.create_simple_posting(entry, target_acct, reverser * total, self.currency)
 
         # Rounding errors posting
-        rounding_error = (reverser * total) +  (ot.unit_price * units)
+        rounding_error = (reverser * total) + (ot.unit_price * units)
         if 0.0005 <= abs(rounding_error) <= self.max_rounding_error:
             data.create_simple_posting(
                 entry, config['rounding_error'], -1 * rounding_error, 'USD')
@@ -191,15 +189,15 @@ class Importer(importer.ImporterProtocol):
                 units = ot.amount
             else:
                 units = ot.total
-        except:
+        except AttributeError:
             print("Could not determine field for transaction amount")
             import pdb; pdb.set_trace()
 
         if ot.type in ['income', 'dividends', 'transfer'] and (hasattr(ot, 'security') and ot.security):
             ticker, ticker_long_name = self.get_ticker_info(ot.security)
             description = f'[{ticker}] {ticker_long_name}'
-            if ot.type in ['income', 'dividends']: # no need to do this for transfers
-                target_acct = self.commodity_leaf(target_acct, ticker) # book to Income:Dividends:HOOLI
+            if ot.type in ['income', 'dividends']:  # no need to do this for transfers
+                target_acct = self.commodity_leaf(target_acct, ticker)  # book to Income:Dividends:HOOLI
         else:  # cash transfer
             description = ot.type
             ticker = self.currency

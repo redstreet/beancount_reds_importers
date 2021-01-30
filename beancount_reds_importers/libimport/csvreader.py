@@ -9,8 +9,8 @@ from beancount.ingest import importer
 from beancount.core.number import D
 import petl as etl
 
-class Importer(importer.ImporterProtocol):
 
+class Importer(importer.ImporterProtocol):
     def initialize_reader(self, file):
         if not self.initialized_reader:
             # TODO: move to custom_init
@@ -19,7 +19,7 @@ class Importer(importer.ImporterProtocol):
             if self.reader_ready:
                 # TODO: move out elsewhere?
                 # self.currency = self.ofx_account.statement.currency.upper()
-                self.currency = 'USD' #TODO
+                self.currency = 'USD'  # TODO
                 self.includes_balances = False
             self.initialized_reader = True
             self.file_read_done = False
@@ -87,7 +87,6 @@ class Importer(importer.ImporterProtocol):
             self.file_read_done = True
 
     def get_transactions(self):
-        new_entries = []
         for ot in self.rdr.namedtuples():
             if self.skip_transaction(ot):
                 continue
@@ -102,4 +101,3 @@ class Importer(importer.ImporterProtocol):
     # TOOD: custom, overridable
     def skip_transaction(self, row):
         return row.type in self.skip_transaction_types
-
