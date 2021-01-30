@@ -13,13 +13,18 @@ class Importer(importer.ImporterProtocol):
             self.ofx_account = None
             for acc in self.ofx.accounts:
                 # account identifying info fieldname varies across institutions
-                if getattr(acc, self.account_number_field) == self.config['account_number']:
+                if self.match_account_number(getattr(acc, self.account_number_field),
+                                             self.config['account_number']):
                     self.ofx_account = acc
                     self.reader_ready = True
             if self.reader_ready:
                 self.currency = self.ofx_account.statement.currency.upper()
                 self.includes_balances = True
             self.initialized_reader = True
+
+    def match_account_number(self, file_account, config_account):
+        """We don't want to store entire credit card numbers in our config, so just use the last 4"""
+        return file_account == config_account
 
     def identify(self, file):
         # quick check to filter out files that are not qfx/ofx
