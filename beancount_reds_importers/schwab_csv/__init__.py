@@ -1,13 +1,11 @@
 """ Schwab csv importer."""
 
-import sys
-import ntpath
 import beancount_reds_importers.libimport.investments
 import beancount_reds_importers.libimport.csvreader
 
-class Importer(beancount_reds_importers.libimport.investments.Importer,
-        beancount_reds_importers.libimport.csvreader.Importer):
 
+class Importer(beancount_reds_importers.libimport.investments.Importer,
+               beancount_reds_importers.libimport.csvreader.Importer):
     def custom_init(self):
         self.max_rounding_error = 0.04
         self.account_number_field = 'number'
@@ -42,7 +40,7 @@ class Importer(beancount_reds_importers.libimport.investments.Importer,
         self.skip_transaction_types = ['Journal']
 
     def prepare_raw_columns(self, rdr):
-        rdr = rdr.cutout('') # clean up last column
+        rdr = rdr.cutout('')  # clean up last column
 
         def cleanup_date(d):
             """'11/16/2018 as of 11/15/2018' --> '11/16/2018'"""

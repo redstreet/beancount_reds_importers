@@ -6,9 +6,49 @@ import re
 from beancount.ingest import importer
 from beancount.core.number import D
 import petl as etl
+from beancount_reds_importers.libimport import reader
+
+# This csv importer uses petl to read a .csv into a table for maniupulation. The output of this reader is a list
+# of namedtuples corresponding roughly to ofx transactions. The following steps achieve this:
+#
+# - read csv into petl table
+# - skip header and footer rows (configurable)
+# - prepare_raw_columns: an overridable method to help get the raw table in shape. As an example, the schwab
+#   importer does the following
+#      - rdr.cutout('') # remove the last column, which is empty
+#      - for rows with interest, the date column contains text such as: '11/16/2018 as of 11/15/2018'. We
+#        convert these into a regular parseable date: '11/16/2018'
+#      - add a 'tradeDate' column, which is a copy of the 'Date' column, to correspond to the importer API
+#      - add a a 'total' column, which is a copy of the 'Amount' column, to correspond to the importer API
+# - rename columns: columns headers are renamed to standardize them to the importer API, using a supplied
+#   dictionary. For the included schwab importer, that looks like:
+#             "Action":      'type',
+#             "Date":        'date',
+#             "tradeDate":   'tradeDate',
+#             "Description": 'memo',
+#             "Symbol":      'security',
+#             etc.
+#
+# - convert_columns: this fixes up the actual data in each column. The base class does the following:
+#   - map types to standard types. The standard types that the importer-API uses are loosely based on ofx
+#     standards. For example, the schwab importer needs this mapping:
+#
+#         self.transaction_type_map = {
+#             'Bank Interest':      'income',
+#             'Buy':                'buystock',
+#             'Cash Dividend':      'dividends',
+#             'MoneyLink Transfer': 'transfer',
+#             'Reinvest Dividend':  'dividends',
+#             'Reinvest Shares':    'buystock',
+#             'Sell':               'sellstock',
+#             }
+#
+#   - numbers are parsed from string and convered into Decimal type. Non-numeric characters like '$' are removed.
+#   - dates are parsed and converted into datetime type.
+# - The table is now ready for use by the importer. petl makes each row available via namedtuples
 
 
-class Importer(importer.ImporterProtocol):
+class Importer(reader.Reader, importer.ImporterProtocol):
     FILE_EXT = 'csv'
 
     def initialize_reader(self, file):

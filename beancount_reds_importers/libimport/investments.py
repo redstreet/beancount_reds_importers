@@ -89,7 +89,7 @@ class Importer(importer.ImporterProtocol):
         return self.target_account_map.get(transaction.type, None)
 
     def get_target_acct(self, transaction):
-        if transaction.type == 'income' and transaction.income_type == 'DIV':
+        if transaction.type == 'income' and getattr(transaction, 'income_type', None) == 'DIV':
             return self.target_account_map.get('dividends', None)
         return self.get_target_acct_custom(transaction)
 
