@@ -1,0 +1,14 @@
+
+=================================
+beancount_reds_importers: CHANGES
+=================================
+
+2021-01-29
+
+ - added the commodity_leaf feature: by default, accounts will now include a commodity
+   as their leaf (eg: Assets:Investments:HOOLI). This is configurable. Simply pass in a
+   'commodity_leaf: False' in your importer config.
+
+ - the source reader (eg: ofx, csv, ...) has now been separated from the importer type
+   (eg: investment, banking, ...). This allows us easy combining of these.
+
