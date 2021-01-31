@@ -52,7 +52,7 @@ class Importer(investments.Importer, csv_multitable_reader.Importer):
     def prepare_tables(self):
         # first row has date
         d = self.raw_rdr[0][0].rsplit(' ', 1)[1]
-        self.date = datetime.datetime.strptime(d, '%m/%d/%Y')
+        self.date = datetime.datetime.strptime(d, self.date_format)
 
         for section, table in self.alltables.items():
             if section in self.config['section_headers']:
