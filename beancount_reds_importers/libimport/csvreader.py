@@ -130,3 +130,20 @@ class Importer(reader.Reader, importer.ImporterProtocol):
     # TOOD: custom, overridable
     def skip_transaction(self, row):
         return row.type in self.skip_transaction_types
+
+    def get_max_transaction_date(self):
+        try:
+            # date = self.ofx_account.statement.end_date.date() # this is the date of ofx download
+            # we find the last transaction's date. If we use the ofx download date (if our source is ofx), we
+            # could end up with a gap in time between the last transaction's date and balance assertion.
+            # Pending (but not yet downloaded) transactions in this gap will get downloaded the next time we
+            # do a download in the future, and cause the balance assertions to be invalid.
+
+            # TODO: clean this up. this probably suffices:
+            # return max(ot.date for ot in self.get_transactions()).date()
+            date = max(ot.tradeDate if hasattr(ot, 'tradeDate') else ot.date
+                       for ot in self.get_transactions()).date()
+        except Exception as err:
+            print("ERROR: no end_date. SKIPPING input.")
+            traceback.print_tb(err.__traceback__)
+            return False
