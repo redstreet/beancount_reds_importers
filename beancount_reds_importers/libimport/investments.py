@@ -4,7 +4,6 @@ beancount_reads_importers to work."""
 import datetime
 import itertools
 import sys
-import traceback
 from beancount.core import data
 from beancount.core import amount
 from beancount.ingest import importer
@@ -81,7 +80,7 @@ class Importer(importer.ImporterProtocol):
             securities = self.get_security_list()
             securities_missing = [s for s in securities if s not in self.funds_db]
             print(f"Error: fund info not found for: {securities_missing}", file=sys.stderr)
-            import pdb; pdb.set_trace()
+            # import pdb; pdb.set_trace()
             sys.exit(1)
         return ticker, ticker_long_name
 
@@ -130,7 +129,7 @@ class Importer(importer.ImporterProtocol):
         if 'sell' in ot.type:
             units = -1 * abs(ot.units)
             if not is_money_market:
-                metadata['todo'] = 'TODO: this entry is incomplete until lots are selected (bean-doctor context <filename> <lineno>)'
+                metadata['todo'] = 'TODO: this entry is incomplete until lots are selected (bean-doctor context <filename> <lineno>)'  # noqa: E501
         if ot.type in ['reinvest']:  # dividends are booked to commodity_leaf. Eg: Income:Dividends:HOOLI
             target_acct = self.commodity_leaf(target_acct, ticker)
         else:
@@ -191,7 +190,7 @@ class Importer(importer.ImporterProtocol):
                 units = ot.total
         except AttributeError:
             print("Could not determine field for transaction amount")
-            import pdb; pdb.set_trace()
+            # import pdb; pdb.set_trace()
 
         if ot.type in ['income', 'dividends', 'transfer'] and (hasattr(ot, 'security') and ot.security):
             ticker, ticker_long_name = self.get_ticker_info(ot.security)
@@ -283,7 +282,6 @@ class Importer(importer.ImporterProtocol):
             try:
                 balance = self.get_available_cash() - settlement_fund_balance
                 meta = data.new_metadata(file.name, next(counter))
-                import pdb; pdb.set_trace()
                 balance_entry = data.Balance(meta, date, self.cash_account,
                                              amount.Amount(balance, self.currency),
                                              None, None)

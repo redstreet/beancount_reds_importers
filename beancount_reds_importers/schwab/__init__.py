@@ -1,6 +1,5 @@
 """ Schwab Brokerage ofx importer."""
 
-import ntpath
 from beancount_reds_importers.libimport import investments, ofxreader
 
 
@@ -15,4 +14,3 @@ class Importer(investments.Importer, ofxreader.Importer):
     #     ticker = self.cusip_map[security]
     #     ticker_long_name = self.inv_ticker_map[ticker]
     #     return ticker, ticker_long_name
-

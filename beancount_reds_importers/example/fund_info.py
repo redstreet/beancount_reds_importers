@@ -15,6 +15,6 @@ fund_data = [
 money_market = ['VMFXX']
 
 fund_info = {
-        'fund_data' : fund_data,
-        'money_market' : money_market,
+        'fund_data': fund_data,
+        'money_market': money_market,
         }

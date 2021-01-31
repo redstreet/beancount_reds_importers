@@ -5,7 +5,6 @@ import re
 from beancount.core.number import D
 from beancount.core import data
 from beancount_reds_importers.libimport import banking, xlsx_multitable_reader
-from string import ascii_lowercase
 
 
 class Importer(banking.Importer, xlsx_multitable_reader.Importer):
@@ -68,7 +67,6 @@ class Importer(banking.Importer, xlsx_multitable_reader.Importer):
     def build_postings(self, entry):
         template = self.config['paycheck_template']
         currency = self.config['currency']
-        postings = []
         total = 0
 
         for section, table in self.alltables.items():
@@ -96,9 +94,8 @@ class Importer(banking.Importer, xlsx_multitable_reader.Importer):
 
         self.read_file(file)
         metadata = data.new_metadata(file.name, 0)
-        entry = data.Transaction(metadata, self.date.date(), self.FLAG, 
+        entry = data.Transaction(metadata, self.date.date(), self.FLAG,
                                  config['desc'], None, data.EMPTY_SET, data.EMPTY_SET, [])
 
         entry = self.build_postings(entry)
         return([entry])
-

@@ -1,10 +1,9 @@
 """csv importer module for beancount to be used along with investment/banking/other importer modules in
 beancount_reds_importers."""
 
-import datetime
-import re
 import petl as etl
 from beancount_reds_importers.libimport import csvreader
+
 
 class NotImplementedError(Exception):
     pass
@@ -54,7 +53,7 @@ class Importer(csvreader.Importer):
 
         # build the dictionary of tables
         self.alltables = {}
-        for (s,e) in table_indexes:
+        for (s, e) in table_indexes:
             if s == e:
                 continue
             table = rdr.skip(s+1)

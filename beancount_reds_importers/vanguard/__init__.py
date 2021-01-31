@@ -3,6 +3,7 @@
 import ntpath
 from beancount_reds_importers.libimport import investments, ofxreader
 
+
 class Importer(investments.Importer, ofxreader.Importer):
     def custom_init(self):
         self.max_rounding_error = 0.04

@@ -1,7 +1,7 @@
 """ TDAmeritrade ofx importer."""
 
-import ntpath
 from beancount_reds_importers.libimport import investments, ofxreader
+
 
 class Importer(investments.Importer, ofxreader.Importer):
     def custom_init(self):

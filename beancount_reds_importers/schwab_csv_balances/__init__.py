@@ -59,7 +59,7 @@ class Importer(investments.Importer, csv_multitable_reader.Importer):
                 table = table.rename(self.header_map)
                 table = self.convert_columns(table)
                 table = table.cut('memo', 'security', 'units', 'unit_price')
-                table = table.selectne('memo', '--') # we don't need total rows
+                table = table.selectne('memo', '--')  # we don't need total rows
                 table = table.addfield('date', self.date)
                 self.alltables[section] = table
 

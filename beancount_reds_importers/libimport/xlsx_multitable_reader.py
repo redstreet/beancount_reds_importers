@@ -1,14 +1,13 @@
 """csv importer module for beancount to be used along with investment/banking/other importer modules in
 beancount_reds_importers."""
 
-import datetime
-import re
 import petl as etl
 from io import StringIO
 import csv
 import openpyxl
 import warnings
 from beancount_reds_importers.libimport import csv_multitable_reader
+
 
 class NotImplementedError(Exception):
     pass
@@ -32,7 +31,6 @@ class Importer(csv_multitable_reader.Importer):
         in_memory_file = StringIO()
         csv_writer = csv.writer(in_memory_file)
 
-
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             wb = openpyxl.load_workbook(file.name)
@@ -49,4 +47,4 @@ class Importer(csv_multitable_reader.Importer):
     def is_section_title(self, row):
         if len(row) == 1:
             return
-        return all(i=='' or i==None for i in row[1:])
+        return all(i == '' or i is None for i in row[1:])

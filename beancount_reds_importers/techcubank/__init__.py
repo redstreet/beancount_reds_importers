@@ -11,5 +11,3 @@ class Importer(banking.Importer, ofxreader.Importer):
             self.filename_identifier_substring = 'transactions'
             self.filename_identifier_substring = 'Accounts'
             self.custom_init_run = True
-
-

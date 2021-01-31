@@ -2,6 +2,7 @@
 
 from beancount_reds_importers.libimport import banking, ofxreader
 
+
 class Importer(banking.Importer, ofxreader.Importer):
     def custom_init(self):
         if not self.custom_init_run:

@@ -59,8 +59,8 @@ class Importer(importer.ImporterProtocol):
         date += datetime.timedelta(days=1)
         meta = data.new_metadata(file.name, next(counter))
         balance_entry = data.Balance(meta, date, self.config['main_account'],
-                amount.Amount(self.ofx_account.statement.balance, self.currency),
-                None, None)
+                                     amount.Amount(self.ofx_account.statement.balance, self.currency),
+                                     None, None)
         return [balance_entry]
 
     def extract(self, file, existing_entries=None):
@@ -76,8 +76,7 @@ class Importer(importer.ImporterProtocol):
 
             # Build transaction entry
             entry = data.Transaction(metadata, ot.date.date(), self.FLAG,
-                                     None, ot.payee, data.EMPTY_SET, data.EMPTY_SET, [])
-                                     # ot.payee, ot.type, data.EMPTY_SET, data.EMPTY_SET, [])
+                                     ot.payee, ot.type, data.EMPTY_SET, data.EMPTY_SET, [])
             data.create_simple_posting(entry, config['main_account'], ot.amount, self.currency)
 
             # TODO: Commented out so smart_importer can fill this in

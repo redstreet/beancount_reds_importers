@@ -3,6 +3,7 @@ beancount_reds_importers."""
 
 import datetime
 import re
+import traceback
 from beancount.ingest import importer
 from beancount.core.number import D
 import petl as etl
@@ -147,3 +148,5 @@ class Importer(reader.Reader, importer.ImporterProtocol):
             print("ERROR: no end_date. SKIPPING input.")
             traceback.print_tb(err.__traceback__)
             return False
+
+        return date
