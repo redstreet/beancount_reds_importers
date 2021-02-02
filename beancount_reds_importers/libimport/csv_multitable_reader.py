@@ -4,12 +4,36 @@ beancount_reds_importers."""
 import petl as etl
 from beancount_reds_importers.libimport import csvreader
 
+# This is a reader that converts:
+# ---- examples.csv -----
+# downloaded on: blah blah
+# section1
+# date,transactions,amount
+# 2020-02-02,3,5.00
+# 2020-02-02,3,5.00
+# section2
+# account_num,balance,date
+# 123123,1000,2020-12-31
+# 23048,2000,2020-12-31
+# end_of_file
+# -----------------------
+#
+# to this data structure:
+# self.alltables =  {'section1': <petl table of section 1>
+#                    'section2': <petl table of section 2>
+#                   }
+#
+# where each value is a petl table.
+#
+# The reader assumes that any line with a single field marks the beginning of a new section, with that field
+# as the title of the section. The next line is assumed to be the header for that new section.
+#
+# This file format is common enough to warrant this reader.
+# The xlsx_multitable reader is built on top of this reader
+
 
 class NotImplementedError(Exception):
     pass
-
-# This csv reader uses petl to read a .csv with multiple tables into a dictionary of petl tables. The section
-# title is the key. See csvreader for more.
 
 
 class Importer(csvreader.Importer):
