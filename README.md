@@ -1,17 +1,23 @@
 # beancount_reds_importers
 
 Simple importers and tools for beancount. Separates the file format reader from the
-transaction builder, so they can be mixed and matched to build new importers.
+transaction builder code. New importers are easily built by mixing and matching a
+fileformat reader and a transaction builder, and specifying (via python code) the
+semantics of the file format.
 
-File format readers included are: ofx, csv, xlsx, including single and multi-table for
-csv and xlsx
+File format readers included are:
+- ofx
+- csv (single and multitable support)
+- xlsx (single and multitable support)
 
-Transaction builders include: banking, and investments (to handle the associated
-complexity).
+Transaction builders included are:
+- banking (for banks and credit cards)
+- investments/brokerages (to handle the associated complexity of investment transactions)
+- paychecks (to handle paychecks, which typically contain many postings)
 
 The coding goal is to factor out importer code into well maintained common libraries for
-banks, credit cards, and investment houses, to minimize institution specific code and
-make writing new importers easy.
+banks, credit cards, investment houses, paychecks and so on, to minimize institution
+specific code and make writing new importers easy.
 
 Input in ofx format (over csv) minimizes data and coding errors, eliminates format
 breaking changes in csv, and typically includes balances that are used to generate
