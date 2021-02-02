@@ -6,6 +6,14 @@ from beancount.core.number import D
 from beancount.core import data
 from beancount_reds_importers.libimport import paycheck, xlsx_multitable_reader
 
+# Workday exports paycheck stubs to a .xlsx, one paycheck per .xlsx, with multiple tables on a single sheet,
+# that this importer imports. Call this importer with a config that looks like:
+#
+# workday.Importer({'desc': "Paycheck (Acme Company)",
+#      'main_account' : 'Income:Employment',
+#      'paycheck_template': '{}' # See paychecks.py for sample template
+#      'currency' : 'PENNIES',
+#     }),
 
 class Importer(paycheck.Importer, xlsx_multitable_reader.Importer):
     def custom_init(self):
