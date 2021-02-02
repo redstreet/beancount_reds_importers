@@ -15,5 +15,12 @@ Look inside the importers/ directory to see a list of institutions supported. Mo
 2. You can now run `bean-identify`, `bean-extract`, etc. See the included script: Run `./import.sh <your_input_ofx>`
 3. If cusip info is missing, the importer will let you know. Add it to your `fund_info.py`
 
+## Testing
+I run tests across hundreds of actual ofx and csv files, against reference outputs that
+I know to be correct from my personal file. However, I'm unable to share them since
+these are personal. Testing against real world files is best, so I recommend you do this
+with your own input files. Having said that, Unit tests are probably useful, even if
+limited, and I'll add these shortly (contributions welcome).
+
 ## Contributions
 Test ofx files and test infra appreciated.
