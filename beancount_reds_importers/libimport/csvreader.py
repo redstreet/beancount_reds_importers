@@ -108,8 +108,8 @@ class Importer(reader.Reader, importer.ImporterProtocol):
     def read_file(self, file):
         if not self.file_read_done:
             rdr = etl.fromcsv(file.name)
-            rdr = rdr.skip(self.skip_head_rows)
-            rdr = rdr.head(len(rdr) - self.skip_tail_rows - 1)
+            rdr = rdr.skip(getattr(self, 'skip_head_rows', 0))            # chop unwanted header rows
+            rdr = rdr.head(len(rdr) - getattr(self, 'skip_tail_rows', 0) - 1) # chop unwanted footer rows
             rdr = self.prepare_raw_columns(rdr)
             rdr = rdr.rename(self.header_map)
             rdr = self.convert_columns(rdr)

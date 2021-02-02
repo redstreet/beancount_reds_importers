@@ -12,6 +12,8 @@ class Importer(investments.Importer, csvreader.Importer):
         self.get_ticker_info = self.get_ticker_info_from_id
         self.date_format = '%m/%d/%Y'
         self.funds_db_txt = 'funds_by_ticker'
+        self.skip_head_rows = 1
+        self.skip_tail_rows = 1
         self.header_map = {
             "Action":      'type',
             "Date":        'date',
