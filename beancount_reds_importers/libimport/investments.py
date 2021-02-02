@@ -248,6 +248,9 @@ class Importer(importer.ImporterProtocol):
     def extract_balances_and_prices(self, file, counter):
         new_entries = []
         date = self.get_max_transaction_date()
+        if not date:
+            print("----------------- No balances, skipping")
+            return []
 
         # balance assertions are evaluated at the beginning of the date, so move it to the following day
         date += datetime.timedelta(days=1)
