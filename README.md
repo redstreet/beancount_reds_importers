@@ -1,10 +1,25 @@
-# beancount_reds_ingestor
+# beancount_reds_importers
 
-Simple importers and tools, mostly ofx based and built on top of `ofxparse`. Using ofx (over csv) minimizes data and coding errors, eliminates format breaking changes in csv, allows for automatic imports of balances to generate balance assertions, and imports prices.
+Simple importers and tools for beancount. Separates the file format reader from the
+transaction builder, so they can be mixed and matched to build new importers.
 
-The coding goal is to factor out importer code into well maintained common libraries for banks, credit cards, and investment houses, to minimize institution specific code and make writing new importers easy.
+File format readers included are: ofx, csv, xlsx, including single and multi-table for
+csv and xlsx
 
-Look inside the importers/ directory to see a list of institutions supported. More investment, credit card, and banking institutions will be added in the future. Contributions welcome.
+Transaction builders include: banking, and investments (to handle the associated
+complexity).
+
+The coding goal is to factor out importer code into well maintained common libraries for
+banks, credit cards, and investment houses, to minimize institution specific code and
+make writing new importers easy.
+
+Input in ofx format (over csv) minimizes data and coding errors, eliminates format
+breaking changes in csv, and typically includes balances that are used to generate
+balance assertions, and commodity prices.
+
+Look inside the importers/ directory to see a list of institutions supported. More
+investment, credit card, and banking institutions will be added in the future.
+Contributions welcome.
 
 ## Installation
 `pip install beancount-reds-importers`
