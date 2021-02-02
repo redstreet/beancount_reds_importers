@@ -1,6 +1,7 @@
 """Ofx importer module for beancount to be used along with investment/banking/other importer modules in
 beancount_reds_importers."""
 
+import traceback
 from beancount.ingest import importer
 from ofxparse import OfxParser
 from beancount_reds_importers.libimport import reader

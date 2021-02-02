@@ -36,7 +36,7 @@ class Importer(banking.Importer, xlsx_multitable_reader.Importer):
 
         # fixup currencies
         def remove_non_numeric(x):
-            return re.sub("[^0-9\.]", "", x)
+            return re.sub("[^0-9\.]", "", x)  # noqa: W605
         currencies = ['unit_price']
         for i in currencies:
             rdr = rdr.convert(i, remove_non_numeric)
