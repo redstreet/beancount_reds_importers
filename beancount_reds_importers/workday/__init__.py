@@ -4,7 +4,8 @@ import datetime
 import re
 from beancount.core.number import D
 from beancount.core import data
-from beancount_reds_importers.libimport import paycheck, xlsx_multitable_reader
+from beancount_reds_importers.libreader import xlsx_multitable_reader
+from beancount_reds_importers.libtransactionbuilder import paycheck
 
 # Workday exports paycheck stubs to a .xlsx, one paycheck per .xlsx, with multiple tables on a single sheet,
 # that this importer imports. Call this importer with a config that looks like:

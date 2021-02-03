@@ -1,6 +1,7 @@
 """Tech CU checking/savings bank account ofx importer for beancount."""
 
-from beancount_reds_importers.libimport import banking, ofxreader
+from beancount_reds_importers.libreader import ofxreader
+from beancount_reds_importers.libtransactionbuilder import banking
 
 
 class Importer(banking.Importer, ofxreader.Importer):

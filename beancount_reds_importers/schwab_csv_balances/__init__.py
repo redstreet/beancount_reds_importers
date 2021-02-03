@@ -3,7 +3,8 @@
 import datetime
 import re
 from beancount.core.number import D
-from beancount_reds_importers.libimport import investments, csv_multitable_reader
+from beancount_reds_importers.libreader import csv_multitable_reader
+from beancount_reds_importers.libtransactionbuilder import investments
 
 
 class Importer(investments.Importer, csv_multitable_reader.Importer):
