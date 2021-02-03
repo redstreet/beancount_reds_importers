@@ -1,9 +1,18 @@
 # beancount_reds_importers
 
-Simple importers and tools for beancount. Separates the file format reader from the
-transaction builder code. New importers are easily built by mixing and matching a
-fileformat reader and a transaction builder, and specifying (via python code) the
-semantics of the file format.
+Simple importers and tools for [beancount](https://github.com/beancount/beancount).
+Importers can be ugly and painful to write, yet are important in automating the grunt
+work out of maintaining personal finance software. The philosophy is to make writing
+importers easy. To achieve this, the design goal is to separate importers in to three
+parts:
+
+1. file format reader (reusable)
+2. transaction builder (reusable)
+3. institution-specific declarations and code (minimal, institution specific)
+
+This helps move common code into (1) and (2) above, and makes writing new importers easy
+by sipmly picking from one of those two along with with minimal declarations and code in
+(3).
 
 File format readers included are:
 - ofx
@@ -11,13 +20,12 @@ File format readers included are:
 - xlsx (single and multitable support)
 
 Transaction builders included are:
-- banking (for banks and credit cards)
-- investments/brokerages (to handle the associated complexity of investment transactions)
-- paychecks (to handle paychecks, which typically contain many postings)
-
-The coding goal is to factor out importer code into well maintained common libraries for
-banks, credit cards, investment houses, paychecks and so on, to minimize institution
-specific code and make writing new importers easy.
+- banking (for banks and credit cards, which benefit from a postings predictor like
+  [smart_importer](https://github.com/beancount/smart_importer)
+- investments/brokerages (to handle the very many distinct cases of investment related
+  transactions)
+- paychecks (to handle paychecks, which typically contain very many pre-determined
+  postings in a single entry)
 
 Input in ofx format (over csv) minimizes data and coding errors, eliminates format
 breaking changes in csv, and typically includes balances that are used to generate
