@@ -6,7 +6,7 @@ from io import StringIO
 import csv
 import openpyxl
 import warnings
-from beancount_reds_importers.libimport import csv_multitable_reader
+from beancount_reds_importers.libreader import csv_multitable_reader
 
 
 class NotImplementedError(Exception):

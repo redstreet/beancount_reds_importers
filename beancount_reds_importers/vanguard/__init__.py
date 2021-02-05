@@ -1,8 +1,8 @@
 """ Vanguard Brokerage ofx importer."""
 
 import ntpath
-from beancount_reds_importers.libreader import investments
-from beancount_reds_importers.libtransactionbuilder import banking
+from beancount_reds_importers.libreader import ofxreader
+from beancount_reds_importers.libtransactionbuilder import investments
 
 
 class Importer(investments.Importer, ofxreader.Importer):

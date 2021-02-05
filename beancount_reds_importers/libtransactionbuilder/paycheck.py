@@ -6,7 +6,7 @@ from beancount.core import data
 from beancount.core.number import D
 from beancount.core import amount
 from beancount.ingest import importer
-from beancount_reds_importers.libimport import banking
+from beancount_reds_importers.libtransactionbuilder import banking
 
 
 # paychecks are typically transaction with many (10-30) postings including several each of income, taxes,

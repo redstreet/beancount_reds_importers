@@ -2,7 +2,7 @@
 beancount_reds_importers."""
 
 import petl as etl
-from beancount_reds_importers.libimport import csvreader
+from beancount_reds_importers.libreader import csvreader
 
 # This is a reader that converts:
 # ---- examples.csv -----

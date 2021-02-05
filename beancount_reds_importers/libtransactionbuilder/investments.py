@@ -8,7 +8,7 @@ from beancount.core import data
 from beancount.core import amount
 from beancount.ingest import importer
 from beancount.core.position import CostSpec
-from beancount_reds_importers.libimport import common
+from beancount_reds_importers.libtransactionbuilder import common
 
 
 class Importer(importer.ImporterProtocol):
@@ -248,18 +248,22 @@ class Importer(importer.ImporterProtocol):
     def extract_balances_and_prices(self, file, counter):
         new_entries = []
         date = self.get_max_transaction_date()
-        if not date:
-            print("----------------- No balances, skipping")
-            return []
-
-        # balance assertions are evaluated at the beginning of the date, so move it to the following day
-        date += datetime.timedelta(days=1)
+        if date:
+            # balance assertions are evaluated at the beginning of the date, so move it to the following day
+            date += datetime.timedelta(days=1)
+        else:
+            print("Warning: no transactions, using statement date for balance assertions.")
+        date = False
 
         settlement_fund_balance = 0
         for pos in self.get_balance_positions():
             ticker, ticker_long_name = self.get_ticker_info(pos.security)
             meta = data.new_metadata(file.name, next(counter))
-            balance_entry = data.Balance(meta, date, self.commodity_leaf(self.config['main_account'], ticker),
+
+            # if there are no transactions, use the date in the source file for the balance. This gives us the
+            # bonus of an updated, recent balance assertion
+            bal_date = date if date else pos.date.date()
+            balance_entry = data.Balance(meta, bal_date, self.commodity_leaf(self.config['main_account'], ticker),
                                          amount.Amount(pos.units, ticker),
                                          None, None)
             new_entries.append(balance_entry)
@@ -273,19 +277,14 @@ class Importer(importer.ImporterProtocol):
                                          amount.Amount(pos.unit_price, self.currency))
                 new_entries.append(price_entry)
 
-        # we want trade date balance, which is reflected as USD
-        #
-        # trade date balance: The net dollar amount in your account that has not swept to or from your
-        # settlement fund.
-        #
-        # available cash combines settlement fund and trade date balance
-
+        # ----------------- available cash
         available_cash = self.get_available_cash()
         if available_cash is not False:
             try:
                 balance = self.get_available_cash() - settlement_fund_balance
                 meta = data.new_metadata(file.name, next(counter))
-                balance_entry = data.Balance(meta, date, self.cash_account,
+                bal_date = date if date else self.file_date(file).date()
+                balance_entry = data.Balance(meta, bal_date, self.cash_account,
                                              amount.Amount(balance, self.currency),
                                              None, None)
                 new_entries.append(balance_entry)

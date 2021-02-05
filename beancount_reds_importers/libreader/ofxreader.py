@@ -4,7 +4,7 @@ beancount_reds_importers."""
 import traceback
 from beancount.ingest import importer
 from ofxparse import OfxParser
-from beancount_reds_importers.libimport import reader
+from beancount_reds_importers.libreader import reader
 
 
 class Importer(reader.Reader, importer.ImporterProtocol):
@@ -57,8 +57,8 @@ class Importer(reader.Reader, importer.ImporterProtocol):
 
             date = max(ot.tradeDate if hasattr(ot, 'tradeDate') else ot.date
                        for ot in self.get_transactions()).date()
-        except Exception as err:
-            print("ERROR: no end_date. SKIPPING input.")
-            traceback.print_tb(err.__traceback__)
+        except (TypeError, ValueError) as e:
+            # print("WARNING: no end_date. SKIPPING input.")
+            # traceback.print_tb(err.__traceback__)
             return False
         return date

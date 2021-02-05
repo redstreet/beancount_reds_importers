@@ -7,7 +7,7 @@ import traceback
 from beancount.ingest import importer
 from beancount.core.number import D
 import petl as etl
-from beancount_reds_importers.libimport import reader
+from beancount_reds_importers.libreader import reader
 
 # This csv reader uses petl to read a .csv into a table for maniupulation. The output of this reader is a list
 # of namedtuples corresponding roughly to ofx transactions. The following steps achieve this. When writing

@@ -1,7 +1,7 @@
 """ Schwab csv importer."""
 
-from beancount_reds_importers.libreader import investments
-from beancount_reds_importers.libtransactionbuilder import banking
+from beancount_reds_importers.libreader import csvreader
+from beancount_reds_importers.libtransactionbuilder import investments
 
 
 class Importer(investments.Importer, csvreader.Importer):
