@@ -68,6 +68,7 @@ class Importer(reader.Reader, importer.ImporterProtocol):
                 # self.currency = self.ofx_account.statement.currency.upper()
                 self.currency = 'USD'  # TODO
                 self.includes_balances = False
+                self.date_format = '%m/%d/%Y'
             self.initialized_reader = True
             self.file_read_done = False
 
@@ -98,7 +99,7 @@ class Importer(reader.Reader, importer.ImporterProtocol):
 
         # fixup dates
         def convert_date(d):
-            return datetime.datetime.strptime(d, '%m/%d/%Y')
+            return datetime.datetime.strptime(d, self.date_format)
         dates = ['date', 'tradeDate']
         for i in dates:
             rdr = rdr.convert(i, convert_date)
