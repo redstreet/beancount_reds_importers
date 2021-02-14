@@ -66,6 +66,8 @@ class Importer(banking.Importer):
                     accounts = template[section][row.description]
                     accounts = [accounts] if not isinstance(accounts, list) else accounts
                     for account in accounts:
+                        if not hasattr(row, 'amount'):
+                            continue
                         amount = D(row.amount)
                         if 'Income:' in account and amount >= 0:
                             amount *= -1
