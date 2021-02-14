@@ -26,7 +26,7 @@ class Importer(importer.ImporterProtocol):
             self.initialized = True
 
     def build_account_map(self):
-        # TODO: Not needed for accounts using smart_importer; make tihs configurable
+        # TODO: Not needed for accounts using smart_importer; make this configurable
         # transaction types: {}
         # self.target_account_map = {
         #         "directdep": 'TODO',
