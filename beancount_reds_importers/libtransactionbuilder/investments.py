@@ -59,6 +59,7 @@ class Importer(importer.ImporterProtocol):
             "credit":    self.config['transfer'],
             "debit":     self.config['transfer'],
             "transfer":  self.config['transfer'],
+            "cash":      self.config['transfer'],
             "dep":       self.config['transfer'],
         }
         self.cash_account = self.commodity_leaf(self.config['main_account'], self.currency)
@@ -184,7 +185,7 @@ class Importer(importer.ImporterProtocol):
         try:
             if ot.type in ['transfer']:
                 units = ot.units
-            elif ot.type in ['other', 'credit', 'debit', 'dep']:
+            elif ot.type in ['other', 'credit', 'debit', 'dep', 'cash']:
                 units = ot.amount
             else:
                 units = ot.total
@@ -236,7 +237,7 @@ class Importer(importer.ImporterProtocol):
         for ot in self.get_transactions():
             if ot.type in ['buymf', 'sellmf', 'buystock', 'sellstock', 'reinvest']:
                 entry = self.generate_trade_entry(ot, file, counter)
-            elif ot.type in ['other', 'credit', 'debit', 'transfer', 'dep', 'income', 'dividends']:
+            elif ot.type in ['other', 'credit', 'debit', 'transfer', 'dep', 'income', 'dividends', 'cash']:
                 entry = self.generate_transfer_entry(ot, file, counter)
             else:
                 print("ERROR: unknown entry type:", ot.type)
@@ -253,7 +254,6 @@ class Importer(importer.ImporterProtocol):
             date += datetime.timedelta(days=1)
         else:
             print("Warning: no transactions, using statement date for balance assertions.")
-        date = False
 
         settlement_fund_balance = 0
         for pos in self.get_balance_positions():
