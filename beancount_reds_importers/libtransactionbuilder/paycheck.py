@@ -1,11 +1,7 @@
 """Generic banking ofx importer for beancount."""
 
-import datetime
-import itertools
 from beancount.core import data
 from beancount.core.number import D
-from beancount.core import amount
-from beancount.ingest import importer
 from beancount_reds_importers.libtransactionbuilder import banking
 
 
@@ -48,7 +44,6 @@ from beancount_reds_importers.libtransactionbuilder import banking
 class Importer(banking.Importer):
     def file_date(self, file):
         return self.paycheck_date()
-
 
     def get_max_transaction_date(self):
         return self.date.date()

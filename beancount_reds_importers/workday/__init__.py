@@ -3,7 +3,6 @@
 import datetime
 import re
 from beancount.core.number import D
-from beancount.core import data
 from beancount_reds_importers.libreader import xlsx_multitable_reader
 from beancount_reds_importers.libtransactionbuilder import paycheck
 
@@ -15,6 +14,7 @@ from beancount_reds_importers.libtransactionbuilder import paycheck
 #      'paycheck_template': '{}' # See paychecks.py for sample template
 #      'currency' : 'PENNIES',
 #     }),
+
 
 class Importer(paycheck.Importer, xlsx_multitable_reader.Importer):
     def custom_init(self):
@@ -67,4 +67,3 @@ class Importer(paycheck.Importer, xlsx_multitable_reader.Importer):
             for header in table.header():
                 table = table.rename(header, valid_header_label(header))
             self.alltables[section] = table
-
