@@ -14,6 +14,7 @@ class Importer(importer.ImporterProtocol):
         self.initialized_reader = False
         self.reader_ready = False
         self.custom_init_run = False
+        self.get_transaction_type_desc = lambda ot: ot.type
         # REQUIRED_CONFIG = {
         #     'account_number'   : 'account number',
         #     'main_account'     : 'destination of import',
@@ -45,6 +46,9 @@ class Importer(importer.ImporterProtocol):
             self.filename_identifier_substring = ''
             self.custom_init_run = True
 
+    def set_credit_card_defaults(self):
+        self.get_transaction_type_desc = lambda ot: None
+
     # def get_target_acct(self, transaction):
     #     # Not needed for accounts using smart_importer
     #     return self.target_account_map.get(transaction.type, None)
@@ -74,9 +78,14 @@ class Importer(importer.ImporterProtocol):
             metadata = data.new_metadata(file.name, next(counter))
             # metadata['type'] = ot.type # Optional metadata, useful for debugging #TODO
 
+            # description fields:
+            # - beancount: (payee, narration):  # payee is optional, narration is mandatory
+            # - OFX: ot.payee tends to be the "main" description field, while ot.memo is optional
+
             # Build transaction entry
             entry = data.Transaction(metadata, ot.date.date(), self.FLAG,
-                                     ot.payee, ot.type, data.EMPTY_SET, data.EMPTY_SET, [])
+                                     self.get_transaction_type_desc(ot), ot.payee,
+                                     data.EMPTY_SET, data.EMPTY_SET, [])
             data.create_simple_posting(entry, config['main_account'], ot.amount, self.currency)
 
             # TODO: Commented out so smart_importer can fill this in
