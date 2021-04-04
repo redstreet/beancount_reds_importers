@@ -57,13 +57,20 @@ class Importer(banking.Importer):
             if section not in template:
                 continue
             for row in table.namedtuples():
-                if row.description in template[section]:
-                    accounts = template[section][row.description]
+                # TODO: 'bank' is workday specific; move it there
+                row_description = getattr(row, 'description', getattr(row, 'bank', None))
+                row_pattern = next(filter(lambda ts: row_description.startswith(ts), template[section]), None)
+                if row_pattern:
+                    accounts = template[section][row_pattern]
                     accounts = [accounts] if not isinstance(accounts, list) else accounts
                     for account in accounts:
-                        if not hasattr(row, 'amount'):
+                        # TODO: 'amount_in_pay_group_currency' is workday specific; move it there
+                        amount = getattr(row, 'amount', getattr(row, 'amount_in_pay_group_currency', None))
+                        # import pdb; pdb.set_trace()
+
+                        if not amount:
                             continue
-                        amount = D(row.amount)
+                        amount = D(amount)
                         if 'Income:' in account and amount >= 0:
                             amount *= -1
                         total += amount
