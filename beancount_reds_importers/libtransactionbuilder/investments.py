@@ -96,8 +96,7 @@ class Importer(importer.ImporterProtocol):
     def get_security_list(self):
         tickers = set()
         for ot in self.get_transactions():
-            if ot.type in ['buymf', 'sellmf', 'buystock', 'sellstock', 'reinvest', 'income']:
-                tickers.add(ot.security)
+            tickers.add(ot.security)
         return tickers
 
     def commodity_leaf(self, account, ticker):
