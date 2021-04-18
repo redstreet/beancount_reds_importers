@@ -1,6 +1,10 @@
 # beancount_reds_importers
 
 Simple importers and tools for [beancount](https://github.com/beancount/beancount).
+
+For a comprehensive look at writing importers, see
+**[The Five Minute Ledger Update](https://reds-rants.netlify.app/personal-finance/the-five-minute-ledger-update/).**
+
 Importers can be ugly and painful to write, yet are important in automating the grunt
 work out of maintaining personal finance software. The philosophy is to make writing
 importers easy. To achieve this, the design goal is to separate importers in to three
@@ -38,11 +42,14 @@ Contributions welcome.
 ## Installation
 `pip install beancount-reds-importers`
 
+If you plan on importing excel files, also run:
+`pip install openpyxl`
+
 ## Running
 1. Create your own my.import. An example my.import is provided. At the least, include your account numbers
 2. Include fund information. Copy the included `fund_info.py` to start with.
-2. You can now run `bean-identify`, `bean-extract`, etc. See the included script: Run `./import.sh <your_input_ofx>`
-3. If cusip info is missing, the importer will let you know. Add it to your `fund_info.py`
+3. You can now run `bean-identify`, `bean-extract`, etc. See the included script: Run `./import.sh <your_input_ofx>`
+4. If cusip info is missing, the importer will let you know. Add it to your `fund_info.py`
 
 ## Testing
 I run tests across hundreds of actual ofx and csv files, against reference outputs that

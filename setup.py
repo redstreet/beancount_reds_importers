@@ -21,6 +21,7 @@ setup(
     install_requires=[
         'beancount>=2.2.3',
         'ofxparse>=0.20',
+        'petl>=1.7.2',
     ],
     zip_safe=False,
     classifiers=[
