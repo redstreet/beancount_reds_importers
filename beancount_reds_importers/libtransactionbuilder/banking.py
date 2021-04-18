@@ -76,7 +76,7 @@ class Importer(importer.ImporterProtocol):
         self.read_file(file)
         for ot in self.get_transactions():
             metadata = data.new_metadata(file.name, next(counter))
-            metadata['file_account'] = self.file_account(None)
+            # metadata['file_account'] = self.file_account(None)
             # metadata['type'] = ot.type # Optional metadata, useful for debugging #TODO
 
             # description fields:

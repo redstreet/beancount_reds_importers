@@ -118,7 +118,7 @@ class Importer(importer.ImporterProtocol):
 
         # Build metadata
         metadata = data.new_metadata(file.name, next(counter))
-        metadata['file_account'] = self.file_account(None)
+        # metadata['file_account'] = self.file_account(None)
         if getattr(ot, 'settleDate', None) is not None and ot.settleDate != ot.tradeDate:
             metadata['settlement_date'] = str(ot.settleDate.date())
 
