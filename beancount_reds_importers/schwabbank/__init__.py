@@ -9,6 +9,5 @@ class Importer(banking.Importer, ofxreader.Importer):
         if not self.custom_init_run:
             self.max_rounding_error = 0.04
             self.account_number_field = 'account_id'
-            self.filename_identifier_substring = 'transactions'
-            self.filename_identifier_substring = 'schwabbank.ofx'
+            self.filename_identifier_substring = 'schwabbank'
             self.custom_init_run = True
