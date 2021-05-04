@@ -56,9 +56,9 @@ class Importer(importer.ImporterProtocol):
     # --------------------------------------------------------------------------------
 
     def extract_balance(self, file, counter):
-        # date = self.ofx_account.statement.balance_date
-        date = max(ot.tradeDate if hasattr(ot, 'tradeDate') else ot.date
-                   for ot in self.get_transactions()).date()
+        date = self.get_max_transaction_date()
+        if not date:
+            return []
         # balance assertions are evaluated at the beginning of the date, so move it to the following day
         date += datetime.timedelta(days=1)
         meta = data.new_metadata(file.name, next(counter))
