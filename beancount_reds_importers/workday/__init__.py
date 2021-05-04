@@ -19,7 +19,6 @@ from beancount_reds_importers.libtransactionbuilder import paycheck
 class Importer(paycheck.Importer, xlsx_multitable_reader.Importer):
     def custom_init(self):
         self.max_rounding_error = 0.04
-        self.account_number_field = 'number'
         self.filename_identifier_substring = '_Complete'
         self.header_identifier = '- Complete' + self.config.get('custom_header', '')
         self.includes_balances = False

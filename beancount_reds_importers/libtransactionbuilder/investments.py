@@ -67,7 +67,6 @@ class Importer(importer.ImporterProtocol):
     def custom_init(self):
         if not self.custom_init_run:
             self.max_rounding_error = 0.04
-            self.account_number_field = 'number'
             self.filename_identifier_substring = 'bank_specific_filename.qfx'
             self.custom_init_run = True
 

@@ -8,7 +8,6 @@ class Importer(investments.Importer, ofxreader.Importer):
     def custom_init(self):
         super(Importer, self).custom_init()
         self.max_rounding_error = 0.07
-        self.account_number_field = 'account_id'
         self.filename_identifier_substring = 'tdameritrade'
         self.get_ticker_info = self.get_ticker_info_from_id
 
