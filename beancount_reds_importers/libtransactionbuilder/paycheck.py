@@ -42,8 +42,8 @@ from beancount_reds_importers.libtransactionbuilder import banking
 
 
 class Importer(banking.Importer):
-    def file_date(self, file):
-        return self.paycheck_date()
+    def file_date(self, input_file):
+        return self.paycheck_date(input_file)
 
     def get_max_transaction_date(self):
         return self.date.date()
