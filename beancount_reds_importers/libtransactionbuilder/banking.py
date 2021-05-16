@@ -1,4 +1,4 @@
-"""Generic banking ofx importer for beancount."""
+"""Generic banking importer for beancount."""
 
 import datetime
 import itertools
@@ -55,16 +55,21 @@ class Importer(importer.ImporterProtocol):
     # --------------------------------------------------------------------------------
 
     def extract_balance(self, file, counter):
-        date = self.get_max_transaction_date()
-        if not date:
-            return []
+        # TODO: make this file format independent (remove self.ofx_account below)
+        # Move this to reader
+        # date = self.get_max_transaction_date()
+        # if not date:
+        #     return []
         # balance assertions are evaluated at the beginning of the date, so move it to the following day
-        date += datetime.timedelta(days=1)
+        # date += datetime.timedelta(days=1)
+        entries = []
         meta = data.new_metadata(file.name, next(counter))
-        balance_entry = data.Balance(meta, date, self.config['main_account'],
-                                     amount.Amount(self.ofx_account.statement.balance, self.currency),
-                                     None, None)
-        return [balance_entry]
+        for bal in self.get_balance_positions():
+            balance_entry = data.Balance(meta, bal.date, self.config['main_account'],
+                                         amount.Amount(bal.amount, self.currency),
+                                         None, None)
+            entries.append(balance_entry)
+        return entries
 
     def extract(self, file, existing_entries=None):
         self.initialize(file)
