@@ -48,19 +48,21 @@ class Importer(importer.ImporterProtocol):
     def build_account_map(self):
         # map transaction types to target posting accounts
         self.target_account_map = {
-            "buymf":     self.config['main_account'],
-            "sellmf":    self.config['main_account'],
-            "buystock":  self.config['main_account'],
-            "sellstock": self.config['main_account'],
-            "reinvest":  self.config['dividends'],
-            "dividends": self.config['dividends'],
-            "income":    self.config['interest'],
-            "other":     self.config['transfer'],
-            "credit":    self.config['transfer'],
-            "debit":     self.config['transfer'],
-            "transfer":  self.config['transfer'],
-            "cash":      self.config['transfer'],
-            "dep":       self.config['transfer'],
+            "buymf":       self.config['main_account'],
+            "sellmf":      self.config['main_account'],
+            "buystock":    self.config['main_account'],
+            "sellstock":   self.config['main_account'],
+            "reinvest":    self.config['dividends'],
+            "dividends":   self.config['dividends'],
+            "capgains_lt": self.config['capgains_lt'],
+            "capgains_st": self.config['capgains_st'],
+            "income":      self.config['interest'],
+            "other":       self.config['transfer'],
+            "credit":      self.config['transfer'],
+            "debit":       self.config['transfer'],
+            "transfer":    self.config['transfer'],
+            "cash":        self.config['transfer'],
+            "dep":         self.config['transfer'],
         }
         self.cash_account = self.commodity_leaf(self.config['main_account'], self.currency)
 
@@ -173,7 +175,7 @@ class Importer(importer.ImporterProtocol):
         return entry
 
     def generate_transfer_entry(self, ot, file, counter):
-        """ Cash or in-kind transfers. One of: [credit, debit, dep, transfer, income, dividends, other]"""
+        """ Cash or in-kind transfers. One of: [credit, debit, dep, transfer, income, dividends, capgains_lt, capgains_st, other]"""
         config = self.config
         metadata = data.new_metadata(file.name, next(counter))
         target_acct = self.get_target_acct(ot)
@@ -193,10 +195,10 @@ class Importer(importer.ImporterProtocol):
             print("Could not determine field for transaction amount")
             # import pdb; pdb.set_trace()
 
-        if ot.type in ['income', 'dividends', 'transfer'] and (hasattr(ot, 'security') and ot.security):
+        if ot.type in ['income', 'dividends', 'capgains_lt', 'capgains_st', 'transfer'] and (hasattr(ot, 'security') and ot.security):
             ticker, ticker_long_name = self.get_ticker_info(ot.security)
             description = f'[{ticker}] {ticker_long_name}'
-            if ot.type in ['income', 'dividends']:  # no need to do this for transfers
+            if ot.type in ['income', 'dividends' 'capgains_st', 'capgains_lt']:  # no need to do this for transfers
                 target_acct = self.commodity_leaf(target_acct, ticker)  # book to Income:Dividends:HOOLI
         else:  # cash transfer
             description = ot.type
@@ -207,7 +209,7 @@ class Importer(importer.ImporterProtocol):
                                  ot.memo, description, data.EMPTY_SET, data.EMPTY_SET, [])
 
         # Build postings
-        if ot.type in ['income', 'dividends']:  # cash
+        if ot.type in ['income', 'dividends', 'capgains_st', 'capgains_lt']:  # cash
             data.create_simple_posting(entry, self.cash_account, ot.total, self.currency)
             data.create_simple_posting(entry, target_acct, -1 * ot.total, self.currency)
         else:
@@ -237,7 +239,7 @@ class Importer(importer.ImporterProtocol):
         for ot in self.get_transactions():
             if ot.type in ['buymf', 'sellmf', 'buystock', 'sellstock', 'reinvest']:
                 entry = self.generate_trade_entry(ot, file, counter)
-            elif ot.type in ['other', 'credit', 'debit', 'transfer', 'dep', 'income', 'dividends', 'cash']:
+            elif ot.type in ['other', 'credit', 'debit', 'transfer', 'dep', 'income', 'dividends', 'capgains_st', 'capgains_lt', 'cash']:
                 entry = self.generate_transfer_entry(ot, file, counter)
             else:
                 print("ERROR: unknown entry type:", ot.type)

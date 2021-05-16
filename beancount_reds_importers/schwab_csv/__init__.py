@@ -27,13 +27,20 @@ class Importer(investments.Importer, csvreader.Importer):
             "Fees & Comm": 'fees',
             }
         self.transaction_type_map = {
-            'Bank Interest':      'income',
-            'Buy':                'buystock',
-            'Cash Dividend':      'dividends',
-            'MoneyLink Transfer': 'transfer',
-            'Reinvest Dividend':  'dividends',
-            'Reinvest Shares':    'buystock',
-            'Sell':               'sellstock',
+            'Bank Interest':                'income',
+            'Bank Transfer':                'transfer',
+            'Buy':                          'buystock',
+            'Cash Dividend':                'dividends',
+            'Long Term Cap Gain Reinvest':  'capgains_lt',
+            'Misc Credits':                 'transfer',
+            'MoneyLink Deposit':            'transfer',
+            'MoneyLink Transfer':           'transfer',
+            'Pr Yr Div Reinvest':           'dividends',
+            'Reinvest Dividend':            'dividends',
+            'Reinvest Shares':              'buystock',
+            'Sell':                         'sellstock',
+            'Short Term Cap Gain Reinvest': 'capgains_st',
+            'Wire Funds Received':          'transfer',
             }
         self.skip_transaction_types = ['Journal']
 
