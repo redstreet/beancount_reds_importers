@@ -198,7 +198,7 @@ class Importer(importer.ImporterProtocol):
         if ot.type in ['income', 'dividends', 'capgains_lt', 'capgains_st', 'transfer'] and (hasattr(ot, 'security') and ot.security):
             ticker, ticker_long_name = self.get_ticker_info(ot.security)
             description = f'[{ticker}] {ticker_long_name}'
-            if ot.type in ['income', 'dividends' 'capgains_st', 'capgains_lt']:  # no need to do this for transfers
+            if ot.type in ['income', 'dividends', 'capgains_st', 'capgains_lt']:  # no need to do this for transfers
                 target_acct = self.commodity_leaf(target_acct, ticker)  # book to Income:Dividends:HOOLI
         else:  # cash transfer
             description = ot.type
