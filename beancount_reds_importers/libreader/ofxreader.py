@@ -1,8 +1,10 @@
 """Ofx importer module for beancount to be used along with investment/banking/other importer modules in
 beancount_reds_importers."""
 
-from beancount.ingest import importer
+import datetime
 from ofxparse import OfxParser
+from collections import namedtuple
+from beancount.ingest import importer
 from beancount_reds_importers.libreader import reader
 
 
@@ -41,6 +43,13 @@ class Importer(reader.Reader, importer.ImporterProtocol):
     def get_transactions(self):
         for ot in self.ofx_account.statement.transactions:
             yield ot
+
+    def get_balance_statement(self):
+        date = self.get_max_transaction_date()
+        if date:
+            date += datetime.timedelta(days=1) # See comment in get_max_transaction_date() for explanation
+            Balance = namedtuple('Balance', ['date', 'amount'])  
+            yield Balance(self.ofx_account.statement.end_date.date(), self.ofx_account.statement.balance)
 
     def get_balance_positions(self):
         for pos in self.ofx_account.statement.positions:

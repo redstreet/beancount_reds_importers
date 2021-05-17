@@ -55,16 +55,9 @@ class Importer(importer.ImporterProtocol):
     # --------------------------------------------------------------------------------
 
     def extract_balance(self, file, counter):
-        # TODO: make this file format independent (remove self.ofx_account below)
-        # Move this to reader
-        # date = self.get_max_transaction_date()
-        # if not date:
-        #     return []
-        # balance assertions are evaluated at the beginning of the date, so move it to the following day
-        # date += datetime.timedelta(days=1)
         entries = []
         meta = data.new_metadata(file.name, next(counter))
-        for bal in self.get_balance_positions():
+        for bal in self.get_balance_statement():
             balance_entry = data.Balance(meta, bal.date, self.config['main_account'],
                                          amount.Amount(bal.amount, self.currency),
                                          None, None)
