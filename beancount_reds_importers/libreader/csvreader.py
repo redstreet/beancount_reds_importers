@@ -66,9 +66,10 @@ class Importer(reader.Reader, importer.ImporterProtocol):
             if self.reader_ready:
                 # TODO: move out elsewhere?
                 # self.currency = self.ofx_account.statement.currency.upper()
-                self.currency = 'USD'  # TODO
+                self.currency = self.config.get('currency', 'USD')
                 self.includes_balances = False
             self.initialized_reader = True
+            self.date_format = '%m/%d/%Y' # TODO: move into class variable, into reader.Reader
             self.file_read_done = False
 
     def file_date(self, file):
@@ -86,22 +87,25 @@ class Importer(reader.Reader, importer.ImporterProtocol):
         # fixup decimals
         decimals = ['units']
         for i in decimals:
-            rdr = rdr.convert(i, D)
+            if i in rdr.header():
+                rdr = rdr.convert(i, D)
 
         # fixup currencies
         def remove_non_numeric(x):
-            return re.sub("[^0-9\.]", "", x)  # noqa: W605
+            return re.sub("[^0-9\.-]", "", x)  # noqa: W605
         currencies = ['unit_price', 'fees', 'total', 'amount']
         for i in currencies:
-            rdr = rdr.convert(i, remove_non_numeric)
-            rdr = rdr.convert(i, D)
+            if i in rdr.header():
+                rdr = rdr.convert(i, remove_non_numeric)
+                rdr = rdr.convert(i, D)
 
         # fixup dates
         def convert_date(d):
-            return datetime.datetime.strptime(d, '%m/%d/%Y')
+            return datetime.datetime.strptime(d, self.date_format)
         dates = ['date', 'tradeDate']
         for i in dates:
-            rdr = rdr.convert(i, convert_date)
+            if i in rdr.header():
+                rdr = rdr.convert(i, convert_date)
 
         return rdr
 
