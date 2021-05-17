@@ -175,7 +175,8 @@ class Importer(importer.ImporterProtocol):
         return entry
 
     def generate_transfer_entry(self, ot, file, counter):
-        """ Cash or in-kind transfers. One of: [credit, debit, dep, transfer, income, dividends, capgains_lt, capgains_st, other]"""
+        """ Cash or in-kind transfers. One of:
+            [credit, debit, dep, transfer, income, dividends, capgains_lt, capgains_st, other]"""
         config = self.config
         metadata = data.new_metadata(file.name, next(counter))
         target_acct = self.get_target_acct(ot)
@@ -195,7 +196,8 @@ class Importer(importer.ImporterProtocol):
             print("Could not determine field for transaction amount")
             # import pdb; pdb.set_trace()
 
-        if ot.type in ['income', 'dividends', 'capgains_lt', 'capgains_st', 'transfer'] and (hasattr(ot, 'security') and ot.security):
+        if ot.type in ['income', 'dividends', 'capgains_lt',
+                       'capgains_st', 'transfer'] and (hasattr(ot, 'security') and ot.security):
             ticker, ticker_long_name = self.get_ticker_info(ot.security)
             description = f'[{ticker}] {ticker_long_name}'
             if ot.type in ['income', 'dividends', 'capgains_st', 'capgains_lt']:  # no need to do this for transfers
@@ -239,7 +241,8 @@ class Importer(importer.ImporterProtocol):
         for ot in self.get_transactions():
             if ot.type in ['buymf', 'sellmf', 'buystock', 'sellstock', 'reinvest']:
                 entry = self.generate_trade_entry(ot, file, counter)
-            elif ot.type in ['other', 'credit', 'debit', 'transfer', 'dep', 'income', 'dividends', 'capgains_st', 'capgains_lt', 'cash']:
+            elif ot.type in ['other', 'credit', 'debit', 'transfer', 'dep', 'income',
+                             'dividends', 'capgains_st', 'capgains_lt', 'cash']:
                 entry = self.generate_transfer_entry(ot, file, counter)
             else:
                 print("ERROR: unknown entry type:", ot.type)

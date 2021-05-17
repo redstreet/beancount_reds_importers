@@ -69,7 +69,7 @@ class Importer(reader.Reader, importer.ImporterProtocol):
                 self.currency = self.config.get('currency', 'USD')
                 self.includes_balances = False
             self.initialized_reader = True
-            self.date_format = '%m/%d/%Y' # TODO: move into class variable, into reader.Reader
+            self.date_format = '%m/%d/%Y'  # TODO: move into class variable, into reader.Reader
             self.file_read_done = False
 
     def file_date(self, file):

@@ -1,6 +1,5 @@
 """Generic banking importer for beancount."""
 
-import datetime
 import itertools
 from beancount.core import data
 from beancount.core import amount
