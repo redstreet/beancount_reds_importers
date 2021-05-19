@@ -49,7 +49,7 @@ class Importer(reader.Reader, importer.ImporterProtocol):
         if date:
             date += datetime.timedelta(days=1)  # See comment in get_max_transaction_date() for explanation
             Balance = namedtuple('Balance', ['date', 'amount'])
-            yield Balance(self.ofx_account.statement.end_date.date(), self.ofx_account.statement.balance)
+            yield Balance(date, self.ofx_account.statement.balance)
 
     def get_balance_positions(self):
         for pos in self.ofx_account.statement.positions:
