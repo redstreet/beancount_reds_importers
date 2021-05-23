@@ -40,10 +40,13 @@ investment, credit card, and banking institutions will be added in the future.
 Contributions welcome.
 
 ## Installation
-`pip install beancount-reds-importers`
+`pip3 install beancount-reds-importers`
+
+Or to install the bleeding edge version from git:
+`pip3 install git+https://github.com/redstreet/beancount_reds_importers`
 
 If you plan on importing excel files, also run:
-`pip install openpyxl`
+`pip3 install openpyxl`
 
 ## Running
 1. Create your own my.import. An example my.import is provided. At the least, include your account numbers
