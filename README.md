@@ -48,6 +48,11 @@ Or to install the bleeding edge version from git:
 If you plan on importing excel files, also run:
 `pip3 install openpyxl`
 
+## Running the included examples:
+1. `cd <your pip installed dir>/example #eg: cd ~/.local/lib/python3.8/site-packages/beancount_reds_importers/example`
+2. `./import.sh OfxDownload.qfx` # Imports investments
+3. `./import.sh transactions.qfx` # Importa bank transactions; uses smart_importer to classify transactions
+
 ## Running
 1. Create your own my.import. An example my.import is provided. At the least, include your account numbers
 2. Include fund information. Copy the included `fund_info.py` to start with.
