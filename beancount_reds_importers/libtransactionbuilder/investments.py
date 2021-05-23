@@ -26,6 +26,8 @@ class Importer(importer.ImporterProtocol):
         #     'transfer'         : 'Account to which contributions and outgoing is transferred',
         #     'dividends'        : 'Account to book dividends',
         #     'cg'               : 'Account to book capital gains/losses',
+        #     'capgains_lt'      : 'Account to book long term capital gains distributions to'
+        #     'capgains_st'      : 'Account to book short term capital gains distributions to'
         #     'fees'             : 'Account to book fees to',
         #     'rounding_error'   : 'Account to book rounding errors to',
         #     'fund_info '       : 'dictionary of fund info (by_id, money_market)',
