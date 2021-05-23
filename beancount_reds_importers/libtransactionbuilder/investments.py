@@ -79,9 +79,10 @@ class Importer(importer.ImporterProtocol):
         try:
             ticker, ticker_long_name = self.funds_db[security_id]
         except KeyError:
+            print(f"Error: fund info not found for {security_id}", file=sys.stderr)
             securities = self.get_security_list()
             securities_missing = [s for s in securities if s not in self.funds_db]
-            print(f"Error: fund info not found for {security_id}. Also: {securities_missing}", file=sys.stderr)
+            print(f"List of securities without fund info: {securities_missing}", file=sys.stderr)
             # import pdb; pdb.set_trace()
             sys.exit(1)
         return ticker, ticker_long_name
@@ -97,7 +98,7 @@ class Importer(importer.ImporterProtocol):
     def get_security_list(self):
         tickers = set()
         for ot in self.get_transactions():
-            if ot.type in ['buymf', 'sellmf', 'buystock', 'sellstock', 'reinvest', 'income']:
+            if hasatrr(ot, 'security'):
                 tickers.add(ot.security)
         return tickers
 
