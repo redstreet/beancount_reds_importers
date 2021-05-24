@@ -100,7 +100,7 @@ class Importer(importer.ImporterProtocol):
     def get_security_list(self):
         tickers = set()
         for ot in self.get_transactions():
-            if hasatrr(ot, 'security'):
+            if hasattr(ot, 'security'):
                 tickers.add(ot.security)
         return tickers
 
