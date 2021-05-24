@@ -54,6 +54,8 @@ class Importer(importer.ImporterProtocol):
             "sellmf":      self.config['main_account'],
             "buystock":    self.config['main_account'],
             "sellstock":   self.config['main_account'],
+            "buyother":    self.config['main_account'],
+            "sellother":   self.config['main_account'],
             "reinvest":    self.config['dividends'],
             "dividends":   self.config['dividends'],
             "capgains_lt": self.config['capgains_lt'],
@@ -114,7 +116,8 @@ class Importer(importer.ImporterProtocol):
     # --------------------------------------------------------------------------------
 
     def generate_trade_entry(self, ot, file, counter):
-        """ Involves a commodity. One of: ['buymf', 'sellmf', 'buystock', 'sellstock', 'reinvest']"""
+        """ Involves a commodity. One of: ['buymf', 'sellmf', 'buystock', 'sellstock', 'buyother',
+        'sellother', 'reinvest']"""
 
         config = self.config
         ticker, ticker_long_name = self.get_ticker_info(ot.security)
@@ -242,7 +245,7 @@ class Importer(importer.ImporterProtocol):
         new_entries = []
         self.read_file(file)
         for ot in self.get_transactions():
-            if ot.type in ['buymf', 'sellmf', 'buystock', 'sellstock', 'reinvest']:
+            if ot.type in ['buymf', 'sellmf', 'buystock', 'sellstock', 'buyother', 'sellother', 'reinvest']:
                 entry = self.generate_trade_entry(ot, file, counter)
             elif ot.type in ['other', 'credit', 'debit', 'transfer', 'dep', 'income',
                              'dividends', 'capgains_st', 'capgains_lt', 'cash']:
