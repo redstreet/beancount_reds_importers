@@ -88,7 +88,7 @@ class Importer(banking.Importer):
         self.read_file(file)
         metadata = data.new_metadata(file.name, 0)
         # metadata['file_account'] = self.file_account(None)
-        entry = data.Transaction(metadata, self.paycheck_date(), self.FLAG,
+        entry = data.Transaction(metadata, self.paycheck_date(file), self.FLAG,
                                  None, config['desc'], data.EMPTY_SET, data.EMPTY_SET, [])
 
         entry = self.build_postings(entry)
