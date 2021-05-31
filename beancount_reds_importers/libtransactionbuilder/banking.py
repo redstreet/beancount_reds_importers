@@ -13,7 +13,10 @@ class Importer(importer.ImporterProtocol):
         self.initialized_reader = False
         self.reader_ready = False
         self.custom_init_run = False
-        self.get_transaction_type_desc = lambda ot: ot.type
+        self.get_transaction_type_desc = lambda ot: None
+        # NOTE: to include type in the description, use:
+        # self.get_transaction_type_desc = lambda ot: ot.type
+
         # REQUIRED_CONFIG = {
         #     'account_number'   : 'account number',
         #     'main_account'     : 'destination of import',
@@ -44,8 +47,6 @@ class Importer(importer.ImporterProtocol):
             self.filename_identifier_substring = ''
             self.custom_init_run = True
 
-    def set_credit_card_defaults(self):
-        self.get_transaction_type_desc = lambda ot: None
 
     # def get_target_acct(self, transaction):
     #     # Not needed for accounts using smart_importer
@@ -57,10 +58,11 @@ class Importer(importer.ImporterProtocol):
         entries = []
         meta = data.new_metadata(file.name, next(counter))
         for bal in self.get_balance_statement():
-            balance_entry = data.Balance(meta, bal.date, self.config['main_account'],
-                                         amount.Amount(bal.amount, self.currency),
-                                         None, None)
-            entries.append(balance_entry)
+            if bal:
+                balance_entry = data.Balance(meta, bal.date, self.config['main_account'],
+                                             amount.Amount(bal.amount, self.currency),
+                                             None, None)
+                entries.append(balance_entry)
         return entries
 
     def extract(self, file, existing_entries=None):
