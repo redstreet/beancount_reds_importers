@@ -118,6 +118,7 @@ class Importer(reader.Reader, importer.ImporterProtocol):
             rdr = rdr.rename(self.header_map)
             rdr = self.convert_columns(rdr)
             self.rdr = rdr
+            self.ifile = file
             self.file_read_done = True
 
     def get_transactions(self):
