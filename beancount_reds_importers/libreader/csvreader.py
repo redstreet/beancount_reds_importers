@@ -131,7 +131,7 @@ class Importer(reader.Reader, importer.ImporterProtocol):
         raise "Not supported"
 
     def get_available_cash(self):
-        raise "Not supported"
+        return None
 
     # TOOD: custom, overridable
     def skip_transaction(self, row):

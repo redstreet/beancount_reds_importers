@@ -102,4 +102,4 @@ class Importer(csvreader.Importer):
         raise "Not supported"
 
     def get_available_cash(self):
-        return False
+        return None
