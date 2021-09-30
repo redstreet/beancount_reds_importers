@@ -56,7 +56,7 @@ class Importer(reader.Reader, importer.ImporterProtocol):
             yield pos
 
     def get_available_cash(self):
-        return self.ofx_account.statement.available_cash
+        return getattr(self.ofx_account.statement, 'available_cash', None)
 
     def get_max_transaction_date(self):
         try:

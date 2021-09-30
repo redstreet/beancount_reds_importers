@@ -296,17 +296,14 @@ class Importer(importer.ImporterProtocol):
 
         # ----------------- available cash
         available_cash = self.get_available_cash()
-        if available_cash is not False:
-            try:
-                balance = self.get_available_cash() - settlement_fund_balance
-                meta = data.new_metadata(file.name, next(counter))
-                bal_date = date if date else self.file_date(file).date()
-                balance_entry = data.Balance(meta, bal_date, self.cash_account,
-                                             amount.Amount(balance, self.currency),
-                                             None, None)
-                new_entries.append(balance_entry)
-            except AttributeError:  # self.get_available_cash()
-                pass
+        if available_cash is not None:
+            balance = available_cash - settlement_fund_balance
+            meta = data.new_metadata(file.name, next(counter))
+            bal_date = date if date else self.file_date(file).date()
+            balance_entry = data.Balance(meta, bal_date, self.cash_account,
+                                         amount.Amount(balance, self.currency),
+                                         None, None)
+            new_entries.append(balance_entry)
 
         return new_entries
 
