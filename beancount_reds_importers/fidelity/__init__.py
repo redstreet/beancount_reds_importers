@@ -14,7 +14,7 @@ class Importer(investments.Importer, ofxreader.Importer):
     def file_name(self, file):
         return 'fidelity-{}-{}'.format(self.config['account_number'], ntpath.basename(file.name))
 
-    def get_target_acct_custom(self, transaction):
+    def get_target_acct_custom(self, transaction, ticker=None):
         if transaction.memo.startswith("CONTRIBUTION"):
             return self.config['transfer']
         if transaction.memo.startswith("FEES"):

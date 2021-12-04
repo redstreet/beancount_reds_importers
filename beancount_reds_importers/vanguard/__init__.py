@@ -14,5 +14,5 @@ class Importer(investments.Importer, ofxreader.Importer):
     def file_name(self, file):
         return 'vanguard-all-{}'.format(ntpath.basename(file.name))
 
-    def get_target_acct_custom(self, transaction):
+    def get_target_acct_custom(self, transaction, ticker=None):
         return self.target_account_map.get(transaction.type, None)

@@ -91,13 +91,13 @@ class Importer(importer.ImporterProtocol):
             sys.exit(1)
         return ticker, ticker_long_name
 
-    def get_target_acct_custom(self, transaction):
+    def get_target_acct_custom(self, transaction, ticker=None):
         return self.target_account_map.get(transaction.type, None)
 
-    def get_target_acct(self, transaction):
+    def get_target_acct(self, transaction, ticker=None):
         if transaction.type == 'income' and getattr(transaction, 'income_type', None) == 'DIV':
             return self.target_account_map.get('dividends', None)
-        return self.get_target_acct_custom(transaction)
+        return self.get_target_acct_custom(transaction, ticker)
 
     def get_security_list(self):
         tickers = set()
@@ -134,7 +134,7 @@ class Importer(importer.ImporterProtocol):
             metadata['settlement_date'] = str(ot.settleDate.date())
 
         description = f'[{ticker}] {ticker_long_name}'
-        target_acct = self.get_target_acct(ot)
+        target_acct = self.get_target_acct(ot, ticker)
         units = ot.units
         total = ot.total
 
