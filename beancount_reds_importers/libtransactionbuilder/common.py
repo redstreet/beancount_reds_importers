@@ -6,6 +6,10 @@ from beancount.core.position import Cost
 from beancount.core.number import Decimal
 from beancount.core.number import D
 
+class PriceCostBothZeroException(Exception):
+    """Raised when the input value is too small"""
+    pass
+
 
 def create_simple_posting_with_price(entry, account,
                                      number, currency,
@@ -17,16 +21,18 @@ def create_simple_posting_with_price(entry, account,
 
 def create_simple_posting_with_cost(entry, account,
                                     number, currency,
-                                    cost_number, cost_currency):
+                                    cost_number, cost_currency, price_cost_both_zero_handler=None):
     return create_simple_posting_with_cost_or_price(entry, account,
                                                     number, currency,
-                                                    cost_number=cost_number, cost_currency=cost_currency)
+                                                    cost_number=cost_number, cost_currency=cost_currency,
+                                                    price_cost_both_zero_handler=price_cost_both_zero_handler)
 
 
 def create_simple_posting_with_cost_or_price(entry, account,
                                              number, currency,
                                              price_number=None, price_currency=None,
-                                             cost_number=None, cost_currency=None, costspec=None):
+                                             cost_number=None, cost_currency=None, costspec=None,
+                                             price_cost_both_zero_handler=None):
     """Create a simple posting on the entry, with a cost (for purchases) or price (for sell transactions).
 
     Args:
@@ -49,10 +55,12 @@ def create_simple_posting_with_cost_or_price(entry, account,
     units = Amount(number, currency)
 
     if not (price_number or cost_number):
-        print("Either price ({}) or cost ({}) must be specified ({})".format(price_number, cost_number, entry))
-        import pdb
-        pdb.set_trace()
-        raise Exception("Either price ({}) or cost ({}) must be specified".format(price_number, cost_number))
+        if price_cost_both_zero_handler:
+            price_cost_both_zero_handler()
+        else:
+            print("WARNING: Either price ({}) or cost ({}) must be specified ({})".format(price_number, cost_number, entry))
+            raise PriceCostBothZeroException
+            # import pdb; pdb.set_trace()
 
     price = Amount(price_number, price_currency) if price_number else None
     cost = Cost(cost_number, cost_currency, None, None) if cost_number else None

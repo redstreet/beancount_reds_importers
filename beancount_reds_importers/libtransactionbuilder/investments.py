@@ -19,6 +19,7 @@ class Importer(importer.ImporterProtocol):
         self.reader_ready = False
         self.custom_init_run = False
         self.includes_balances = False
+        self.price_cost_both_zero_handler = None
         self.use_commodity_leaf = config.get('commodity_leaf', True)
         # REQUIRED_CONFIG = {
         #     'account_number'   : 'account number',
@@ -116,6 +117,7 @@ class Importer(importer.ImporterProtocol):
     def skip_transactions(self, ot):
         return False
 
+
     # extract() and supporting methods
     # --------------------------------------------------------------------------------
 
@@ -165,7 +167,8 @@ class Importer(importer.ImporterProtocol):
                                                             costspec=CostSpec(None, None, None, None, None, None))
             data.create_simple_posting(entry, self.config['cg'], None, None)  # capital gains posting
         else:  # buy stock/fund
-            common.create_simple_posting_with_cost(entry, main_acct, units, ticker, ot.unit_price, self.currency)
+            common.create_simple_posting_with_cost(entry, main_acct, units, ticker, ot.unit_price,
+                    self.currency, self.price_cost_both_zero_handler)
 
         # "Other" account posting
         reverser = 1
