@@ -5,6 +5,7 @@ from beancount_reds_importers.libtransactionbuilder import investments
 
 
 class Importer(investments.Importer, ofxreader.Importer):
+    IMPORTER_NAME = 'TDAmeritrade'
     def custom_init(self):
         super(Importer, self).custom_init()
         self.max_rounding_error = 0.07

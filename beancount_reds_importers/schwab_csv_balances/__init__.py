@@ -8,6 +8,7 @@ from beancount_reds_importers.libtransactionbuilder import investments
 
 
 class Importer(investments.Importer, csv_multitable_reader.Importer):
+    IMPORTER_NAME = 'Schwab Brokerage Balances CSV'
     def custom_init(self):
         self.max_rounding_error = 0.04
         self.filename_identifier_substring = 'All_Accounts'
