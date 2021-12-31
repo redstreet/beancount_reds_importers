@@ -10,8 +10,8 @@ from beancount_reds_importers.libtransactionbuilder import investments
 class Importer(investments.Importer, csv_multitable_reader.Importer):
     def custom_init(self):
         self.max_rounding_error = 0.04
-        self.filename_identifier_substring = '-Positions-'
-        self.header_identifier = '"Positions for All-Accounts' + self.config.get('custom_header', '')
+        self.filename_identifier_substring = 'All_Accounts'
+        self.header_identifier = '.*All-Accounts.*' + self.config.get('custom_header', '')
         self.get_ticker_info = self.get_ticker_info_from_id
         self.date_format = '%m/%d/%Y'
         self.skip_head_rows = 1
