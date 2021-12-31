@@ -30,7 +30,9 @@ class Importer(investments.Importer, csvreader.Importer):
             'Bank Interest':                'income',
             'Bank Transfer':                'transfer',
             'Buy':                          'buystock',
+            'Reinvestment Adj':             'buystock',
             'Cash Dividend':                'dividends',
+            'Div Adjustment':               'dividends',
             'Long Term Cap Gain Reinvest':  'capgains_lt',
             'Misc Credits':                 'transfer',
             'MoneyLink Deposit':            'transfer',
@@ -41,6 +43,7 @@ class Importer(investments.Importer, csvreader.Importer):
             'Sell':                         'sellstock',
             'Short Term Cap Gain Reinvest': 'capgains_st',
             'Wire Funds Received':          'transfer',
+            'Funds Received':               'transfer',
             }
         self.skip_transaction_types = ['Journal']
 
