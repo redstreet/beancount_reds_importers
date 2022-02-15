@@ -1,4 +1,4 @@
-"""csv importer module for beancount to be used along with investment/banking/other importer modules in
+"""xlsx importer module for beancount to be used along with investment/banking/other importer modules in
 beancount_reds_importers."""
 
 import petl as etl
@@ -46,5 +46,5 @@ class Importer(csv_multitable_reader.Importer):
 
     def is_section_title(self, row):
         if len(row) == 1:
-            return
+            return True
         return all(i == '' or i is None for i in row[1:])
