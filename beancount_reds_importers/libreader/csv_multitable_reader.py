@@ -40,9 +40,6 @@ class Importer(csvreader.Importer):
     def initialize_reader(self, file):
         csvreader.Importer.initialize_reader(self, file)
 
-        # TODO: should be in importer, not here
-        self.includes_balances = True
-
     def file_date(self, file):
         "Get the maximum date from the file."
         self.read_file(file)
@@ -56,6 +53,7 @@ class Importer(csvreader.Importer):
         return etl.fromcsv(file.name)
 
     def is_section_title(self, row):
+        # Detect 'section1', 'section2', ...
         return len(row) == 1
 
     def read_file(self, file):
@@ -69,6 +67,10 @@ class Importer(csvreader.Importer):
 
         self.raw_rdr = rdr = self.read_raw(file)
 
+        # skip non-table rows at file head & footer
+        rdr = rdr.skip(getattr(self, 'skip_head_rows', 0))                 # chop unwanted header rows
+        rdr = rdr.head(len(rdr) - getattr(self, 'skip_tail_rows', 0) - 1)  # chop unwanted footer rows
+
         #     [0, 2, 10] <-- starts
         # [-1, 1, 9]     <-- ends
         table_starts = [i for (i, row) in enumerate(rdr) if self.is_section_title(row)] + [len(rdr)]
@@ -80,8 +82,8 @@ class Importer(csvreader.Importer):
         for (s, e) in table_indexes:
             if s == e:
                 continue
-            table = rdr.skip(s+1)
-            table = table.head(e-s-1)
+            table = rdr.skip(s+1)  # skip past start index & header row
+            table = table.head(e-s-1)  # chop lines after table section data
             self.alltables[rdr[s][0]] = table
 
         for section, table in self.alltables.items():
