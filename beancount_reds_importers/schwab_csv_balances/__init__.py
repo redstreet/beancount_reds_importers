@@ -10,6 +10,7 @@ from beancount_reds_importers.libtransactionbuilder import investments
 class Importer(investments.Importer, csv_multitable_reader.Importer):
     IMPORTER_NAME = 'Schwab Brokerage Balances CSV'
     def custom_init(self):
+        self.includes_balances = True
         self.max_rounding_error = 0.04
         self.filename_identifier_substring = 'All_Accounts'
         self.header_identifier = '.*All-Accounts.*' + self.config.get('custom_header', '')
@@ -43,6 +44,9 @@ class Importer(investments.Importer, csv_multitable_reader.Importer):
             rdr = rdr.convert(i, D)
 
         return rdr
+
+    def is_section_title(self, row):
+        return len(row) == 1
 
     def file_date(self, file):
         return self.date.date()

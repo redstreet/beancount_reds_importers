@@ -40,9 +40,6 @@ class Importer(csvreader.Importer):
     def initialize_reader(self, file):
         csvreader.Importer.initialize_reader(self, file)
 
-        # TODO: should be in importer, not here
-        self.includes_balances = True
-
     def file_date(self, file):
         "Get the maximum date from the file."
         self.read_file(file)
@@ -56,7 +53,8 @@ class Importer(csvreader.Importer):
         return etl.fromcsv(file.name)
 
     def is_section_title(self, row):
-        return len(row) == 1
+        # Should be in importer.
+        raise "Not supported"
 
     def read_file(self, file):
         # read csv
