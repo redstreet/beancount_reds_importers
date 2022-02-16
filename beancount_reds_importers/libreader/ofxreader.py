@@ -55,6 +55,14 @@ class Importer(reader.Reader, importer.ImporterProtocol):
         for pos in self.ofx_account.statement.positions:
             yield pos
 
+    def get_commodity_entries(self):
+        """Commodity listing entries"""
+        raise "Not supported"
+
+    def get_account_entries(self):
+        """Account open/close entries"""
+        raise "Not supported"
+
     def get_available_cash(self):
         return getattr(self.ofx_account.statement, 'available_cash', None)
 

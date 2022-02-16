@@ -130,6 +130,14 @@ class Importer(reader.Reader, importer.ImporterProtocol):
     def get_balance_positions(self):
         raise "Not supported"
 
+    def get_commodities(self):
+        """Commodity listing entries"""
+        raise "Not supported"
+
+    def get_accounts(self):
+        """Account open/close entries"""
+        raise "Not supported"
+
     def get_available_cash(self):
         return None
 

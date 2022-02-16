@@ -103,5 +103,38 @@ class Importer(csvreader.Importer):
         # TODO
         raise "Not supported"
 
+    def get_commodity_entries(self):
+        """Commodity listing entries"""
+        #
+        # Expected to return a named
+        # tuple with at minimum:
+        # 'security' : ticker name
+        # 'date' : (inception) date
+        #
+        # Additional metadata
+        # (e.g. 'name') handled
+        # by custom importer's
+        # build_commodity_metadata
+        #
+        raise "Not supported"
+
+    def get_account_entries(self):
+        """Account open/close entries"""
+        #
+        # Expected to return a named
+        # tuple with at minimum:
+        # 'type' : 'open' or 'close'
+        # 'date' : date
+        #
+        # and either:
+        # 'security' : (commodity leaf) name
+        # 'name': fullname
+        #
+        # Additional metadata handled
+        # by custom importer's
+        # build_account_metadata
+        #
+        raise "Not supported"
+
     def get_available_cash(self):
         return None

@@ -19,6 +19,8 @@ class Importer(importer.ImporterProtocol):
         self.reader_ready = False
         self.custom_init_run = False
         self.includes_balances = False
+        self.includes_commodities = False
+        self.includes_accounts = False
         self.price_cost_both_zero_handler = None
         self.use_commodity_leaf = config.get('commodity_leaf', True)
         # REQUIRED_CONFIG = {
@@ -77,6 +79,14 @@ class Importer(importer.ImporterProtocol):
 
     def build_transaction_metadata(self, file, counter, ot=None, metadata={}):
         """Override in importer make use of ot argument"""
+        return self.build_metadata(file.name, counter, metadata)
+
+    def build_commodity_metadata(self, file, counter, commodity=None, metadata={}):
+        """Override in importer make use of commodity argument"""
+        return self.build_metadata(file.name, counter, metadata)
+
+    def build_account_metadata(self, file, counter, account=None, metadata={}):
+        """Override in importer make use of account argument"""
         return self.build_metadata(file.name, counter, metadata)
 
     def custom_init(self):
@@ -323,6 +333,52 @@ class Importer(importer.ImporterProtocol):
 
         return new_entries
 
+    def extract_commodities(self, file, counter):
+        """extract and write in commodity entries"""
+        new_entries = []
+
+        for commodity in self.get_commodities():
+            date = commodity.date
+            security = commodity.security
+
+            metadata = self.build_commodity_metadata(
+                file, next(counter), commodity)
+            commodity = data.Commodity(bond_commodity_meta, date, security)
+            new_entries.append(commodity)
+
+        return new_entries
+
+    def extract_accounts(self, file, counter):
+        """extract and write in account open/close entries"""
+        new_entries = []
+
+        for account in self.get_accounts():
+            date = account.date
+            acct_type = account.type
+            name = account.name
+
+            metadata = self.build_account_metadata(file, next(counter))
+            if(acct_type == 'open'):
+                entry = data.Open(
+                    meta, date,
+                    name,
+                    None,
+                    None
+                )
+                entries.append(entry)
+            elif(acct_type == 'close'):
+                entry = data.Open(
+                    meta, date,
+                    name,
+                    None,
+                    None
+                )
+                entries.append(entry)
+            else:
+                raise Exception('Unknown account entry type')
+
+        return new_entries
+
     def add_fee_postings(self, entry, ot):
         config = self.config
         if hasattr(ot, 'fees') or hasattr(ot, 'commission'):
@@ -339,5 +395,11 @@ class Importer(importer.ImporterProtocol):
         new_entries += self.extract_transactions(file, counter)
         if self.includes_balances:
             new_entries += self.extract_balances_and_prices(file, counter)
+
+        if self.includes_commodities:
+            new_entries += self.extract_commodities(file, counter)
+
+        if self.includes_accounts:
+            new_entries += self.extract_accounts(file, counter)
 
         return(new_entries)
