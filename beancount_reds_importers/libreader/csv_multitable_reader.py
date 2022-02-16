@@ -67,6 +67,10 @@ class Importer(csvreader.Importer):
 
         self.raw_rdr = rdr = self.read_raw(file)
 
+        # skip non-table rows at file head & footer
+        rdr = rdr.skip(getattr(self, 'skip_head_rows', 0))                 # chop unwanted header rows
+        rdr = rdr.head(len(rdr) - getattr(self, 'skip_tail_rows', 0) - 1)  # chop unwanted footer rows
+
         #     [0, 2, 10] <-- starts
         # [-1, 1, 9]     <-- ends
         table_starts = [i for (i, row) in enumerate(rdr) if self.is_section_title(row)] + [len(rdr)]
@@ -78,7 +82,7 @@ class Importer(csvreader.Importer):
         for (s, e) in table_indexes:
             if s == e:
                 continue
-            table = rdr.skip(s+1)
+            table = rdr.skip(s+self.skip_section_rows)
             table = table.head(e-s-1)
             self.alltables[rdr[s][0]] = table
 
