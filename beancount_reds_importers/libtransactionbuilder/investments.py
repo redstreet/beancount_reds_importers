@@ -71,6 +71,14 @@ class Importer(importer.ImporterProtocol):
         }
         self.cash_account = self.commodity_leaf(self.config['main_account'], self.currency)
 
+    def build_metadata(self, file, counter, metadata={}):
+        metadata_ = data.new_metadata(file.name, counter)
+        return metadata_ | metadata
+
+    def build_transaction_metadata(self, file, counter, ot=None, metadata={}):
+        """Override in importer make use of ot argument"""
+        return self.build_metadata(file.name, counter, metadata)
+
     def custom_init(self):
         if not self.custom_init_run:
             self.max_rounding_error = 0.04
@@ -117,7 +125,6 @@ class Importer(importer.ImporterProtocol):
     def skip_transactions(self, ot):
         return False
 
-
     # extract() and supporting methods
     # --------------------------------------------------------------------------------
 
@@ -130,7 +137,7 @@ class Importer(importer.ImporterProtocol):
         is_money_market = ticker in self.money_market_funds
 
         # Build metadata
-        metadata = data.new_metadata(file.name, next(counter))
+        metadata = {}
         # metadata['file_account'] = self.file_account(None)
         if getattr(ot, 'settleDate', None) is not None and ot.settleDate != ot.tradeDate:
             metadata['settlement_date'] = str(ot.settleDate.date())
@@ -149,6 +156,9 @@ class Importer(importer.ImporterProtocol):
             target_acct = self.commodity_leaf(target_acct, ticker)
         else:
             target_acct = self.commodity_leaf(target_acct, self.currency)
+
+        metadata = self.build_transaction_metadata(
+            file, next(counter), ot, metadata)
 
         # Build transaction entry
         entry = data.Transaction(metadata, ot.tradeDate.date(), self.FLAG,
@@ -191,7 +201,7 @@ class Importer(importer.ImporterProtocol):
         """ Cash or in-kind transfers. One of:
             [credit, debit, dep, transfer, income, dividends, capgains_lt, capgains_st, other]"""
         config = self.config
-        metadata = data.new_metadata(file.name, next(counter))
+        metadata = self.build_transaction_metadata(file, next(counter), ot)
         target_acct = self.get_target_acct(ot)
         date = getattr(ot, 'tradeDate', None)
         if not date:
@@ -278,32 +288,35 @@ class Importer(importer.ImporterProtocol):
         settlement_fund_balance = 0
         for pos in self.get_balance_positions():
             ticker, ticker_long_name = self.get_ticker_info(pos.security)
-            meta = data.new_metadata(file.name, next(counter))
+            metadata = self.build_metadata(file, next(counter))
 
             # if there are no transactions, use the date in the source file for the balance. This gives us the
             # bonus of an updated, recent balance assertion
             bal_date = date if date else pos.date.date()
-            balance_entry = data.Balance(meta, bal_date, self.commodity_leaf(self.config['main_account'], ticker),
-                                         amount.Amount(pos.units, ticker),
-                                         None, None)
+            balance_entry = data.Balance(
+                metadata, bal_date,
+                self.commodity_leaf(self.config['main_account'], ticker),
+                amount.Amount(pos.units, ticker),
+                None, None)
             new_entries.append(balance_entry)
             if ticker in self.money_market_funds:
                 settlement_fund_balance = pos.units
 
             # extract price info if available
             if hasattr(pos, 'unit_price') and hasattr(pos, 'date'):
-                meta = data.new_metadata(file.name, next(counter))
-                price_entry = data.Price(meta, pos.date.date(), ticker,
-                                         amount.Amount(pos.unit_price, self.currency))
+                metadata = self.build_metadata(file, next(counter))
+                price_entry = data.Price(
+                    metadata, pos.date.date(), ticker,
+                    amount.Amount(pos.unit_price, self.currency))
                 new_entries.append(price_entry)
 
         # ----------------- available cash
         available_cash = self.get_available_cash()
         if available_cash is not None:
             balance = available_cash - settlement_fund_balance
-            meta = data.new_metadata(file.name, next(counter))
+            metadata = self.build_metadata(file, next(counter))
             bal_date = date if date else self.file_date(file).date()
-            balance_entry = data.Balance(meta, bal_date, self.cash_account,
+            balance_entry = data.Balance(metadata, bal_date, self.cash_account,
                                          amount.Amount(balance, self.currency),
                                          None, None)
             new_entries.append(balance_entry)

@@ -81,13 +81,18 @@ class Importer(banking.Importer):
         newentry = entry._replace(postings=sorted(entry.postings))
         return newentry
 
+    def build_metadata(self, file, counter, metadata={}):
+        metadata_ = data.new_metadata(file.name, counter)
+        return metadata_ | metadata
+
     def extract(self, file, existing_entries=None):
         self.initialize(file)
         config = self.config
 
         self.read_file(file)
-        metadata = data.new_metadata(file.name, 0)
+        metadata = {}
         # metadata['file_account'] = self.file_account(None)
+        metadata = self.build_metadata(file, 0, metadata)
         entry = data.Transaction(metadata, self.paycheck_date(file), self.FLAG,
                                  None, config['desc'], data.EMPTY_SET, data.EMPTY_SET, [])
 

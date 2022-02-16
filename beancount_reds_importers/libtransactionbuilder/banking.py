@@ -38,6 +38,10 @@ class Importer(importer.ImporterProtocol):
         # }
         pass
 
+    def build_metadata(self, file, counter, metadata={}):
+        metadata_ = data.new_metadata(file.name, counter)
+        return metadata_ | metadata
+
     def match_account_number(self, file_account, config_account):
         return file_account.endswith(config_account)
 
@@ -56,10 +60,10 @@ class Importer(importer.ImporterProtocol):
 
     def extract_balance(self, file, counter):
         entries = []
-        meta = data.new_metadata(file.name, next(counter))
+        metadata = self.build_metadata(file, next(counter))
         for bal in self.get_balance_statement():
             if bal:
-                balance_entry = data.Balance(meta, bal.date, self.config['main_account'],
+                balance_entry = data.Balance(metadata, bal.date, self.config['main_account'],
                                              amount.Amount(bal.amount, self.currency),
                                              None, None)
                 entries.append(balance_entry)
@@ -73,9 +77,10 @@ class Importer(importer.ImporterProtocol):
 
         self.read_file(file)
         for ot in self.get_transactions():
-            metadata = data.new_metadata(file.name, next(counter))
+            metadata = {}
             # metadata['file_account'] = self.file_account(None)
             # metadata['type'] = ot.type # Optional metadata, useful for debugging #TODO
+            metadata = self.build_metadata(file, next(counter))
 
             # description fields:
             # - beancount: (payee, narration):  # payee is optional, narration is mandatory
