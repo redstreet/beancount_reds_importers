@@ -23,6 +23,14 @@ class Importer(importer.ImporterProtocol):
         self.includes_accounts = False
         self.price_cost_both_zero_handler = None
         self.use_commodity_leaf = config.get('commodity_leaf', True)
+        self.transfer_unit_types = ['transfer']
+        self.transfer_amount_types = [
+            'other', 'credit', 'debit', 'dep', 'cash']
+        self.transfer_other_types = [
+            'income', 'dividends', 'capgains_st', 'capgains_lt']
+        self.transfer_types = (self.transfer_unit_types
+                               + self.transfer_amount_types
+                               + self.transfer_other_types)
         # REQUIRED_CONFIG = {
         #     'account_number'   : 'account number',
         #     'main_account'     : 'Destination account of import',
@@ -219,9 +227,9 @@ class Importer(importer.ImporterProtocol):
         date = date.date()
 
         try:
-            if ot.type in ['transfer']:
+            if ot.type in self.transfer_unit_types:
                 units = ot.units
-            elif ot.type in ['other', 'credit', 'debit', 'dep', 'cash']:
+            elif ot.type in self.transfer_amount_types:
                 units = ot.amount
             else:
                 units = ot.total
@@ -276,8 +284,7 @@ class Importer(importer.ImporterProtocol):
                 continue
             if ot.type in ['buymf', 'sellmf', 'buystock', 'sellstock', 'buyother', 'sellother', 'reinvest']:
                 entry = self.generate_trade_entry(ot, file, counter)
-            elif ot.type in ['other', 'credit', 'debit', 'transfer', 'dep', 'income',
-                             'dividends', 'capgains_st', 'capgains_lt', 'cash']:
+            elif ot.type in self.transfer_types:
                 entry = self.generate_transfer_entry(ot, file, counter)
             else:
                 print("ERROR: unknown entry type:", ot.type)
