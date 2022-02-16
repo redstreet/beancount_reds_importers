@@ -80,9 +80,11 @@ class Importer(reader.Reader, importer.ImporterProtocol):
     def prepare_raw_columns(self, rdr):
         return rdr
 
+    def convert_transaction_types(self, rdr):
+        return rdr.convert('type', self.transaction_type_map)
+
     def convert_columns(self, rdr):
-        # convert data in transaction types column
-        rdr = rdr.convert('type', self.transaction_type_map)
+        rdr = self.convert_transaction_types(rdr)
 
         # fixup decimals
         decimals = ['units']
