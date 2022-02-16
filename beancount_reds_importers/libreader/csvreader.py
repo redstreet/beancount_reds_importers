@@ -104,7 +104,7 @@ class Importer(reader.Reader, importer.ImporterProtocol):
         # fixup dates
         def convert_date(d):
             return datetime.datetime.strptime(d, self.date_format)
-        dates = ['date', 'tradeDate']
+        dates = ['date', 'tradeDate', 'settleDate']
         for i in dates:
             if i in rdr.header():
                 rdr = rdr.convert(i, convert_date)
