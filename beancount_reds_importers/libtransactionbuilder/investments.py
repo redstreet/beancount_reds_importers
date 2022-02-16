@@ -87,15 +87,15 @@ class Importer(importer.ImporterProtocol):
 
     def build_transaction_metadata(self, file, counter, ot=None, metadata={}):
         """Override in importer make use of ot argument"""
-        return self.build_metadata(file.name, counter, metadata)
+        return self.build_metadata(file, counter, metadata)
 
     def build_commodity_metadata(self, file, counter, commodity=None, metadata={}):
         """Override in importer make use of commodity argument"""
-        return self.build_metadata(file.name, counter, metadata)
+        return self.build_metadata(file, counter, metadata)
 
     def build_account_metadata(self, file, counter, account=None, metadata={}):
         """Override in importer make use of account argument"""
-        return self.build_metadata(file.name, counter, metadata)
+        return self.build_metadata(file, counter, metadata)
 
     def custom_init(self):
         if not self.custom_init_run:
@@ -345,13 +345,14 @@ class Importer(importer.ImporterProtocol):
         new_entries = []
 
         for commodity in self.get_commodities():
-            date = commodity.date
+            date = commodity.date.date()
             security = commodity.security
 
             metadata = self.build_commodity_metadata(
                 file, next(counter), commodity)
-            commodity = data.Commodity(bond_commodity_meta, date, security)
-            new_entries.append(commodity)
+            entry = data.Commodity(metadata, date, security)
+
+            new_entries.append(entry)
 
         return new_entries
 
@@ -360,29 +361,29 @@ class Importer(importer.ImporterProtocol):
         new_entries = []
 
         for account in self.get_accounts():
-            date = account.date
+            date = account.date.date()
             acct_type = account.type
             name = account.name
 
             metadata = self.build_account_metadata(file, next(counter))
             if(acct_type == 'open'):
                 entry = data.Open(
-                    meta, date,
+                    metadata, date,
                     name,
                     None,
                     None
                 )
-                entries.append(entry)
             elif(acct_type == 'close'):
                 entry = data.Open(
-                    meta, date,
+                    metadata, date,
                     name,
                     None,
                     None
                 )
-                entries.append(entry)
             else:
                 raise Exception('Unknown account entry type')
+
+            new_entries.append(entry)
 
         return new_entries
 
