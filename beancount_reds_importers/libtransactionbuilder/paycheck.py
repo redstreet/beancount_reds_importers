@@ -71,7 +71,11 @@ class Importer(banking.Importer):
                         if not amount:
                             continue
                         amount = D(amount)
-                        if 'Income:' in account and amount >= 0:
+                        if (amount >= 0 and any(
+                                account.startswith(prefix) for prefix in ['Income:', 'Equity:', 'Liabilities:']
+                        )) or (amount < 0 and any(
+                            account.startswith(prefix) for prefix in ['Expenses:', 'Assets:']
+                        )):
                             amount *= -1
                         total += amount
                         if amount:
