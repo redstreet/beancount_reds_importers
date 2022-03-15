@@ -246,8 +246,12 @@ class Importer(importer.ImporterProtocol):
             description = f'[{ticker}] {ticker_long_name}'
             if ot.type in ['income', 'dividends', 'capgains_st', 'capgains_lt']:  # no need to do this for transfers
                 target_acct = self.commodity_leaf(target_acct, ticker)  # book to Income:Dividends:HOOLI
+                source_account = self.cash_account
+            else:
+                source_account = self.commodity_leaf(config['main_account'], ticker)
         else:  # cash transfer
             description = ot.type
+            source_account = self.cash_account
             ticker = self.currency
 
         # Build transaction entry
@@ -256,11 +260,10 @@ class Importer(importer.ImporterProtocol):
 
         # Build postings
         if ot.type in ['income', 'dividends', 'capgains_st', 'capgains_lt']:  # cash
-            data.create_simple_posting(entry, self.cash_account, ot.total, self.currency)
+            data.create_simple_posting(entry, source_account, ot.total, self.currency)
             data.create_simple_posting(entry, target_acct, -1 * ot.total, self.currency)
         else:
-            main_acct = self.commodity_leaf(config['main_account'], ticker)
-            data.create_simple_posting(entry, main_acct, units, ticker)
+            data.create_simple_posting(entry, source_account, units, ticker)
             data.create_simple_posting(entry, target_acct, -1 * units, ticker)
         return entry
 
