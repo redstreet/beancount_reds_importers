@@ -71,14 +71,23 @@ class Importer(banking.Importer):
                         if not amount:
                             continue
                         amount = D(amount)
-                        if 'Income:' in account and amount >= 0:
+                        if (amount >= 0 and any(
+                                account.startswith(prefix) for prefix in ['Income:', 'Equity:', 'Liabilities:']
+                        )) or (amount < 0 and any(
+                            account.startswith(prefix) for prefix in ['Expenses:', 'Assets:']
+                        )):
                             amount *= -1
                         total += amount
                         if amount:
                             data.create_simple_posting(entry, account, amount, currency)
         if total != 0:
             data.create_simple_posting(entry, "TOTAL:NONZERO", total, currency)
-        newentry = entry._replace(postings=sorted(entry.postings))
+
+        if self.config.get('sort_postings', True):
+            postings = sorted(entry.postings)
+        else:
+            postings = entry.postings
+        newentry = entry._replace(postings=postings)
         return newentry
 
     def build_metadata(self, file, counter, metadata={}):
