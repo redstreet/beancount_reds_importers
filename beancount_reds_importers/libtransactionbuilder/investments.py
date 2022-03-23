@@ -98,7 +98,7 @@ class Importer(importer.ImporterProtocol):
             sys.exit(1)
         return ticker, ticker_long_name
 
-    def add_ticker(s, ticker):
+    def add_ticker(self, s, ticker):
         try:
             return s.format(ticker=ticker)
         except AttributeError:
@@ -107,9 +107,9 @@ class Importer(importer.ImporterProtocol):
     def get_target_acct_custom(self, transaction, ticker=None):
         return self.add_ticker(self.target_account_map.get(transaction.type, None), ticker)
 
-    def get_target_acct(self, transaction, ticker=None):
+    def get_target_acct(self, transaction, ticker):
         if transaction.type == 'income' and getattr(transaction, 'income_type', None) == 'DIV':
-            self.add_ticker(self.target_account_map.get('dividends', None), ticker)
+            return self.add_ticker(self.target_account_map.get('dividends', None), ticker)
         return self.get_target_acct_custom(transaction, ticker)
 
     def get_security_list(self):
@@ -201,7 +201,7 @@ class Importer(importer.ImporterProtocol):
             [credit, debit, dep, transfer, income, dividends, capgains_lt, capgains_st, other]"""
         config = self.config
         metadata = data.new_metadata(file.name, next(counter))
-        target_acct = self.get_target_acct(ot)
+        target_acct = self.get_target_acct(ot, None)
         date = getattr(ot, 'tradeDate', None)
         if not date:
             date = ot.date
@@ -223,7 +223,7 @@ class Importer(importer.ImporterProtocol):
             ticker, ticker_long_name = self.get_ticker_info(ot.security)
             description = f'[{ticker}] {ticker_long_name}'
             if ot.type in ['income', 'dividends', 'capgains_st', 'capgains_lt']:  # no need to do this for transfers
-                target_acct = target_acct.format(ticker=ticker)  # book to Income:Dividends:HOOLI
+                target_acct = self.get_target_acct(ot, ticker)  # book to Income:Dividends:HOOLI
         else:  # cash transfer
             description = ot.type
             ticker = self.currency
