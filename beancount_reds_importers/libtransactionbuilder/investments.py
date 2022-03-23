@@ -20,10 +20,15 @@ class Importer(importer.ImporterProtocol):
         self.custom_init_run = False
         self.includes_balances = False
         self.price_cost_both_zero_handler = None
-        self.use_commodity_leaf = config.get('commodity_leaf', True)
         # REQUIRED_CONFIG = {
+        #     #                  : # The string "{ticker}" will be replaced with the ticker symbol. Use this
+        #                            to obtain account names that end with the commodity (commodity leaf
+        #                            accounts). The string "{currency}" will be replaced with the operating
+        #                            currency of the account in question (which is in turn obtained from the
+        #                            ofx or csv)
         #     'account_number'   : 'account number',
         #     'main_account'     : 'Destination account of import',
+        #     'cash_account'     : 'Cash account (usually same as the main account + a :{currency} appended)',
         #     'transfer'         : 'Account to which contributions and outgoing is transferred',
         #     'dividends'        : 'Account to book dividends',
         #     'cg'               : 'Account to book capital gains/losses',
@@ -32,7 +37,6 @@ class Importer(importer.ImporterProtocol):
         #     'fees'             : 'Account to book fees to',
         #     'rounding_error'   : 'Account to book rounding errors to',
         #     'fund_info '       : 'dictionary of fund info (by_id, money_market)',
-        #     'commodity_leaf '  : True/False # uses Assets:Brokerage:HOOLI vs Assets:Brokerage
         # }
 
     def initialize(self, file):
@@ -40,6 +44,9 @@ class Importer(importer.ImporterProtocol):
             self.custom_init()
             self.initialize_reader(file)
             if self.reader_ready:
+                # self.currency is defined by the reader (ofx, csv, etc.)
+                d = {'currency': self.currency, 'ticker': '{ticker}'}
+                self.config = {k:v.format(**d) if isinstance(v, str) else v for k, v in self.config.items()}
                 self.money_market_funds = self.config['fund_info']['money_market']
                 self.fund_data = self.config['fund_info']['fund_data']  # [(ticker, id, long_name), ...]
                 self.funds_by_id = {i: (ticker, desc) for ticker, i, desc in self.fund_data}
@@ -69,7 +76,6 @@ class Importer(importer.ImporterProtocol):
             "cash":        self.config['transfer'],
             "dep":         self.config['transfer'],
         }
-        self.cash_account = self.commodity_leaf(self.config['main_account'], self.currency)
 
     def custom_init(self):
         if not self.custom_init_run:
@@ -92,12 +98,18 @@ class Importer(importer.ImporterProtocol):
             sys.exit(1)
         return ticker, ticker_long_name
 
+    def add_ticker(s, ticker):
+        try:
+            return s.format(ticker=ticker)
+        except AttributeError:
+            return None
+
     def get_target_acct_custom(self, transaction, ticker=None):
-        return self.target_account_map.get(transaction.type, None)
+        return self.add_ticker(self.target_account_map.get(transaction.type, None), ticker)
 
     def get_target_acct(self, transaction, ticker=None):
         if transaction.type == 'income' and getattr(transaction, 'income_type', None) == 'DIV':
-            return self.target_account_map.get('dividends', None)
+            self.add_ticker(self.target_account_map.get('dividends', None), ticker)
         return self.get_target_acct_custom(transaction, ticker)
 
     def get_security_list(self):
@@ -107,11 +119,8 @@ class Importer(importer.ImporterProtocol):
                 tickers.add(ot.security)
         return tickers
 
-    def commodity_leaf(self, account, ticker):
-        if self.use_commodity_leaf:
-            return account + f':{ticker}'
-        else:
-            return account
+    def main_acct(self, ticker):
+        return self.config['main_account'].format(ticker=ticker)
 
     # for custom importers to override
     def skip_transactions(self, ot):
@@ -146,16 +155,16 @@ class Importer(importer.ImporterProtocol):
             if not is_money_market:
                 metadata['todo'] = 'TODO: this entry is incomplete until lots are selected (bean-doctor context <filename> <lineno>)'  # noqa: E501
         if ot.type in ['reinvest']:  # dividends are booked to commodity_leaf. Eg: Income:Dividends:HOOLI
-            target_acct = self.commodity_leaf(target_acct, ticker)
+            target_acct = target_acct.format(ticker=ticker)
         else:
-            target_acct = self.commodity_leaf(target_acct, self.currency)
+            target_acct = target_acct.format(ticker=self.currency)
 
         # Build transaction entry
         entry = data.Transaction(metadata, ot.tradeDate.date(), self.FLAG,
                                  ot.memo, description, data.EMPTY_SET, data.EMPTY_SET, [])
 
         # Main posting(s):
-        main_acct = self.commodity_leaf(config['main_account'], ticker)
+        main_acct = self.main_acct(ticker)
 
         if is_money_market:  # Use price conversions instead of holding these at cost
             common.create_simple_posting_with_price(entry, main_acct,
@@ -165,7 +174,7 @@ class Importer(importer.ImporterProtocol):
                                                             units, ticker, price_number=ot.unit_price,
                                                             price_currency=self.currency,
                                                             costspec=CostSpec(None, None, None, None, None, None))
-            data.create_simple_posting(entry, self.config['cg'], None, None)  # capital gains posting
+            data.create_simple_posting(entry, self.config['cg'].format(ticker=ticker), None, None)  # capital gains posting
         else:  # buy stock/fund
             common.create_simple_posting_with_cost(entry, main_acct, units, ticker, ot.unit_price,
                     self.currency, self.price_cost_both_zero_handler)
@@ -214,7 +223,7 @@ class Importer(importer.ImporterProtocol):
             ticker, ticker_long_name = self.get_ticker_info(ot.security)
             description = f'[{ticker}] {ticker_long_name}'
             if ot.type in ['income', 'dividends', 'capgains_st', 'capgains_lt']:  # no need to do this for transfers
-                target_acct = self.commodity_leaf(target_acct, ticker)  # book to Income:Dividends:HOOLI
+                target_acct = target_acct.format(ticker=ticker)  # book to Income:Dividends:HOOLI
         else:  # cash transfer
             description = ot.type
             ticker = self.currency
@@ -225,10 +234,10 @@ class Importer(importer.ImporterProtocol):
 
         # Build postings
         if ot.type in ['income', 'dividends', 'capgains_st', 'capgains_lt']:  # cash
-            data.create_simple_posting(entry, self.cash_account, ot.total, self.currency)
+            data.create_simple_posting(entry, config['cash_account'], ot.total, self.currency)
             data.create_simple_posting(entry, target_acct, -1 * ot.total, self.currency)
         else:
-            main_acct = self.commodity_leaf(config['main_account'], ticker)
+            main_acct = self.main_acct(ticker)
             data.create_simple_posting(entry, main_acct, units, ticker)
             data.create_simple_posting(entry, target_acct, -1 * units, ticker)
         return entry
@@ -283,7 +292,7 @@ class Importer(importer.ImporterProtocol):
             # if there are no transactions, use the date in the source file for the balance. This gives us the
             # bonus of an updated, recent balance assertion
             bal_date = date if date else pos.date.date()
-            balance_entry = data.Balance(meta, bal_date, self.commodity_leaf(self.config['main_account'], ticker),
+            balance_entry = data.Balance(meta, bal_date, self.main_acct(ticker),
                                          amount.Amount(pos.units, ticker),
                                          None, None)
             new_entries.append(balance_entry)
@@ -303,7 +312,7 @@ class Importer(importer.ImporterProtocol):
             balance = available_cash - settlement_fund_balance
             meta = data.new_metadata(file.name, next(counter))
             bal_date = date if date else self.file_date(file).date()
-            balance_entry = data.Balance(meta, bal_date, self.cash_account,
+            balance_entry = data.Balance(meta, bal_date, self.config['cash_account'],
                                          amount.Amount(balance, self.currency),
                                          None, None)
             new_entries.append(balance_entry)
