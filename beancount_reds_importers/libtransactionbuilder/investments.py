@@ -201,7 +201,7 @@ class Importer(importer.ImporterProtocol):
             [credit, debit, dep, transfer, income, dividends, capgains_lt, capgains_st, other]"""
         config = self.config
         metadata = data.new_metadata(file.name, next(counter))
-        target_acct = self.get_target_acct(ot, None)
+        ticker = None
         date = getattr(ot, 'tradeDate', None)
         if not date:
             date = ot.date
@@ -222,15 +222,15 @@ class Importer(importer.ImporterProtocol):
                        'capgains_st', 'transfer'] and (hasattr(ot, 'security') and ot.security):
             ticker, ticker_long_name = self.get_ticker_info(ot.security)
             description = f'[{ticker}] {ticker_long_name}'
-            if ot.type in ['income', 'dividends', 'capgains_st', 'capgains_lt']:  # no need to do this for transfers
-                target_acct = self.get_target_acct(ot, ticker)  # book to Income:Dividends:HOOLI
         else:  # cash transfer
             description = ot.type
             ticker = self.currency
 
+
         # Build transaction entry
         entry = data.Transaction(metadata, date, self.FLAG,
                                  ot.memo, description, data.EMPTY_SET, data.EMPTY_SET, [])
+        target_acct = self.get_target_acct(ot, ticker)
 
         # Build postings
         if ot.type in ['income', 'dividends', 'capgains_st', 'capgains_lt']:  # cash
