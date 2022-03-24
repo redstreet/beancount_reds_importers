@@ -28,4 +28,4 @@ class Reader():
         return '{}'.format(ntpath.basename(file.name))
 
     def file_account(self, _):
-        return self.config['main_account']
+        return self.config['main_account'].replace(':{ticker}', '').replace(':{currency}', '')
