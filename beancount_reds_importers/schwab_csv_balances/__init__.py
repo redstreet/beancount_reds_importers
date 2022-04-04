@@ -11,8 +11,8 @@ class Importer(investments.Importer, csv_multitable_reader.Importer):
     IMPORTER_NAME = 'Schwab Brokerage Balances CSV'
     def custom_init(self):
         self.max_rounding_error = 0.04
-        self.filename_identifier_substring = 'All_Accounts'
-        self.header_identifier = '.*All-Accounts.*' + self.config.get('custom_header', '')
+        self.filename_identifier_substring = self.config.get('filename_identifier_substring', '_Transactions_')
+        self.header_identifier = self.config.get('header_identifier', 'Transactions  for account')
         self.get_ticker_info = self.get_ticker_info_from_id
         self.date_format = '%m/%d/%Y'
         self.skip_head_rows = 1
