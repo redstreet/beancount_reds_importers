@@ -58,12 +58,12 @@ class Importer(importer.ImporterProtocol):
     def build_account_map(self):
         # map transaction types to target posting accounts
         self.target_account_map = {
-            "buymf":       self.config['main_account'],
-            "sellmf":      self.config['main_account'],
-            "buystock":    self.config['main_account'],
-            "sellstock":   self.config['main_account'],
-            "buyother":    self.config['main_account'],
-            "sellother":   self.config['main_account'],
+            "buymf":       self.config['cash_account'],
+            "sellmf":      self.config['cash_account'],
+            "buystock":    self.config['cash_account'],
+            "sellstock":   self.config['cash_account'],
+            "buyother":    self.config['cash_account'],
+            "sellother":   self.config['cash_account'],
             "reinvest":    self.config['dividends'],
             "dividends":   self.config['dividends'],
             "capgains_lt": self.config['capgains_lt'],
