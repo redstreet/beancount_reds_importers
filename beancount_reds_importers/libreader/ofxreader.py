@@ -35,7 +35,7 @@ class Importer(reader.Reader, importer.ImporterProtocol):
 
     def file_date(self, file):
         "Get the maximum date from the file."
-        self.ofx_account.statement.end_date
+        return self.ofx_account.statement.end_date
 
     def read_file(self, file):
         pass

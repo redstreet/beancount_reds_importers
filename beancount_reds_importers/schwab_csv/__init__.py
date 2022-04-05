@@ -8,8 +8,8 @@ class Importer(investments.Importer, csvreader.Importer):
     IMPORTER_NAME = 'Schwab Brokerage CSV'
     def custom_init(self):
         self.max_rounding_error = 0.04
-        self.filename_identifier_substring = '_Transactions_'
-        self.header_identifier = '"Transactions  for account ' + self.config.get('custom_header', '')
+        self.filename_identifier_substring = self.config.get('filename_identifier_substring', '_Transactions_')
+        self.header_identifier = self.config.get('header_identifier', '"Transactions  for account.*')
         self.get_ticker_info = self.get_ticker_info_from_id
         self.date_format = '%m/%d/%Y'
         self.funds_db_txt = 'funds_by_ticker'

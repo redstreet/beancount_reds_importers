@@ -3,6 +3,13 @@
 beancount_reds_importers: CHANGES
 =================================
 
+2022-03-23
+ - commodity_leaf is now configurable via replacement of '{ticker}' and '{currency}'
+   strings. See comments in libtransactionbuilder/investments.py for more info
+
+   WARNING! above is a breaking change: you will need to rewrite your .import file with
+   the strings above!
+
 2021-01-29
 
  - added the commodity_leaf feature: by default, accounts will now include a commodity

@@ -43,6 +43,7 @@ IMPORTER = fidelity_csv.Importer(
         "transfer_info": transfer_info,
         "fund_info": fund_info,
         "main_account": "Assets:Fidelity:Checking",
+        "cash_account": "Assets:Fidelity:Checking",
         "dividends": "Income:Fidelity:Checking:Dividends",
         "capgains_lt": "Income:Fidelity:Checking:Capgainslt",
         "capgains_st": "Income:Fidelity:Checking:Capgainsst",
