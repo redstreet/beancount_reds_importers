@@ -9,7 +9,7 @@ class Importer(investments.Importer, ofxreader.Importer):
     IMPORTER_NAME = 'Vanguard'
     def custom_init(self):
         self.max_rounding_error = 0.11
-        self.filename_identifier_substring = 'OfxDownload.qfx'
+        self.filename_pattern = '.*OfxDownload'
         self.get_ticker_info = self.get_ticker_info_from_id
 
         # See https://github.com/redstreet/beancount_reds_importers/issues/15: occasionally, Vanguard qfx

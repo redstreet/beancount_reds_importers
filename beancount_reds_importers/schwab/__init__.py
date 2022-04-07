@@ -8,7 +8,7 @@ class Importer(investments.Importer, ofxreader.Importer):
     IMPORTER_NAME = 'Schwab Brokerage'
     def custom_init(self):
         self.max_rounding_error = 0.04
-        self.filename_identifier_substring = 'schwab'
+        self.filename_pattern = '.*schwab'
         self.get_ticker_info = self.get_ticker_info_from_id
 
     # def get_ticker_info(self, security):

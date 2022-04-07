@@ -44,7 +44,7 @@ class Importer(importer.ImporterProtocol):
     def custom_init(self):
         if not self.custom_init_run:
             self.max_rounding_error = 0.04
-            self.filename_identifier_substring = ''
+            self.filename_pattern = '.*bank_specific_filename.*'
             self.custom_init_run = True
 
 

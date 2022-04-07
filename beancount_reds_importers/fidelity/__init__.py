@@ -9,7 +9,7 @@ class Importer(investments.Importer, ofxreader.Importer):
     IMPORTER_NAME = 'Fidelity'
     def custom_init(self):
         self.max_rounding_error = 0.14
-        self.filename_identifier_substring = 'fidelity'
+        self.filename_pattern = '.*fidelity'
         self.get_ticker_info = self.get_ticker_info_from_id
 
     def file_name(self, file):

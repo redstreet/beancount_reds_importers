@@ -2,6 +2,7 @@
 
 import ntpath
 from os import path
+import re
 
 
 class Reader():
@@ -17,8 +18,8 @@ class Reader():
             # print("No match on extension")
             return False
         self.custom_init()
-        if self.filename_identifier_substring not in path.basename(file.name):
-            # print("No match on filename_identifier_substring", self.filename_identifier_substring)
+        if not re.match(self.filename_pattern, path.basename(file.name)):
+            # print("No match on filename_pattern", self.filename_pattern, path.basename(file.name))
             return False
         self.initialize_reader(file)
         # print("reader_ready:", self.reader_ready)
