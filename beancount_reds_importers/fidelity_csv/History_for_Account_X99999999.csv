@@ -1,0 +1,34 @@
+
+
+
+Brokerage
+
+Run Date,Action,Symbol,Security Description,Security Type,Quantity,Price ($),Commission ($),Fees ($),Accrued Interest ($),Amount ($),Settlement Date
+ 12/03/2021, REINVESTMENT FIDELITY ZERO EXTND MARKET INDEX FUND (FZIPX) (Cash), FZIPX, FIDELITY ZERO EXTND MARKET INDEX FUND,Cash,48.195,12.45,,,,-600.03,
+ 12/03/2021, DIVIDEND RECEIVED FIDELITY ZERO EXTND MARKET INDEX FUND (FZIPX) (Cash), FZIPX, FIDELITY ZERO EXTND MARKET INDEX FUND,Cash,,,,,,100.01,
+ 12/03/2021, SHORT-TERM CAP GAIN FIDELITY ZERO EXTND MARKET INDEX FUND (FZIPX) (Cash), FZIPX, FIDELITY ZERO EXTND MARKET INDEX FUND,Cash,,,,,,150.01,
+ 12/03/2021, LONG-TERM CAP GAIN FIDELITY ZERO EXTND MARKET INDEX FUND (FZIPX) (Cash), FZIPX, FIDELITY ZERO EXTND MARKET INDEX FUND,Cash,,,,,,350.01,
+ 11/30/2021, REINVESTMENT FIDELITY TREASURY MONEY MARKET FUND (FZFXX) (Cash), FZFXX, FIDELITY TREASURY MONEY MARKET FUND,Cash,0.02,1,,,,-0.02,
+ 11/30/2021, DIVIDEND RECEIVED FIDELITY TREASURY MONEY MARKET FUND (FZFXX) (Cash), FZFXX, FIDELITY TREASURY MONEY MARKET FUND,Cash,,,,,,0.02,
+ 09/01/2021, MERGER MER FROM G8354H126#REOR M0099999990001 GINKGO BIOWORKS HOLDINGS INC CL A SHS (DNA) (Cash), DNA, GINKGO BIOWORKS HOLDINGS INC CL A SHS,Cash,1,,,,,,
+ 09/01/2021, MERGER MER PAYOUT #REOR M0099999990000 SOARING EAGLE ACQUISITION CORP COM USD0 (G8354H126) (Cash), G8354H126, SOARING EAGLE ACQUISITION CORP COM USD0,Cash,-1,,,,,,
+ 05/20/2021, YOU BOUGHT SOARING EAGLE ACQUISITION CORP COM USD0 (G8354H126) (Cash), G8354H126, SOARING EAGLE ACQUISITION CORP COM USD0,Cash,1,9.88,,,,-9.88,05/26/2021
+ 05/01/2021, TRANSFERRED FROM VS X11-111111-1 (Cash), , No Description,Cash,,,,,,10000,
+ 04/20/2021, CHECK RECEIVED (Cash), , No Description,Cash,,,,,,4200,
+ 01/02/2021, Electronic Funds Transfer Received (Cash), , No Description,Cash,,,,,,123.4,
+ 01/01/2021, DIRECT DEPOSIT Sphere Inc * Cashew App (Cash), , No Description,Cash,,,,,,100.20,
+ 09/24/2018, YOU BOUGHT, 9128285B2, UNITED STATES TREAS NTS NOTE 2.75000% 09/30/2020,Cash,3000,99.85,,,0.23,-2995.66,
+ 09/17/2018, YOU BOUGHT, 912796RC5, UNITED STATES TREAS BILLS ZERO CPN 0.00000% 03/21/2019,Cash,15000,98.84,,,,-14826.34,
+
+
+"The data and information in this spreadsheet is provided to you solely for your use and is not for distribution. The spreadsheet is provided for"
+"informational purposes only, and is not intended to provide advice, nor should it be construed as an offer to sell, a solicitation of an offer to buy or a"
+"recommendation for any security or insurance product by Fidelity or any third party. Data and information shown is based on information known to Fidelity as of the date it was"
+"exported and is subject to change. It should not be used in place of your account statements or trade confirmations and is not intended for tax reporting"
+"purposes. For more information on the data included in this spreadsheet, including any limitations thereof, go to Fidelity.com."
+
+"Brokerage services are provided by Fidelity Brokerage Services LLC, 900 Salem Street, Smithfield, RI 02917. Custody and other services provided by National"
+"Financial Services LLC. Both are Fidelity Investment companies and members SIPC, NYSE. Insurance products at Fidelity are distributed by"
+"Fidelity Insurance Agency, Inc., and, for certain products, by Fidelity Brokerage Services, Member NYSE, SIPC."
+
+"Date downloaded" 12/31/2021, 9:11 AM
