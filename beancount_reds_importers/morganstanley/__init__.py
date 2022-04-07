@@ -8,5 +8,5 @@ class Importer(investments.Importer, ofxreader.Importer):
     IMPORTER_NAME = 'Morgan Stanley Investments'
     def custom_init(self):
         self.max_rounding_error = 0.04
-        self.filename_pattern = '.*morganstanley'
+        self.filename_pattern_def = '.*morganstanley'
         self.get_ticker_info = self.get_ticker_info_from_id

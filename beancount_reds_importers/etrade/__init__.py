@@ -9,7 +9,7 @@ class Importer(investments.Importer, ofxreader.Importer):
     IMPORTER_NAME = 'ETrade'
     def custom_init(self):
         self.max_rounding_error = 0.11
-        self.filename_pattern = '.*etrade'
+        self.filename_pattern_def = '.*etrade'
         self.get_ticker_info = self.get_ticker_info_from_id
 
     def skip_transactions(self, ot):
