@@ -17,9 +17,7 @@ class Importer(investments.Importer, csvreader.Importer):
         self.skip_head_rows = 5
         self.skip_tail_rows = 14
 
-
         self.header_map = {
-
                 "Run Date":             'date',
                 "Action":               'memo',
                 "Symbol":               'security',
@@ -33,8 +31,8 @@ class Importer(investments.Importer, csvreader.Importer):
                 "type":                 'type',
 
                 "Security Description": "security_description",
-                "Security Type": "security_type",
-                "Commission ($)": "commission",
+                "Security Type":        "security_type",
+                "Commission ($)":       "commission",
                 "Accrued Interest ($)": "accrued_interest",
 
                 # TODO:
@@ -42,7 +40,7 @@ class Importer(investments.Importer, csvreader.Importer):
                 # "Accrued Interest ($)": '',
             }
 
-        self.transaction_type_map = {
+        self.transaction_type_map = { #TODO this list is incomplete
                 'CHECK RECEIVED':                     'dep',
                 'DIRECT DEPOSIT':                     'dep',
                 'DIVIDEND RECEIVED':                  'dividends',
@@ -60,22 +58,18 @@ class Importer(investments.Importer, csvreader.Importer):
         self.skip_transaction_types = [ 'MERGER MER FROM', 'MERGER MER PAYOUT']
 
     def prepare_raw_columns(self, rdr):
-        def cleanup_date(d):
-            """' 11/16/2018 as' --> '11/16/2018'"""
-            return d[1:]
-
         def description_to_action(d):
             for i in self.transaction_type_map:
                 if d.startswith(i):
                     return i
-            print("Unknown type: ", d)
+            print("Unknown transaction type: ", d)
             return d
 
-        rdr = rdr.convert('Run Date', cleanup_date)
-        rdr = rdr.convert('Settlement Date', cleanup_date)
+        for field in ['Run Date', 'Settlement Date', 'Action', 'Symbol']:
+            rdr = rdr.convert(field, lambda x: x.lstrip())
+
         rdr = rdr.addfield('tradeDate', lambda x: x['Run Date'])
         rdr = rdr.addfield('total', lambda x: x['Amount ($)'])
-        rdr = rdr.addfield('type', lambda x: x['Action'][1:])
+        rdr = rdr.addfield('type', lambda x: x['Action'])
         rdr = rdr.convert('type', description_to_action)
-        rdr = rdr.convert('Symbol', lambda x: x[1:])
         return rdr
