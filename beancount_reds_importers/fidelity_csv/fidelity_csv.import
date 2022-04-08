@@ -1,0 +1,44 @@
+#!/usr/bin/env python3
+"""Import configuration."""
+
+from beancount_reds_importers import fidelity_csv
+
+fund_data = [
+        ('FZFXX',     'helllo', 'Fideilty Zero',          ),
+        ('DNA',       'world', 'DNA Systems',             ),
+        ('G8354H126', '',          'Great Stock',         ),
+        ('FZIPX',     '',          'Fidelity Zero IPX',   ),
+        ('9128285B2', '',          'Fidelity 9128285B2',  ),
+        ('',          '',          'Unknown',             ),
+]
+money_market = [ 'VMMXX' ]
+fund_info = {
+        'fund_data' : fund_data,
+        'money_market' : money_market,
+        }
+
+def invst(importer, account_number, acct, config={}):
+    s = acct.split(':')
+    root = s[1]
+    taxability = s[2]
+    leaf = ':'.join(s[3:])
+    accts = {
+        'account_number' : account_number,
+        'main_account'   : acct + ':{ticker}',
+        'cash_account'   : f'{acct}:{{currency}}',
+        'transfer'       : 'Assets:Zero-Sum-Accounts:Transfers:Bank-Account',
+        'dividends'      : f'Income:{root}:{taxability}:Dividends:{leaf}:{{ticker}}',
+        'interest'       : f'Income:{root}:{taxability}:Interest:{leaf}',
+        'cg'             : f'Income:{root}:{taxability}:Capital-Gains:{leaf}:{{ticker}}',
+        'capgains_lt'    : f'Income:{root}:{taxability}:Capital-Gains-Distributions:Long:{leaf}:{{ticker}}',
+        'capgains_st'    : f'Income:{root}:{taxability}:Capital-Gains-Distributions:Short:{leaf}:{{ticker}}',
+        'fees'           : f'Expenses:Fees-and-Charges:Brokerage-Fees:{taxability}:{leaf}',
+        'rounding_error' : 'Equity:Rounding-Errors:Imports',
+        'fund_info'      : fund_info,
+    }
+    return importer.Importer({**accts, **config})
+
+# Setting this variable provides a list of importer instances.
+CONFIG = [
+        invst(fidelity_csv, '99999999', 'Assets:Investments:Taxable:Fidelity')
+]
