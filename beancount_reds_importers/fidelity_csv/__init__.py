@@ -43,17 +43,17 @@ class Importer(investments.Importer, csvreader.Importer):
             }
 
         self.transaction_type_map = {
-                ' CHECK RECEIVED': 'transfer',
-                ' DIRECT DEPOSIT': 'transfer',
-                ' DIVIDEND RECEIVED': 'dividends',
-                ' Electronic Funds Transfer Received': 'transfer',
-                ' LONG-TERM CAP GAIN': 'capgains_lt',
-                ' REINVESTMENT': 'buystock',
-                ' SHORT-TERM CAP GAIN': 'capgains_st',
-                ' TRANSFERRED FROM': 'transfer',
-                ' YOU BOUGHT': 'buystock',
-                ' MERGER MER FROM': 'transfer',
-                ' MERGER MER PAYOUT': 'transfer',
+                'CHECK RECEIVED':                     'dep',
+                'DIRECT DEPOSIT':                     'dep',
+                'DIVIDEND RECEIVED':                  'dividends',
+                'Electronic Funds Transfer Received': 'credit',
+                'LONG-TERM CAP GAIN':                 'capgains_lt',
+                'REINVESTMENT':                       'buystock',
+                'SHORT-TERM CAP GAIN':                'capgains_st',
+                'TRANSFERRED FROM':                   'debit',
+                'YOU BOUGHT':                         'buystock',
+                'MERGER MER FROM':                    'transfer',
+                'MERGER MER PAYOUT':                  'transfer',
             }
 
         # TODO
@@ -75,7 +75,7 @@ class Importer(investments.Importer, csvreader.Importer):
         rdr = rdr.convert('Settlement Date', cleanup_date)
         rdr = rdr.addfield('tradeDate', lambda x: x['Run Date'])
         rdr = rdr.addfield('total', lambda x: x['Amount ($)'])
-        rdr = rdr.addfield('type', lambda x: x['Action'])
+        rdr = rdr.addfield('type', lambda x: x['Action'][1:])
         rdr = rdr.convert('type', description_to_action)
         rdr = rdr.convert('Symbol', lambda x: x[1:])
         return rdr
