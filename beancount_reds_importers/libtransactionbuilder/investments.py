@@ -32,8 +32,8 @@ class Importer(importer.ImporterProtocol):
         #     'transfer'         : 'Account to which contributions and outgoing is transferred',
         #     'dividends'        : 'Account to book dividends',
         #     'cg'               : 'Account to book capital gains/losses',
-        #     'capgains_lt'      : 'Account to book long term capital gains distributions to'
-        #     'capgains_st'      : 'Account to book short term capital gains distributions to'
+        #     'capgainsd_lt'     : 'Account to book long term capital gains distributions to'
+        #     'capgainsd_st'     : 'Account to book short term capital gains distributions to'
         #     'fees'             : 'Account to book fees to',
         #     'rounding_error'   : 'Account to book rounding errors to',
         #     'fund_info '       : 'dictionary of fund info (by_id, money_market)',
@@ -58,23 +58,23 @@ class Importer(importer.ImporterProtocol):
     def build_account_map(self):
         # map transaction types to target posting accounts
         self.target_account_map = {
-            "buymf":       self.config['cash_account'],
-            "sellmf":      self.config['cash_account'],
-            "buystock":    self.config['cash_account'],
-            "sellstock":   self.config['cash_account'],
-            "buyother":    self.config['cash_account'],
-            "sellother":   self.config['cash_account'],
-            "reinvest":    self.config['dividends'],
-            "dividends":   self.config['dividends'],
-            "capgains_lt": self.config['capgains_lt'],
-            "capgains_st": self.config['capgains_st'],
-            "income":      self.config['interest'],
-            "other":       self.config['transfer'],
-            "credit":      self.config['transfer'],
-            "debit":       self.config['transfer'],
-            "transfer":    self.config['transfer'],
-            "cash":        self.config['transfer'],
-            "dep":         self.config['transfer'],
+            "buymf":        self.config['cash_account'],
+            "sellmf":       self.config['cash_account'],
+            "buystock":     self.config['cash_account'],
+            "sellstock":    self.config['cash_account'],
+            "buyother":     self.config['cash_account'],
+            "sellother":    self.config['cash_account'],
+            "reinvest":     self.config['dividends'],
+            "dividends":    self.config['dividends'],
+            "capgainsd_lt": self.config['capgainsd_lt'],
+            "capgainsd_st": self.config['capgainsd_st'],
+            "income":       self.config['interest'],
+            "other":        self.config['transfer'],
+            "credit":       self.config['transfer'],
+            "debit":        self.config['transfer'],
+            "transfer":     self.config['transfer'],
+            "cash":         self.config['transfer'],
+            "dep":          self.config['transfer'],
         }
 
     def custom_init(self):
@@ -196,7 +196,7 @@ class Importer(importer.ImporterProtocol):
 
     def generate_transfer_entry(self, ot, file, counter):
         """ Cash or in-kind transfers. One of:
-            [credit, debit, dep, transfer, income, dividends, capgains_lt, capgains_st, other]"""
+            [credit, debit, dep, transfer, income, dividends, capgainsd_lt, capgainsd_st, other]"""
         config = self.config
         metadata = data.new_metadata(file.name, next(counter))
         ticker = None
@@ -216,8 +216,8 @@ class Importer(importer.ImporterProtocol):
             print("Could not determine field for transaction amount")
             # import pdb; pdb.set_trace()
 
-        if ot.type in ['income', 'dividends', 'capgains_lt',
-                       'capgains_st', 'transfer'] and (hasattr(ot, 'security') and ot.security):
+        if ot.type in ['income', 'dividends', 'capgainsd_lt',
+                       'capgainsd_st', 'transfer'] and (hasattr(ot, 'security') and ot.security):
             ticker, ticker_long_name = self.get_ticker_info(ot.security)
             description = f'[{ticker}] {ticker_long_name}'
         else:  # cash transfer
@@ -230,7 +230,7 @@ class Importer(importer.ImporterProtocol):
         target_acct = self.get_target_acct(ot, ticker)
 
         # Build postings
-        if ot.type in ['income', 'dividends', 'capgains_st', 'capgains_lt']:  # cash
+        if ot.type in ['income', 'dividends', 'capgainsd_st', 'capgainsd_lt']:  # cash
             data.create_simple_posting(entry, config['cash_account'], ot.total, self.currency)
             data.create_simple_posting(entry, target_acct, -1 * ot.total, self.currency)
         else:
@@ -263,7 +263,7 @@ class Importer(importer.ImporterProtocol):
             if ot.type in ['buymf', 'sellmf', 'buystock', 'sellstock', 'buyother', 'sellother', 'reinvest']:
                 entry = self.generate_trade_entry(ot, file, counter)
             elif ot.type in ['other', 'credit', 'debit', 'transfer', 'dep', 'income',
-                             'dividends', 'capgains_st', 'capgains_lt', 'cash']:
+                             'dividends', 'capgainsd_st', 'capgainsd_lt', 'cash']:
                 entry = self.generate_transfer_entry(ot, file, counter)
             else:
                 print("ERROR: unknown entry type:", ot.type)

@@ -35,7 +35,7 @@ class Importer(investments.Importer, csvreader.Importer):
             'Reinvestment Adj':             'buystock',
             'Cash Dividend':                'dividends',
             'Div Adjustment':               'dividends',
-            'Long Term Cap Gain Reinvest':  'capgains_lt',
+            'Long Term Cap Gain Reinvest':  'capgainsd_lt',
             'Misc Credits':                 'transfer',
             'MoneyLink Deposit':            'transfer',
             'MoneyLink Transfer':           'transfer',
