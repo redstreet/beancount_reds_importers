@@ -26,4 +26,10 @@ class Importer(investments.Importer, ofxreader.Importer):
         return 'vanguard-all-{}'.format(ntpath.basename(file.name))
 
     def get_target_acct_custom(self, transaction, ticker=None):
-        return self.target_account_map.get(transaction.type, None)
+        target = self.target_account_map.get(transaction.type, None)
+        if target.startswith('Income:'):
+            if 'LT CAP GAIN' in transaction.memo:
+                target = self.config['capgainsd_lt']
+            elif 'ST CAP GAIN' in transaction.memo:
+                target = self.config['capgainsd_st']
+        return target
