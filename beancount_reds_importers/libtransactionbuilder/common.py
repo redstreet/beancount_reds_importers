@@ -6,6 +6,7 @@ from beancount.core.position import Cost
 from beancount.core.number import Decimal
 from beancount.core.number import D
 
+
 class PriceCostBothZeroException(Exception):
     """Raised when the input value is too small"""
     pass

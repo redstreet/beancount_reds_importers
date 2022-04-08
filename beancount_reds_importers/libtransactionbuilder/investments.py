@@ -46,7 +46,7 @@ class Importer(importer.ImporterProtocol):
             if self.reader_ready:
                 # self.currency is defined by the reader (ofx, csv, etc.)
                 d = {'currency': self.currency, 'ticker': '{ticker}'}
-                self.config = {k:v.format(**d) if isinstance(v, str) else v for k, v in self.config.items()}
+                self.config = {k: v.format(**d) if isinstance(v, str) else v for k, v in self.config.items()}
                 self.money_market_funds = self.config['fund_info']['money_market']
                 self.fund_data = self.config['fund_info']['fund_data']  # [(ticker, id, long_name), ...]
                 self.funds_by_id = {i: (ticker, desc) for ticker, i, desc in self.fund_data}
@@ -126,7 +126,6 @@ class Importer(importer.ImporterProtocol):
     def skip_transactions(self, ot):
         return False
 
-
     # extract() and supporting methods
     # --------------------------------------------------------------------------------
 
@@ -176,7 +175,7 @@ class Importer(importer.ImporterProtocol):
             data.create_simple_posting(entry, self.config['cg'].format(ticker=ticker), None, None)  # capital gains posting
         else:  # buy stock/fund
             common.create_simple_posting_with_cost(entry, main_acct, units, ticker, ot.unit_price,
-                    self.currency, self.price_cost_both_zero_handler)
+                                                   self.currency, self.price_cost_both_zero_handler)
 
         # "Other" account posting
         reverser = 1
@@ -224,7 +223,6 @@ class Importer(importer.ImporterProtocol):
         else:  # cash transfer
             description = ot.type
             ticker = self.currency
-
 
         # Build transaction entry
         entry = data.Transaction(metadata, date, self.FLAG,

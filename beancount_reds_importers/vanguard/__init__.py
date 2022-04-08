@@ -7,6 +7,7 @@ from beancount_reds_importers.libtransactionbuilder import investments
 
 class Importer(investments.Importer, ofxreader.Importer):
     IMPORTER_NAME = 'Vanguard'
+
     def custom_init(self):
         self.max_rounding_error = 0.11
         self.filename_pattern_def = '.*OfxDownload'

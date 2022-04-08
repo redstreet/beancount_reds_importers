@@ -47,7 +47,6 @@ class Importer(importer.ImporterProtocol):
             self.filename_pattern_def = '.*bank_specific_filename.*'
             self.custom_init_run = True
 
-
     # def get_target_acct(self, transaction):
     #     # Not needed for accounts using smart_importer
     #     return self.target_account_map.get(transaction.type, None)

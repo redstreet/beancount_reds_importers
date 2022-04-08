@@ -6,6 +6,7 @@ from beancount_reds_importers.libtransactionbuilder import investments
 
 class Importer(investments.Importer, csvreader.Importer):
     IMPORTER_NAME = 'Schwab Brokerage CSV'
+
     def custom_init(self):
         self.max_rounding_error = 0.04
         self.filename_pattern_def = '.*_Transactions_'
