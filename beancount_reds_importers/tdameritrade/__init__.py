@@ -15,11 +15,3 @@ class Importer(investments.Importer, ofxreader.Importer):
     def get_ticker_info(self, security):
         ticker = self.config['fund_info']['cusip_map'][security]
         return ticker, ''
-
-    def get_target_acct_custom(self, transaction, ticker=None):
-        m = transaction.memo
-        if m.startswith("CONTRIBUTION"):
-            return self.config['transfer']
-        if m.startswith("FEES"):
-            return self.config['fees']
-        return self.target_account_map.get(transaction.type, None)

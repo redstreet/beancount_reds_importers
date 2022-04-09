@@ -16,6 +16,3 @@ class Importer(investments.Importer, ofxreader.Importer):
         if 'JNL' in ot.memo:
             return True
         return False
-
-    def get_target_acct_custom(self, transaction, ticker=None):
-        return self.target_account_map.get(transaction.type, None)

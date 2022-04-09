@@ -11,8 +11,3 @@ class Importer(investments.Importer, ofxreader.Importer):
         self.max_rounding_error = 0.04
         self.filename_pattern_def = '.*schwab'
         self.get_ticker_info = self.get_ticker_info_from_id
-
-    # def get_ticker_info(self, security):
-    #     ticker = self.cusip_map[security]
-    #     ticker_long_name = self.inv_ticker_map[ticker]
-    #     return ticker, ticker_long_name
