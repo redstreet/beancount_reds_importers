@@ -21,4 +21,4 @@ class Importer(investments.Importer, ofxreader.Importer):
             return self.config['transfer']
         if transaction.memo.startswith("FEES"):
             return self.config['fees']
-        return self.target_account_map.get(transaction.type, None)
+        return None

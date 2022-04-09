@@ -98,19 +98,18 @@ class Importer(importer.ImporterProtocol):
             sys.exit(1)
         return ticker, ticker_long_name
 
-    def add_ticker(self, s, ticker):
-        try:
-            return s.format(ticker=ticker)
-        except AttributeError:
-            return None
-
     def get_target_acct_custom(self, transaction, ticker=None):
-        return self.add_ticker(self.target_account_map.get(transaction.type, None), ticker)
+        """This method is for importers to override. The overridden method can return a target account for
+        special cases, or return None, which will let get_target_acct() decide the target account"""
+        return None
 
     def get_target_acct(self, transaction, ticker):
+        target = self.get_target_acct_custom(transaction, ticker)
+        if target:
+            return target
         if transaction.type == 'income' and getattr(transaction, 'income_type', None) == 'DIV':
-            return self.add_ticker(self.target_account_map.get('dividends', None), ticker)
-        return self.get_target_acct_custom(transaction, ticker)
+            return self.target_account_map.get('dividends', None)
+        return self.target_account_map.get(transaction.type, None)
 
     def get_security_list(self):
         tickers = set()
@@ -227,7 +226,7 @@ class Importer(importer.ImporterProtocol):
         # Build transaction entry
         entry = data.Transaction(metadata, date, self.FLAG,
                                  ot.memo, description, data.EMPTY_SET, data.EMPTY_SET, [])
-        target_acct = self.get_target_acct(ot, ticker)
+        target_acct = self.get_target_acct(ot, ticker).format(ticker=ticker)
 
         # Build postings
         if ot.type in ['income', 'dividends', 'capgainsd_st', 'capgainsd_lt']:  # cash
