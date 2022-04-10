@@ -11,7 +11,7 @@ from beancount_reds_importers.libtransactionbuilder import paycheck
 #
 # workday.Importer({'desc': "Paycheck (Acme Company)",
 #      'main_account' : 'Income:Employment',
-#      'paycheck_template': '{}' # See paychecks.py for sample template
+#      'paycheck_template': '{}' # See beancount_reds_importers/libtransactionbuilder/paycheck.py for sample template
 #      'currency' : 'PENNIES',
 #     }),
 

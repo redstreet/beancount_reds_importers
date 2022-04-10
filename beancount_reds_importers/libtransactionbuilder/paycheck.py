@@ -5,15 +5,20 @@ from beancount.core.number import D
 from beancount_reds_importers.libtransactionbuilder import banking
 
 
-# paychecks are typically transaction with many (10-30) postings including several each of income, taxes,
+# paychecks are typically transaction with many (10-40) postings including several each of income, taxes,
 # pre-tax and post-tax deductions, transfers, reimbursements, etc. This importer enables importing a single
-# paycheck, resulting in a single entry. The source can be a pdf that has been turned to text, or a .csv or
-# other format. The input specification is a dictionary corresponding to various sections of a paycheck and
-# the text in them to match. For example:
+# paycheck, resulting in a single transaction. The source can be a pdf that has been turned to text, or a .csv
+# or .xlsx, or another format. The input specification is a dictionary corresponding to various sections of a
+# paycheck and the text in them to match. For example:
+
+#
 # template = {
-#         # keys correspond to text found in the paycheck being imported. Values are postings to generate.
-#         Each value generates a single posting for the matching text. Lists of accounts therefore generate
-#         multiple postings.
+#
+#         # top level keys (eg: 'Earnings') correspond to sections of the paycheck.
+#
+#         # Inner keys correspond to text found in the paycheck being imported. Values are postings to
+#         # generate, and can be a string or a list. Each string generates a single posting. A list therefore
+          # generates multiple postings. The example shows where this is useful:
 #
 #         'Employer Paid Benefits': {
 #             "401(k) Employer Match": ["Income:Benefits:Employer-401k",
