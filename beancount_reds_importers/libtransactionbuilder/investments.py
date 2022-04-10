@@ -194,7 +194,7 @@ class Importer(importer.ImporterProtocol):
         return entry
 
     def generate_transfer_entry(self, ot, file, counter):
-        """ Cash or in-kind transfers. One of:
+        """ Cash transactions, or in-kind transfers. One of:
             [credit, debit, dep, transfer, income, dividends, capgainsd_lt, capgainsd_st, other]"""
         config = self.config
         metadata = data.new_metadata(file.name, next(counter))
