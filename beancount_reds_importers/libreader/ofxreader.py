@@ -12,7 +12,8 @@ class Importer(reader.Reader, importer.ImporterProtocol):
     FILE_EXT = 'fx'
 
     def initialize_reader(self, file):
-        if not self.initialized_reader:
+        if getattr(self, 'file', None) != file:
+            self.file = file
             self.ofx = OfxParser.parse(open(file.name))
             self.ofx_account = None
             for acc in self.ofx.accounts:
@@ -26,7 +27,6 @@ class Importer(reader.Reader, importer.ImporterProtocol):
             if self.reader_ready:
                 self.currency = self.ofx_account.statement.currency.upper()
                 self.includes_balances = True
-            self.initialized_reader = True
 
     def match_account_number(self, file_account, config_account):
         """We many not want to store entire credit card numbers in our config. Or a given ofx may not contain

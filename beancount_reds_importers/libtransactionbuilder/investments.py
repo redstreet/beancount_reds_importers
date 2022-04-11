@@ -15,7 +15,6 @@ class Importer(importer.ImporterProtocol):
     def __init__(self, config):
         self.config = config
         self.initialized = False
-        self.initialized_reader = False
         self.reader_ready = False
         self.custom_init_run = False
         self.includes_balances = False

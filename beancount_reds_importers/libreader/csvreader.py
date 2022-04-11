@@ -61,14 +61,14 @@ class Importer(reader.Reader, importer.ImporterProtocol):
     FILE_EXT = 'csv'
 
     def initialize_reader(self, file):
-        if not self.initialized_reader:
+        if getattr(self, 'file', None) != file:
+            self.file = file
             self.reader_ready = re.match(self.header_identifier, file.head())
             if self.reader_ready:
                 # TODO: move out elsewhere?
                 # self.currency = self.ofx_account.statement.currency.upper()
                 self.currency = self.config.get('currency', 'USD')
                 self.includes_balances = False
-                self.initialized_reader = True
                 self.date_format = '%m/%d/%Y'  # TODO: move into class variable, into reader.Reader
                 self.file_read_done = False
             # else:

@@ -9,8 +9,8 @@ class Importer(csvreader.Importer):
     FILE_EXT = 'xlsx'
 
     def initialize_reader(self, file):
-        if not self.initialized_reader:
-            self.initialized_reader = True
+        if getattr(self, 'file', None) != file:
+            self.file = file
             self.file_read_done = False
             self.reader_ready = True
 
