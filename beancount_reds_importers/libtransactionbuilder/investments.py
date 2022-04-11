@@ -213,10 +213,7 @@ class Importer(importer.ImporterProtocol):
         config = self.config
         metadata = data.new_metadata(file.name, next(counter))
         ticker = None
-        date = getattr(ot, 'tradeDate', None)
-        if not date:
-            date = ot.date
-        date = date.date()
+        date = getattr(ot, 'tradeDate', ot.date).date()
 
         try:
             if ot.type in ['transfer']:
