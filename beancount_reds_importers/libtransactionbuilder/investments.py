@@ -219,23 +219,32 @@ class Importer(importer.ImporterProtocol):
                        'capgainsd_st', 'transfer'] and (hasattr(ot, 'security') and ot.security):
             ticker, ticker_long_name = self.get_ticker_info(ot.security)
             description = f'[{ticker}] {ticker_long_name}'
-        else:  # cash transfer
+            target_acct = self.get_target_acct(ot, ticker).format(ticker=ticker)
+            if ot.type in ['income', 'dividends', 'capgainsd_st', 'capgainsd_lt']:  
+                # security income/gain to cash transfer
+                currency = self.currency
+                importer_acct = self.cash_account
+                amount = ot.total
+            else:
+                # security shares to shares transfer
+                currency = ticker
+                importer_acct = self.main_acct(ticker)
+                amount = units
+        else:
+            # cash to cash transfer
             description = ot.type
-            ticker = self.currency
+            currency = self.currency
+            target_acct = self.get_target_acct(ot, currency)
+            importer_acct = self.cash_account
+            amount = units
 
         # Build transaction entry
         entry = data.Transaction(metadata, date, self.FLAG,
                                  ot.memo, description, data.EMPTY_SET, data.EMPTY_SET, [])
-        target_acct = self.get_target_acct(ot, ticker).format(ticker=ticker)
 
         # Build postings
-        if ot.type in ['income', 'dividends', 'capgainsd_st', 'capgainsd_lt']:  # cash
-            data.create_simple_posting(entry, config['cash_account'], ot.total, self.currency)
-            data.create_simple_posting(entry, target_acct, -1 * ot.total, self.currency)
-        else:
-            main_acct = self.main_acct(ticker)
-            data.create_simple_posting(entry, main_acct, units, ticker)
-            data.create_simple_posting(entry, target_acct, -1 * units, ticker)
+            data.create_simple_posting(entry, importer_acct, amount, currency)
+            data.create_simple_posting(entry, target_acct, -1 * amount, currency)
         return entry
 
     def extract_transactions(self, file, counter):
