@@ -19,9 +19,7 @@ class Importer(csvreader.Importer):
 
     def read_raw(self, file):
         rdr = etl.fromxlsx(file.name, read_only=True)
-        # openpyxl gives us nicely typed columns from the xlsx files (e.g. `float` for numeric
-        # values, `datetime.datetime` for dates). But the rest of beancount_reds_importers assumes
-        # string values in all columns and will silently fail otherwise (e.g. in
-        # `csvreader.convert_columns()`). Work around this by converting all of the nicely typed
-        # data back to plain strings.
+        # openpyxl gives us typed columns from the xlsx files (e.g. `float` for numeric
+        # values, `datetime.datetime` for dates). Since xlsxreader currently inherits from csvreader,
+        # converting these to be plain strings. Consider building a new xlsxreader that doesn't have to
         return rdr.convertall(str)
