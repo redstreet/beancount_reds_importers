@@ -37,6 +37,21 @@ class Importer(importer.ImporterProtocol):
         #     'rounding_error'   : 'Account to book rounding errors to',
         #     'fund_info '       : 'dictionary of fund info (by_id, money_market)',
         # }
+        #
+        # Example:
+        # { 'account_number' : '1234567',
+        #     'main_account'   : 'Assets:Investments:XTrade:{ticker}',
+        #     'cash_account'   : 'Assets:Investments:XTrade:{currency}',
+        #     'transfer'       : 'Assets:Zero-Sum-Accounts:Transfers:Bank-Account',
+        #     'dividends'      : 'Income:Dividends:XTrade:{ticker}',
+        #     'interest'       : 'Income:Interest:XTrade:{ticker}',
+        #     'cg'             : 'Income:Capital-Gains:XTrade:{ticker}',
+        #     'capgainsd_lt'   : 'Income:Capital-Gains-Distributions:Long:XTrade:{ticker}',
+        #     'capgainsd_st'   : 'Income:Capital-Gains-Distributions:Short:XTrade:{ticker}',
+        #     'fees'           : 'Expenses:Brokerage-Fees:XTrade',
+        #     'rounding_error' : 'Equity:Rounding-Errors:Imports',
+        #     'fund_info'       : fund_info, }
+
 
     def initialize(self, file):
         if not self.initialized:
