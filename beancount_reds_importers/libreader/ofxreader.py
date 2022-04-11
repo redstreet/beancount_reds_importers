@@ -16,6 +16,7 @@ class Importer(reader.Reader, importer.ImporterProtocol):
             self.file = file
             self.ofx = OfxParser.parse(open(file.name))
             self.ofx_account = None
+            self.reader_ready = False
             for acc in self.ofx.accounts:
                 # account identifying info fieldname varies across institutions
                 # self.acc_num_field can be overridden in self.custom_init() if needed
