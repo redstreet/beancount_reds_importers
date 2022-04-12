@@ -226,13 +226,16 @@ class Importer(importer.ImporterProtocol):
             print("Could not determine field for transaction amount")
             # import pdb; pdb.set_trace()
 
+        main_acct = None
         if ot.type in ['income', 'dividends', 'capgainsd_lt',
                        'capgainsd_st', 'transfer'] and (hasattr(ot, 'security') and ot.security):
             ticker, ticker_long_name = self.get_ticker_info(ot.security)
             description = f'[{ticker}] {ticker_long_name}'
-        else:  # cash transfer
+            main_acct = self.main_acct(ticker)
+        else:  # cash transaction
             description = ot.type
             ticker = self.currency
+            main_acct = config['cash_account']
 
         # Build transaction entry
         entry = data.Transaction(metadata, date, self.FLAG,
@@ -244,7 +247,6 @@ class Importer(importer.ImporterProtocol):
             data.create_simple_posting(entry, config['cash_account'], ot.total, self.currency)
             data.create_simple_posting(entry, target_acct, -1 * ot.total, self.currency)
         else:
-            main_acct = self.main_acct(ticker)
             data.create_simple_posting(entry, main_acct, units, ticker)
             data.create_simple_posting(entry, target_acct, -1 * units, ticker)
         return entry
