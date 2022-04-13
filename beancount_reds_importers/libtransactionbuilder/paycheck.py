@@ -95,12 +95,19 @@ class Importer(banking.Importer):
         newentry = entry._replace(postings=postings)
         return newentry
 
+    def build_metadata(self, file, metatype=None, data={}):
+        """This method is for importers to override. The overridden method can 
+        look at the metatype ('transaction', 'balance', 'account', 'commodity', etc.)
+        and the data dictionary to return additional metadata"""
+        return {}
+
     def extract(self, file, existing_entries=None):
         self.initialize(file)
         config = self.config
 
         self.read_file(file)
         metadata = data.new_metadata(file.name, 0)
+        metadata |= self.build_metadata(file, metatype='transaction')
         entry = data.Transaction(metadata, self.paycheck_date(file), self.FLAG,
                                  None, config['desc'], data.EMPTY_SET, data.EMPTY_SET, [])
 
