@@ -1,6 +1,7 @@
 # beancount_reds_importers
 
-Simple importers and tools for [Beancount](https://github.com/beancount/beancount).
+Simple importers and tools for [Beancount](https://beancount.github.io/), software for
+[plain text](https://plaintextaccounting.org/), double entry bookkeeping.
 
 This is a reference implementation of the principles expressed in
 **[The Five Minute Ledger Update](https://reds-rants.netlify.app/personal-finance/the-five-minute-ledger-update/).**
