@@ -15,7 +15,6 @@ class Importer(importer.ImporterProtocol):
     def __init__(self, config):
         self.config = config
         self.initialized = False
-        self.initialized_reader = False
         self.reader_ready = False
         self.custom_init_run = False
         self.includes_balances = False
@@ -38,6 +37,21 @@ class Importer(importer.ImporterProtocol):
         #     'rounding_error'   : 'Account to book rounding errors to',
         #     'fund_info '       : 'dictionary of fund info (by_id, money_market)',
         # }
+        #
+        # Example:
+        # { 'account_number' : '1234567',
+        #     'main_account'   : 'Assets:Investments:XTrade:{ticker}',
+        #     'cash_account'   : 'Assets:Investments:XTrade:{currency}',
+        #     'transfer'       : 'Assets:Zero-Sum-Accounts:Transfers:Bank-Account',
+        #     'dividends'      : 'Income:Dividends:XTrade:{ticker}',
+        #     'interest'       : 'Income:Interest:XTrade:{ticker}',
+        #     'cg'             : 'Income:Capital-Gains:XTrade:{ticker}',
+        #     'capgainsd_lt'   : 'Income:Capital-Gains-Distributions:Long:XTrade:{ticker}',
+        #     'capgainsd_st'   : 'Income:Capital-Gains-Distributions:Short:XTrade:{ticker}',
+        #     'fees'           : 'Expenses:Brokerage-Fees:XTrade',
+        #     'rounding_error' : 'Equity:Rounding-Errors:Imports',
+        #     'fund_info'       : fund_info, }
+
 
     def initialize(self, file):
         if not self.initialized:
@@ -227,13 +241,16 @@ class Importer(importer.ImporterProtocol):
             print("Could not determine field for transaction amount")
             # import pdb; pdb.set_trace()
 
+        main_acct = None
         if ot.type in ['income', 'dividends', 'capgainsd_lt',
                        'capgainsd_st', 'transfer'] and (hasattr(ot, 'security') and ot.security):
             ticker, ticker_long_name = self.get_ticker_info(ot.security)
             description = f'[{ticker}] {ticker_long_name}'
-        else:  # cash transfer
+            main_acct = self.main_acct(ticker)
+        else:  # cash transaction
             description = ot.type
             ticker = self.currency
+            main_acct = config['cash_account']
 
         # Build transaction entry
         entry = data.Transaction(metadata, date, self.FLAG,
@@ -245,7 +262,6 @@ class Importer(importer.ImporterProtocol):
             data.create_simple_posting(entry, config['cash_account'], ot.total, self.currency)
             data.create_simple_posting(entry, target_acct, -1 * ot.total, self.currency)
         else:
-            main_acct = self.main_acct(ticker)
             data.create_simple_posting(entry, main_acct, units, ticker)
             data.create_simple_posting(entry, target_acct, -1 * units, ticker)
         return entry

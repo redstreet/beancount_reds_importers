@@ -1,8 +1,9 @@
 # beancount_reds_importers
 
-Simple importers and tools for [beancount](https://github.com/beancount/beancount).
+Simple importers and tools for [Beancount](https://beancount.github.io/), software for
+[plain text](https://plaintextaccounting.org/), double entry bookkeeping.
 
-For a comprehensive look at writing importers, see
+This is a reference implementation of the principles expressed in
 **[The Five Minute Ledger Update](https://reds-rants.netlify.app/personal-finance/the-five-minute-ledger-update/).**
 
 Importers can be ugly and painful to write, yet are important in automating the grunt
@@ -12,16 +13,17 @@ parts:
 
 1. file format reader (reusable)
 2. transaction builder (reusable)
-3. institution-specific declarations and code (minimal, institution specific)
+3. institution-specific declarations and code (minimal, institution specific) <- The
+   only one you have to write
 
-This helps move common code into (1) and (2) above, and makes writing new importers easy
-by sipmly picking from one of those two along with with minimal declarations and code in
-(3).
+This design helps move most of the heavy-lifting common code into (1) and (2) above.
+Writing new importer is made easier since on only has to write code to address the
+institution-specific formatting and quirks for each bank/brokerage.
 
 File format readers included are:
-- ofx
-- csv (single and multitable support)
-- xlsx (single and multitable support)
+- `.ofx`
+- `.csv` (single and multitable support)
+- `.xlsx` (single and multitable support)
 
 Transaction builders included are:
 - banking (for banks and credit cards, which benefit from a postings predictor like
@@ -31,13 +33,30 @@ Transaction builders included are:
 - paychecks (to handle paychecks, which typically contain very many pre-determined
   postings in a single entry)
 
-Input in ofx format (over csv) minimizes data and coding errors, eliminates format
+Input in `.ofx` format (over `.csv`) minimizes data and coding errors, eliminates format
 breaking changes in csv, and typically includes balances that are used to generate
 balance assertions, and commodity prices.
 
 Look inside the importers/ directory to see a list of institutions supported. More
 investment, credit card, and banking institutions will be added in the future.
 Contributions welcome.
+
+## Features
+- supports [Beancount](https://github.com/beancount/beancount) output via `bean-extract`
+  - should be easy to extend to ledger/hledger, etc. (contributions welcome)
+- automatically generates [balance assertions](https://reds-rants.netlify.app/personal-finance/automating-balance-assertions/)
+- support for:
+  - investment accounts (brokerages including retirement accounts)
+    - handles sweep funds, money market funds, and all standard brokerage transactions
+  - banking and credit card
+  - paychecks
+- file format independent (ofx, csv, xlsx supported out of the box; single and
+  multitable for csv and xlsx; write your own handler if needed)
+- supports commodity-leaf accounts
+- see [The Five Minute Ledger Update](https://reds-rants.netlify.app/personal-finance/the-five-minute-ledger-update/)
+  for automating downloads via `ofxclient`, connecting to `smart_importer` to
+  auto-classify transactions, and more
+
 
 ## Installation
 `pip3 install beancount-reds-importers`
@@ -51,7 +70,7 @@ If you plan on importing excel files, also run:
 ## Running the included examples:
 1. `cd <your pip installed dir>/example #eg: cd ~/.local/lib/python3.8/site-packages/beancount_reds_importers/example`
 2. `./import.sh OfxDownload.qfx` # Imports investments
-3. `./import.sh transactions.qfx` # Importa bank transactions; uses smart_importer to classify transactions
+3. `./import.sh transactions.qfx` # Import bank transactions; uses smart_importer to classify transactions
 
 ## Running
 1. Create your own my.import. An example my.import is provided. At the least, include your account numbers
