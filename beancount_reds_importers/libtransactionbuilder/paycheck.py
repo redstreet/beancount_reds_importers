@@ -45,6 +45,13 @@ from beancount_reds_importers.libtransactionbuilder import banking
 #         },
 # }
 
+def flip_if_needed(amount, account):
+    if amount >= 0 and any(account.startswith(prefix) for prefix in ['Income:', 'Equity:', 'Liabilities:']):
+        amount *= -1
+    if amount < 0 and any(account.startswith(prefix) for prefix in ['Expenses:', 'Assets:']):
+        amount *= -1
+    return amount
+
 
 class Importer(banking.Importer):
     def file_date(self, input_file):
@@ -76,12 +83,7 @@ class Importer(banking.Importer):
                         if not amount:
                             continue
                         amount = D(amount)
-                        if (amount >= 0 and any(
-                                account.startswith(prefix) for prefix in ['Income:', 'Equity:', 'Liabilities:']
-                        )) or (amount < 0 and any(
-                            account.startswith(prefix) for prefix in ['Expenses:', 'Assets:']
-                        )):
-                            amount *= -1
+                        amount = flip_if_needed(amount, account)
                         total += amount
                         if amount:
                             data.create_simple_posting(entry, account, amount, currency)
