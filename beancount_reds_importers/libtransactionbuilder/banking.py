@@ -38,7 +38,7 @@ class Importer(importer.ImporterProtocol):
         pass
 
     def build_metadata(self, file, metatype=None, data={}):
-        """This method is for importers to override. The overridden method can 
+        """This method is for importers to override. The overridden method can
         look at the metatype ('transaction', 'balance', 'account', 'commodity', etc.)
         and the data dictionary to return additional metadata"""
         return {}
@@ -81,8 +81,8 @@ class Importer(importer.ImporterProtocol):
         for ot in self.get_transactions():
             metadata = data.new_metadata(file.name, next(counter))
             metadata |= self.build_metadata(file,
-                metatype='transaction',
-                data={'transaction': ot})
+                                            metatype='transaction',
+                                            data={'transaction': ot})
 
             # description fields:
             # - beancount: (payee, narration):  # payee is optional, narration is mandatory

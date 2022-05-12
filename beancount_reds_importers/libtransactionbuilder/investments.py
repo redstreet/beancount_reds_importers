@@ -52,7 +52,6 @@ class Importer(importer.ImporterProtocol):
         #     'rounding_error' : 'Equity:Rounding-Errors:Imports',
         #     'fund_info'       : fund_info, }
 
-
     def initialize(self, file):
         if not self.initialized:
             self.custom_init()
@@ -92,7 +91,7 @@ class Importer(importer.ImporterProtocol):
         }
 
     def build_metadata(self, file, metatype=None, data={}):
-        """This method is for importers to override. The overridden method can 
+        """This method is for importers to override. The overridden method can
         look at the metatype ('transaction', 'balance', 'account', 'commodity', etc.)
         and the data dictionary to return additional metadata"""
         return {}
@@ -220,7 +219,7 @@ class Importer(importer.ImporterProtocol):
         """ Cash transactions, or in-kind transfers. One of:
             [credit, debit, dep, transfer, income, dividends, capgainsd_lt, capgainsd_st, other]"""
         config = self.config
-        metadata = data.new_metadata(file.name, next(counter))        
+        metadata = data.new_metadata(file.name, next(counter))
         metadata |= self.build_metadata(file,
                                         metatype='transaction',
                                         data={'transaction': ot})

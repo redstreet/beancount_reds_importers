@@ -18,7 +18,7 @@ from beancount_reds_importers.libtransactionbuilder import banking
 #
 #         # Inner keys correspond to text found in the paycheck being imported. Values are postings to
 #         # generate, and can be a string or a list. Each string generates a single posting. A list therefore
-          # generates multiple postings. The example shows where this is useful:
+#         # generates multiple postings. The example shows where this is useful:
 #
 #         'Employer Paid Benefits': {
 #             "401(k) Employer Match": ["Income:Benefits:Employer-401k",
@@ -96,7 +96,7 @@ class Importer(banking.Importer):
         return newentry
 
     def build_metadata(self, file, metatype=None, data={}):
-        """This method is for importers to override. The overridden method can 
+        """This method is for importers to override. The overridden method can
         look at the metatype ('transaction', 'balance', 'account', 'commodity', etc.)
         and the data dictionary to return additional metadata"""
         return {}
