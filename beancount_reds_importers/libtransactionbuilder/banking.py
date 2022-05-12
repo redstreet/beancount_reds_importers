@@ -80,6 +80,7 @@ class Importer(importer.ImporterProtocol):
         self.read_file(file)
         for ot in self.get_transactions():
             metadata = data.new_metadata(file.name, next(counter))
+            # metadata['type'] = ot.type # Optional metadata, useful for debugging #TODO
             metadata |= self.build_metadata(file,
                                             metatype='transaction',
                                             data={'transaction': ot})
