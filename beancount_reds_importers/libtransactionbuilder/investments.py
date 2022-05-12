@@ -90,6 +90,12 @@ class Importer(importer.ImporterProtocol):
             "dep":          self.config['transfer'],
         }
 
+    def build_metadata(self, file, metatype=None, data={}):
+        """This method is for importers to override. The overridden method can
+        look at the metatype ('transaction', 'balance', 'account', 'commodity', etc.)
+        and the data dictionary to return additional metadata"""
+        return {}
+
     def custom_init(self):
         if not self.custom_init_run:
             self.max_rounding_error = 0.04
@@ -151,6 +157,9 @@ class Importer(importer.ImporterProtocol):
 
         # Build metadata
         metadata = data.new_metadata(file.name, next(counter))
+        metadata |= self.build_metadata(file,
+                                        metatype='transaction',
+                                        data={'transaction': ot})
         if getattr(ot, 'settleDate', None) is not None and ot.settleDate != ot.tradeDate:
             metadata['settlement_date'] = str(ot.settleDate.date())
 
@@ -211,6 +220,9 @@ class Importer(importer.ImporterProtocol):
             [credit, debit, dep, transfer, income, dividends, capgainsd_lt, capgainsd_st, other]"""
         config = self.config
         metadata = data.new_metadata(file.name, next(counter))
+        metadata |= self.build_metadata(file,
+                                        metatype='transaction',
+                                        data={'transaction': ot})
         ticker = None
         date = getattr(ot, 'tradeDate', None)
         if not date:
@@ -298,12 +310,13 @@ class Importer(importer.ImporterProtocol):
         settlement_fund_balance = 0
         for pos in self.get_balance_positions():
             ticker, ticker_long_name = self.get_ticker_info(pos.security)
-            meta = data.new_metadata(file.name, next(counter))
+            metadata = data.new_metadata(file.name, next(counter))
+            metadata = metadata | self.build_metadata(file, metatype='balance', data={'pos': pos})
 
             # if there are no transactions, use the date in the source file for the balance. This gives us the
             # bonus of an updated, recent balance assertion
             bal_date = date if date else pos.date.date()
-            balance_entry = data.Balance(meta, bal_date, self.main_acct(ticker),
+            balance_entry = data.Balance(metadata, bal_date, self.main_acct(ticker),
                                          amount.Amount(pos.units, ticker),
                                          None, None)
             new_entries.append(balance_entry)
@@ -312,19 +325,22 @@ class Importer(importer.ImporterProtocol):
 
             # extract price info if available
             if hasattr(pos, 'unit_price') and hasattr(pos, 'date'):
-                meta = data.new_metadata(file.name, next(counter))
-                price_entry = data.Price(meta, pos.date.date(), ticker,
-                                         amount.Amount(pos.unit_price, self.currency))
+                metadata = data.new_metadata(file.name, next(counter))
+                metadata |= self.build_metadata(file, metatype='price', data={'pos': pos})
+                price_entry = data.Price(
+                    metadata, pos.date.date(), ticker,
+                    amount.Amount(pos.unit_price, self.currency))
                 new_entries.append(price_entry)
 
         # ----------------- available cash
         available_cash = self.get_available_cash()
         if available_cash is not None:
             balance = available_cash - settlement_fund_balance
-            meta = data.new_metadata(file.name, next(counter))
+            metadata = data.new_metadata(file.name, next(counter))
+            metadata |= self.build_metadata(file, metatype='balance')
             try:
                 bal_date = date if date else self.file_date(file).date()  # unavailable file_date raises AttributeError
-                balance_entry = data.Balance(meta, bal_date, self.config['cash_account'],
+                balance_entry = data.Balance(metadata, bal_date, self.config['cash_account'],
                                              amount.Amount(balance, self.currency),
                                              None, None)
                 new_entries.append(balance_entry)
