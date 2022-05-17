@@ -71,6 +71,10 @@ class Importer(importer.ImporterProtocol):
                 entries.append(balance_entry)
         return entries
 
+    def extract_custom_entries(self, file, counter):
+        """For custom importers to override"""
+        return []
+
     def extract(self, file, existing_entries=None):
         self.initialize(file)
         counter = itertools.count()
@@ -103,5 +107,7 @@ class Importer(importer.ImporterProtocol):
 
         if self.includes_balances:
             new_entries += self.extract_balance(file, counter)
+
+        new_entries += self.extract_custom_entries(file, counter)
 
         return(new_entries)

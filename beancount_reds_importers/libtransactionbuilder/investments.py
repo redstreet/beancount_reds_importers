@@ -352,6 +352,10 @@ class Importer(importer.ImporterProtocol):
             if getattr(ot, 'commission', 0) != 0:
                 data.create_simple_posting(entry, config['fees'], ot.commission, self.currency)
 
+    def extract_custom_entries(self, file, counter):
+        """For custom importers to override"""
+        return []
+
     def extract(self, file):
         self.initialize(file)
         counter = itertools.count()
@@ -360,5 +364,7 @@ class Importer(importer.ImporterProtocol):
         new_entries += self.extract_transactions(file, counter)
         if self.includes_balances:
             new_entries += self.extract_balances_and_prices(file, counter)
+
+        new_entries += self.extract_custom_entries(file, counter)
 
         return(new_entries)
