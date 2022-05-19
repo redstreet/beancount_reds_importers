@@ -52,6 +52,7 @@ class Importer(importer.ImporterProtocol):
         #     'rounding_error' : 'Equity:Rounding-Errors:Imports',
         #     'fund_info'       : fund_info, }
 
+
     def initialize(self, file):
         if not self.initialized:
             self.custom_init()
@@ -64,6 +65,8 @@ class Importer(importer.ImporterProtocol):
                 self.fund_data = self.config['fund_info']['fund_data']  # [(ticker, id, long_name), ...]
                 self.funds_by_id = {i: (ticker, desc) for ticker, i, desc in self.fund_data}
                 self.funds_by_ticker = {ticker: (ticker, desc) for ticker, _, desc in self.fund_data}
+
+                # Most ofx/csv files refer to funds by id (cusip/isin etc.) Some use tickers instead
                 self.funds_db = getattr(self, getattr(self, 'funds_db_txt', 'funds_by_id'))
                 self.build_account_map()  # TODO: avoid for identify()
             self.initialized = True
@@ -107,11 +110,17 @@ class Importer(importer.ImporterProtocol):
 
     def get_ticker_info_from_id(self, security_id):
         try:
-            ticker, ticker_long_name = self.funds_db[security_id]
-        except KeyError:
+            # isin might look like "US293409829" while the ofx use only a substring like "29340982"
+            ticker, ticker_long_name = [v for k, v in self.funds_db.items() if security_id in k][0]
+        except IndexError:
             print(f"Error: fund info not found for {security_id}", file=sys.stderr)
             securities = self.get_security_list()
-            securities_missing = [s for s in securities if s not in self.funds_db]
+            securities_missing = [s for s in securities]
+            for s in securities:
+                for k in self.funds_db:
+                    if s in k:
+                        securities_missing.remove(s)
+            # securities_missing = [s for s in securities if s not in self.funds_db]
             print(f"List of securities without fund info: {securities_missing}", file=sys.stderr)
             # import pdb; pdb.set_trace()
             sys.exit(1)
