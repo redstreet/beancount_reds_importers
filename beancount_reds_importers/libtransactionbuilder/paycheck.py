@@ -109,7 +109,7 @@ class Importer(banking.Importer):
 
         self.read_file(file)
         metadata = data.new_metadata(file.name, 0)
-        metadata |= self.build_metadata(file, metatype='transaction')
+        metadata.update(self.build_metadata(file, metatype='transaction'))
         entry = data.Transaction(metadata, self.paycheck_date(file), self.FLAG,
                                  None, config['desc'], data.EMPTY_SET, data.EMPTY_SET, [])
 

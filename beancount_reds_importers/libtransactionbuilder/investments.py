@@ -166,7 +166,7 @@ class Importer(importer.ImporterProtocol):
 
         # Build metadata
         metadata = data.new_metadata(file.name, next(counter))
-        metadata |= self.build_metadata(file, metatype='transaction_trade', data={'transaction': ot})
+        metadata.update(self.build_metadata(file, metatype='transaction_trade', data={'transaction': ot}))
         if getattr(ot, 'settleDate', None) is not None and ot.settleDate != ot.tradeDate:
             metadata['settlement_date'] = str(ot.settleDate.date())
 
@@ -227,7 +227,7 @@ class Importer(importer.ImporterProtocol):
             [credit, debit, dep, transfer, income, dividends, capgainsd_lt, capgainsd_st, other]"""
         config = self.config
         metadata = data.new_metadata(file.name, next(counter))
-        metadata |= self.build_metadata(file, metatype='transaction_transfer', data={'transaction': ot})
+        metadata.update(self.build_metadata(file, metatype='transaction_transfer', data={'transaction': ot}))
         ticker = None
         date = getattr(ot, 'tradeDate', None)
         if not date:
@@ -331,7 +331,7 @@ class Importer(importer.ImporterProtocol):
             # extract price info if available
             if hasattr(pos, 'unit_price') and hasattr(pos, 'date'):
                 metadata = data.new_metadata(file.name, next(counter))
-                metadata |= self.build_metadata(file, metatype='price', data={'pos': pos})
+                metadata.update(self.build_metadata(file, metatype='price', data={'pos': pos}))
                 price_entry = data.Price(metadata, pos.date.date(), ticker,
                                          amount.Amount(pos.unit_price, self.currency))
                 new_entries.append(price_entry)
@@ -341,7 +341,7 @@ class Importer(importer.ImporterProtocol):
         if available_cash is not None:
             balance = available_cash - settlement_fund_balance
             metadata = data.new_metadata(file.name, next(counter))
-            metadata |= self.build_metadata(file, metatype='balance_cash')
+            metadata.update(self.build_metadata(file, metatype='balance_cash'))
             try:
                 bal_date = date if date else self.file_date(file).date()  # unavailable file_date raises AttributeError
                 balance_entry = data.Balance(metadata, bal_date, self.config['cash_account'],

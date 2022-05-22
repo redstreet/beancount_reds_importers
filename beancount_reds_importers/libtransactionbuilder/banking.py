@@ -61,7 +61,7 @@ class Importer(importer.ImporterProtocol):
     def extract_balance(self, file, counter):
         entries = []
         metadata = data.new_metadata(file.name, counter)
-        metadata |= self.build_metadata(file, metatype='balance')
+        metadata.update(self.build_metadata(file, metatype='balance'))
 
         for bal in self.get_balance_statement():
             if bal:
@@ -85,9 +85,9 @@ class Importer(importer.ImporterProtocol):
         for ot in self.get_transactions():
             metadata = data.new_metadata(file.name, next(counter))
             # metadata['type'] = ot.type # Optional metadata, useful for debugging #TODO
-            metadata |= self.build_metadata(file,
-                                            metatype='transaction',
-                                            data={'transaction': ot})
+            metadata.update(self.build_metadata(file,
+                                                metatype='transaction',
+                                                data={'transaction': ot}))
 
             # description fields:
             # - beancount: (payee, narration):  # payee is optional, narration is mandatory
