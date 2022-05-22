@@ -52,7 +52,6 @@ class Importer(importer.ImporterProtocol):
         #     'rounding_error' : 'Equity:Rounding-Errors:Imports',
         #     'fund_info'       : fund_info, }
 
-
     def initialize(self, file):
         if not self.initialized:
             self.custom_init()

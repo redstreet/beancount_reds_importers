@@ -3,7 +3,6 @@ screenscrapped into a tsv"""
 
 from beancount_reds_importers.libreader import tsvreader
 from beancount_reds_importers.libtransactionbuilder import investments
-import petl as etl
 
 
 class Importer(investments.Importer, tsvreader.Importer):
