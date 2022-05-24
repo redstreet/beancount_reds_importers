@@ -315,7 +315,7 @@ class Importer(importer.ImporterProtocol):
         for pos in self.get_balance_positions():
             ticker, ticker_long_name = self.get_ticker_info(pos.security)
             metadata = data.new_metadata(file.name, next(counter))
-            metadata = metadata | self.build_metadata(file, metatype='balance', data={'pos': pos})
+            metadata.update(self.build_metadata(file, metatype='balance', data={'pos': pos}))
 
             # if there are no transactions, use the date in the source file for the balance. This gives us the
             # bonus of an updated, recent balance assertion
