@@ -40,5 +40,5 @@ def invst(importer, account_number, acct, config={}):
 
 # Setting this variable provides a list of importer instances.
 CONFIG = [
-        invst(fidelity_csv, '99999999', 'Assets:Investments:Taxable:Fidelity')
+        invst(fidelity_csv, '456', 'Assets:Investments:Taxable:Fidelity')
 ]

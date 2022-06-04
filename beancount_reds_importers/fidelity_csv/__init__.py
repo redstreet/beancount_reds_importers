@@ -57,6 +57,13 @@ class Importer(investments.Importer, csvreader.Importer):
         # TODO
         self.skip_transaction_types = [ 'MERGER MER FROM', 'MERGER MER PAYOUT']
 
+    def skip_transaction(self, row):
+        if row.type in self.skip_transaction_types:
+            return True
+        if 'Account' in self.rdr.header():
+            return row.Account != self.config['account_number']
+        return False
+
     def prepare_raw_columns(self, rdr):
         def description_to_action(d):
             for i in self.transaction_type_map:

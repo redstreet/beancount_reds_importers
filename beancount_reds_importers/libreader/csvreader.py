@@ -63,6 +63,7 @@ class Importer(reader.Reader, importer.ImporterProtocol):
     def initialize_reader(self, file):
         if getattr(self, 'file', None) != file:
             self.file = file
+            # TODO: if self.config.accountnum_in_filename, check if that's true
             self.reader_ready = re.match(self.header_identifier, file.head())
             if self.reader_ready:
                 # TODO: move out elsewhere?
@@ -139,7 +140,7 @@ class Importer(reader.Reader, importer.ImporterProtocol):
     def get_available_cash(self):
         return None
 
-    # TOOD: custom, overridable
+    # custom, overridable
     def skip_transaction(self, row):
         return row.type in self.skip_transaction_types
 
