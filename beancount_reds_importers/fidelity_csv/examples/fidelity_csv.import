@@ -2,6 +2,7 @@
 """Import configuration."""
 
 from beancount_reds_importers import fidelity_csv
+from beancount_reds_importers.fidelity_csv import combined
 
 fund_data = [
         ('FZFXX',     'helllo', 'Fideilty Zero',          ),
@@ -10,8 +11,9 @@ fund_data = [
         ('FZIPX',     '',          'Fidelity Zero IPX',   ),
         ('9128285B2', '',          'Fidelity 9128285B2',  ),
         ('',          '',          'Unknown',             ),
+        ('SPAXX', '',          'Fidelity SPA',  ),
 ]
-money_market = [ 'VMMXX' ]
+money_market = [ 'VMMXX', 'SPAXX' ]
 fund_info = {
         'fund_data' : fund_data,
         'money_market' : money_market,
@@ -40,5 +42,12 @@ def invst(importer, account_number, acct, config={}):
 
 # Setting this variable provides a list of importer instances.
 CONFIG = [
-        invst(fidelity_csv, '456', 'Assets:Investments:Taxable:Fidelity')
+        invst(fidelity_csv, '456', 'Assets:Investments:Taxable:Fidelity'),
+
+        # This is a checking account!
+        # invst(fidelity_csv.combined, 'Fidelity X82000000', 'Assets:Banking:Fidelity-Checking'),
+        invst(fidelity_csv.combined, 'Index Funds X83000000', 'Assets:Investments:Taxable:Fidelity-Index-Funds'),
+        invst(fidelity_csv.combined, 'Value Picks Z2000000', 'Assets:Investments:Taxable:Fidelity-Value-Picks'),
+
+
 ]

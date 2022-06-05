@@ -8,6 +8,8 @@ from beancount.ingest import importer
 from beancount.core.number import D
 import petl as etl
 from beancount_reds_importers.libreader import reader
+# import logging, sys
+# logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
 
 # This csv reader uses petl to read a .csv into a table for maniupulation. The output of this reader is a list
 # of namedtuples corresponding roughly to ofx transactions. The following steps achieve this. When writing
@@ -64,7 +66,7 @@ class Importer(reader.Reader, importer.ImporterProtocol):
         if getattr(self, 'file', None) != file:
             self.file = file
             # TODO: if self.config.accountnum_in_filename, check if that's true
-            self.reader_ready = re.match(self.header_identifier, file.head())
+            self.reader_ready = re.match(self.header_identifier, file.head(), flags=re.DOTALL)
             if self.reader_ready:
                 # TODO: move out elsewhere?
                 # self.currency = self.ofx_account.statement.currency.upper()
@@ -72,9 +74,12 @@ class Importer(reader.Reader, importer.ImporterProtocol):
                 self.includes_balances = False
                 self.date_format = '%m/%d/%Y'  # TODO: move into class variable, into reader.Reader
                 self.file_read_done = False
-            # else:
-            #     print("header_identifier failed---------------:")
-            #     print(self.header_identifier, file.head())
+            else:
+                pass
+                # logging.info("header_identifier failed---------------:")
+                # # logging.info(file.head())
+                # logging.info("header_identifier:")
+                # logging.info(self.header_identifier)
 
     def file_date(self, file):
         "Get the maximum date from the file."

@@ -1,1 +1,2 @@
 bean-extract fidelity_csv.import History_for_Account_X99999999.csv
+bean-extract fidelity_csv.import Combined-Accounts_History.csv

@@ -355,9 +355,9 @@ class Importer(importer.ImporterProtocol):
     def add_fee_postings(self, entry, ot):
         config = self.config
         if hasattr(ot, 'fees') or hasattr(ot, 'commission'):
-            if getattr(ot, 'fees', 0) != 0:
+            if getattr(ot, 'fees', 0):
                 data.create_simple_posting(entry, config['fees'], ot.fees, self.currency)
-            if getattr(ot, 'commission', 0) != 0:
+            if getattr(ot, 'commission', 0):
                 data.create_simple_posting(entry, config['fees'], ot.commission, self.currency)
 
     def extract_custom_entries(self, file, counter):
