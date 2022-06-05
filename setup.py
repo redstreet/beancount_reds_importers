@@ -22,7 +22,13 @@ setup(
         'beancount>=2.2.3',
         'ofxparse>=0.20',
         'petl>=1.7.2',
+        'Click',
     ],
+    entry_points={
+        'console_scripts': [
+            'ofx-summarize = beancount_reds_importers.util.ofx_summarize:summarize',
+        ]
+    },
     zip_safe=False,
     classifiers=[
         'Development Status :: 4 - Beta',
