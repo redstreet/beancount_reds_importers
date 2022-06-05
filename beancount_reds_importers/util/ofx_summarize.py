@@ -18,6 +18,7 @@ def analyze(filename, ttype='dividends', pdb_explore=False):
     import pdb
     pdb.set_trace()
 
+
 @click.command()
 @click.argument('filename', type=click.Path(exists=True))
 @click.option('-n', '--num-transactions', default=5, help='Number of transactions to show')
