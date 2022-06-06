@@ -1,11 +1,6 @@
 #!/usr/bin/env python3
-
 """Download account statements automatically when possible, or display a reminder of how to download them.
 Multi-threaded."""
-
-# TODO:
-# - autocomplete sites from command line
-# - subcommand to generate an initial download.cfg file
 
 import click
 from click_aliases import ClickAliasedGroup
@@ -51,10 +46,32 @@ def list_institutions(config_file, sort):
         print()
 
 
+def get_sites_and_sections(config_file):
+    if config_file and os.path.exists(config_file):
+        config = readConfigFile(config_file)
+        all_sites = config.sections()
+        types = set([config[s]['type'] for s in all_sites])
+    return all_sites, types
+
+
+def complete_sites(ctx, param, incomplete):
+    config_file = ctx.params['config_file']
+    all_sites, _ = get_sites_and_sections(config_file)
+    return [s for s in all_sites if s.startswith(incomplete)]
+
+
+def complete_site_types(ctx, param, incomplete):
+    config_file = ctx.params['config_file']
+    _, types = get_sites_and_sections(config_file)
+    return [s for s in types if s.startswith(incomplete)]
+
+
 @cli.command()
 @click.option('-c', '--config-file', envvar='BEAN_DOWNLOAD_CONFIG', required=True, help='Config file')
-@click.option('--sites', help="Sites to downlad; unspecified means all", default='')
-@click.option('--site_type', help="Download all sites in specified type", default='')
+@click.option('--sites', help="Sites to downlad; unspecified means all", default='',
+              shell_complete=complete_sites)
+@click.option('--site-type', help="Download all sites in specified type", default='',
+              shell_complete=complete_site_types)
 @click.option('--dry-run', is_flag=True, help="Do not actually download", default=False)
 @click.option('--verbose', is_flag=True, help="Verbose", default=False)
 def download(config_file, sites, site_type, dry_run, verbose):
@@ -112,6 +129,26 @@ def download(config_file, sites, site_type, dry_run, verbose):
     else:
         print(f"{len(success)} Downloads successful:", ','.join(success))
 
+
+@cli.command(aliases=['init'])
+def config_template():
+    """Output a template for download.cfg that you can then use to build your own."""
+
+    template="""\
+[DEFAULT]
+ofx_pre = pass show dummy > /dev/null; ofxget stmt --nokeyring -u
+
+[fidelity_mine]
+type = ofxget
+cmd = %(ofx_pre)s your_username --useragent randomstring --password $(pass fidelity) fidelity -i <accnum> -i <accnum > ~/Downloads/fidelity.ofx
+
+[amazon_purchases]
+type = manual
+display = "Submit via: https://www.amazon.com/gp/privacycentral/dsar/preview.html"
+comment = "Internet-search for Request My Data, choose my orders. Last updated: 2022-02-22"
+"""
+
+    print(template)
 
 if __name__ == '__main__':
     cli()
