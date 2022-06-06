@@ -1,19 +1,23 @@
 #!/usr/bin/env python3
-"""Download account statements automatically when possible, or display a reminder of how to download them."""
 
-# TODO: autocomplete sites from command line
+"""Download account statements automatically when possible, or display a reminder of how to download them.
+Multi-threaded."""
+
+# TODO:
+# - autocomplete sites from command line
+# - subcommand to generate an initial download.cfg file
 
 import click
 from click_aliases import ClickAliasedGroup
 import os
-import sys
 import configparser
 import asyncio
 
 
 @click.group(cls=ClickAliasedGroup)
 def cli():
-    """Download account statements automatically when possible, or display a reminder of how to download them."""
+    """Download account statements automatically when possible, or display a reminder of how to download them.
+    Multi-threaded."""
     pass
 
 
@@ -63,6 +67,11 @@ def download(config_file, sites, site_type, dry_run, verbose):
         if site_type:
             sites = get_sites(sites, site_type, config)
 
+    errors = []
+    success = []
+    numsites = len(sites)
+    print(f"{numsites} to process.")
+
     async def download_site(i, site):
         tid = f'[{i+1}/{numsites} {site}]'
         print(f'{tid}: Begin')
@@ -78,25 +87,17 @@ def download(config_file, sites, site_type, dry_run, verbose):
                 await asyncio.sleep(2)
             else:
                 # https://docs.python.org/3.8/library/asyncio-subprocess.html#asyncio.create_subprocess_exec
-
                 proc = await asyncio.create_subprocess_shell(
                     cmd,
                     stdout=asyncio.subprocess.PIPE,
                     stderr=asyncio.subprocess.PIPE)
-
                 stdout, stderr = await proc.communicate()
 
-                ret = proc.returncode
-                if ret != 0:
+                if proc.returncode != 0:
                     errors.append(site)
                 else:
                     success.append(site)
                     print(f"{tid}: Success")
-
-    errors = []
-    success = []
-    numsites = len(sites)
-    print(f"{numsites} to process.")
 
     async def perform_downloads(sites):
         tasks = [download_site(i, site) for i, site in enumerate(sites)]
@@ -110,25 +111,6 @@ def download(config_file, sites, site_type, dry_run, verbose):
         print(f"Unsuccessful sites: {errors}.")
     else:
         print(f"{len(success)} Downloads successful:", ','.join(success))
-
-
-@cli.command(aliases=['import'])
-@click.option('-c', '--config-file', envvar='BEAN_DOWNLOAD_CONFIG', required=True, help='Config file')
-def import_transactions(config_file):
-    """Convenience function to call your importer command"""
-    import_cmd = ''
-    try:
-        config = readConfigFile(config_file)
-        import_cmd = config['DEFAULT']['import_cmd']
-    except KeyError:
-        pass
-
-    if import_cmd:
-        retval = os.system(import_cmd)
-        sys.exit(retval)
-    else:
-        print(f"import_cmd not found under the DEFAULT section in {config_file}. Exiting.")
-        sys.exit(1)
 
 
 if __name__ == '__main__':
