@@ -77,7 +77,16 @@ def download(config_file, sites, site_type, dry_run, verbose):
             if dry_run:
                 await asyncio.sleep(2)
             else:
-                ret = os.system(cmd)
+                # https://docs.python.org/3.8/library/asyncio-subprocess.html#asyncio.create_subprocess_exec
+
+                proc = await asyncio.create_subprocess_shell(
+                    cmd,
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.PIPE)
+
+                stdout, stderr = await proc.communicate()
+
+                ret = proc.returncode
                 if ret != 0:
                     errors.append(site)
                 else:
