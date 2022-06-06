@@ -27,6 +27,7 @@ setup(
     entry_points={
         'console_scripts': [
             'ofx-summarize = beancount_reds_importers.util.ofx_summarize:summarize',
+            'bean-ingest = beancount_reds_importers.util.bean_ingest:cli',
         ]
     },
     zip_safe=False,
