@@ -1,15 +1,18 @@
-# beancount_reds_importers
+# Beancount Red's Importers
 
 Simple importers and tools for [Beancount](https://beancount.github.io/), software for
-[plain text](https://plaintextaccounting.org/), double entry bookkeeping.
+[plain text](https://plaintextaccounting.org/), double entry bookkeeping. _More
+importantly, a framework to allow you to easily write your own importers._
+
+### Introduction
 
 This is a reference implementation of the principles expressed in
 **[The Five Minute Ledger Update](https://reds-rants.netlify.app/personal-finance/the-five-minute-ledger-update/).**
 
 Importers can be ugly and painful to write, yet are important in automating the grunt
 work out of maintaining personal finance software. The philosophy is to make writing
-importers easy. To achieve this, the design goal is to separate importers in to three
-parts:
+sustainable, dependable importers easy. To achieve this, the design separates importers
+in to three parts:
 
 1. file format reader (reusable)
 2. transaction builder (reusable)
@@ -17,8 +20,11 @@ parts:
    only one you have to write
 
 This design helps move most of the heavy-lifting common code into (1) and (2) above.
-Writing new importer is made easier since on only has to write code to address the
-institution-specific formatting and quirks for each bank/brokerage.
+Writing new importers is made easier since on only has to write code to address the
+institution-specific formatting and quirks for each bank/brokerage. See working examples
+of an [ofx based](https://github.com/redstreet/beancount_reds_importers/blob/main/beancount_reds_importers/citi/__init__.py) and [csv](https://github.com/redstreet/beancount_reds_importers/blob/main/beancount_reds_importers/schwab_csv/__init__.py) based importers.
+
+### Importers
 
 File format readers included are:
 - `.ofx`
@@ -30,16 +36,37 @@ Transaction builders included are:
   [smart_importer](https://github.com/beancount/smart_importer)
 - investments/brokerages (to handle the very many distinct cases of investment related
   transactions)
-- paychecks (to handle paychecks, which typically contain very many pre-determined
-  postings in a single entry)
+- paychecks (to handle paychecks, which typically contain very many mostly
+  pre-determined postings in a single entry)
 
-Input in `.ofx` format (over `.csv`) minimizes data and coding errors, eliminates format
-breaking changes in csv, and typically includes balances that are used to generate
-balance assertions, and commodity prices.
+[Input in `.ofx` format (over `.csv`) is preferred](https://reds-rants.netlify.app/personal-finance/a-word-about-input-formats-use-ofx-when-you-can/),
+when provided by the institution, as it minimizes data and coding errors, eliminates
+format breaking changes in csv, and typically includes balances that are used to
+generate balance assertions, and commodity prices.
 
-Look inside the importers/ directory to see a list of institutions supported. More
-investment, credit card, and banking institutions will be added in the future.
-Contributions welcome.
+See [here](https://github.com/redstreet/beancount_reds_importers/tree/main/beancount_reds_importers)
+for a list of institutions built-in. More investment, credit card, and banking
+institutions will be added in the future. Contributions welcome.
+
+### Tools and Utilities
+These commands are installed as a part of the pip installation:
+
+- `ofx-summarize`: Quick and dirty way to summarize a .ofx file, and peek inside it
+- `bean-download`: [Download account statements automatically](https://reds-rants.netlify.app/personal-finance/direct-downloads/)
+  (for supporting institutions), from your configuration of accounts. Multi-threaded.
+
+The commands include shell auto-completion (tab-to-complete). `bean-download`, in
+particular, can complete the account or account groups you want to download, which can
+be handy. To enable it, do:
+
+```
+mkdir -p ~/.zcomplete
+_OFX_SUMMARIZE_COMPLETE=zsh_source ofx-summarize > ~/.zcomplete/ofx-summarize-complete.zsh
+_BEAN_DOWNLOAD_COMPLETE=zsh_source bean-download > ~/.zcomplete/bean-download-complete.zsh
+
+# Place this in your shell's rc file (.zshrc or .bashrc or .fishrc):
+for f in ~/.zcomplete/*; do source $f; done
+```
 
 ## Features
 - supports [Beancount](https://github.com/beancount/beancount) output via `bean-extract`
@@ -51,7 +78,7 @@ Contributions welcome.
   - banking and credit card
   - paychecks
 - file format independent (ofx, csv, xlsx supported out of the box; single and
-  multitable for csv and xlsx; write your own handler if needed)
+  multitable for csv and xlsx; write your own reusable handler if needed)
 - supports commodity-leaf accounts
 - see [The Five Minute Ledger Update](https://reds-rants.netlify.app/personal-finance/the-five-minute-ledger-update/)
   for automating downloads via `ofxclient`, connecting to `smart_importer` to
@@ -59,20 +86,25 @@ Contributions welcome.
 
 
 ## Installation
-`pip3 install beancount-reds-importers`
+```
+pip3 install beancount-reds-importers
+```
 
 Or to install the bleeding edge version from git:
-`pip3 install git+https://github.com/redstreet/beancount_reds_importers`
+```
+pip3 install git+https://github.com/redstreet/beancount_reds_importers
+```
 
-If you plan on importing excel files, also run:
-`pip3 install openpyxl`
 
-## Running the included examples:
+## Running
+
+### Running the included examples:
 1. `cd <your pip installed dir>/example #eg: cd ~/.local/lib/python3.8/site-packages/beancount_reds_importers/example`
 2. `./import.sh OfxDownload.qfx` # Imports investments
 3. `./import.sh transactions.qfx` # Import bank transactions; uses smart_importer to classify transactions
 
-## Running
+
+### Creating and running your own config:
 1. Create your own my.import. An example my.import is provided. At the least, include your account numbers
 2. Include fund information. Copy the included `fund_info.py` to start with.
 3. You can now run `bean-identify`, `bean-extract`, etc. See the included script: Run `./import.sh <your_input_ofx>`
