@@ -140,7 +140,11 @@ ofx_pre = pass show dummy > /dev/null; ofxget stmt --nokeyring -u
 
 [fidelity_mine]
 type = ofxget
-cmd = %(ofx_pre)s your_username --useragent randomstring --password $(pass fidelity) fidelity -i <accnum> -i <accnum > ~/Downloads/fidelity.ofx
+cmd = %(ofx_pre)s your_username         \\
+        --useragent randomstring        \\
+        --password $(pass fidelity)     \\
+        fidelity -i <accnum> -i <accnum \\
+        > ~/Downloads/fidelity.ofx
 
 [amazon_purchases]
 type = manual
