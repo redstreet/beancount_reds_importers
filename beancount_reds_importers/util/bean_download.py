@@ -68,10 +68,10 @@ def complete_site_types(ctx, param, incomplete):
 
 @cli.command()
 @click.option('-c', '--config-file', envvar='BEAN_DOWNLOAD_CONFIG', required=True, help='Config file')
-@click.option('--sites', help="Sites to downlad; unspecified means all", default='',
+@click.option('-i', '--sites', '--institutions', help="Institutions to download; unspecified means all", default='',
               shell_complete=complete_sites)
-@click.option('--site-type', help="Download all sites in specified type", default='',
-              shell_complete=complete_site_types)
+@click.option('-t', '--site-type', '--institution-type', help="Download all institutions of a specified type",
+              default='', shell_complete=complete_site_types)
 @click.option('--dry-run', is_flag=True, help="Do not actually download", default=False)
 @click.option('--verbose', is_flag=True, help="Verbose", default=False)
 def download(config_file, sites, site_type, dry_run, verbose):
@@ -134,7 +134,7 @@ def download(config_file, sites, site_type, dry_run, verbose):
 def config_template():
     """Output a template for download.cfg that you can then use to build your own."""
 
-    template="""\
+    template = """\
 [DEFAULT]
 ofx_pre = pass show dummy > /dev/null; ofxget stmt --nokeyring -u
 
@@ -149,6 +149,7 @@ comment = "Internet-search for Request My Data, choose my orders. Last updated: 
 """
 
     print(template)
+
 
 if __name__ == '__main__':
     cli()
