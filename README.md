@@ -16,11 +16,11 @@ in to three parts:
 
 1. file format reader (reusable)
 2. transaction builder (reusable)
-3. institution-specific declarations and code (minimal, institution specific) <- The
-   only one you have to write
+3. institution-specific declarations and code (minimal, institution specific) <- _The
+   only one you have to write_
 
 This design helps move most of the heavy-lifting common code into (1) and (2) above.
-Writing new importers is made easier since on only has to write code to address the
+Writing new importers is made easier since one only has to write code to address the
 institution-specific formatting and quirks for each bank/brokerage. See working examples
 of an [ofx based](https://github.com/redstreet/beancount_reds_importers/blob/main/beancount_reds_importers/citi/__init__.py) and [csv](https://github.com/redstreet/beancount_reds_importers/blob/main/beancount_reds_importers/schwab_csv/__init__.py) based importers.
 
@@ -41,7 +41,7 @@ Transaction builders included are:
 
 [Input in `.ofx` format (over `.csv`) is preferred](https://reds-rants.netlify.app/personal-finance/a-word-about-input-formats-use-ofx-when-you-can/),
 when provided by the institution, as it minimizes data and coding errors, eliminates
-format breaking changes in csv, and typically includes balances that are used to
+format breaking changes in .csv files, and typically includes balances that are used to
 generate balance assertions, and commodity prices.
 
 See [here](https://github.com/redstreet/beancount_reds_importers/tree/main/beancount_reds_importers)
@@ -55,7 +55,8 @@ These commands are installed as a part of the pip installation:
 - `bean-download`: [Download account statements automatically](https://reds-rants.netlify.app/personal-finance/direct-downloads/)
   (for supporting institutions), from your configuration of accounts. Multi-threaded.
 
-The commands include shell auto-completion (tab-to-complete). `bean-download`, in
+The commands include shell auto-completion (tab-to-complete) via
+[click](https://click.palletsprojects.com/en/8.1.x/shell-completion/). `bean-download`, in
 particular, can complete the account or account groups you want to download, which can
 be handy. To enable it, do:
 
@@ -114,8 +115,8 @@ pip3 install git+https://github.com/redstreet/beancount_reds_importers
 I run tests across hundreds of actual ofx and csv files, against reference outputs that
 I know to be correct from my personal file. However, I'm unable to share them since
 these are personal. Testing against real world files is best, so I recommend you do this
-with your own input files. Having said that, Unit tests are probably useful, even if
-limited, and I'll add these shortly (contributions welcome).
+with your own input files.
 
 ## Contributions
-Test ofx files and test infra appreciated.
+Contributions welcome. New importers for institutions and test input files appreciated.
+Sharing importers helps the community.
