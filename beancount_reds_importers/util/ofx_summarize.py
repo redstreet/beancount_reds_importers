@@ -2,7 +2,6 @@
 """Quick and dirty way to summarize a .ofx file and peek inside it."""
 
 import click
-import itertools
 import os
 import sys
 from collections import defaultdict
@@ -15,8 +14,9 @@ def analyze(filename, ttype='dividends', pdb_explore=False):
     for acc in ofx.accounts:
         for t in acc.statement.transactions:
             ts[t.type].append(t)
-    import pdb
-    pdb.set_trace()
+    if pdb_explore:
+        import pdb
+        pdb.set_trace()
 
 
 @click.command()
@@ -63,13 +63,15 @@ def summarize(filename, pdb_explore, num_transactions, stats_only):
         print("Types: ", set([t.type for t in acc.statement.transactions]))
 
         print()
-        for t in itertools.islice(acc.statement.transactions, 0, num_transactions):
+        txns = sorted(acc.statement.transactions, reverse=True,
+                      key=lambda t: t.date if hasattr(t, 'date') else t.tradeDate)
+        for t in txns[:num_transactions]:
             date = t.date if hasattr(t, 'date') else t.tradeDate
             description = t.payee + ' ' + t.memo if hasattr(t, 'payee') else t.memo
             amount = t.amount if hasattr(t, 'amount') else t.total
             print(date, t.type, description, amount)
         if pdb_explore:
-            print("Hint: dir(acc), dir(acc.statement.transactions)")
+            print("Hint: try dir(acc), dir(acc.statement.transactions)")
             import pdb
             pdb.set_trace()
         print()
