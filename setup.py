@@ -19,13 +19,13 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     install_requires=[
-        'Click' >= 7.0,
-        'beancount' >= 2.2.3,
-        'click_aliases' >= 1.0.1,
-        'ofxparse' >= 0.21,
-        'openpyxl' >= 3.0.9,
-        'packaging' >= 20.3,
-        'petl' >= 1.7.4,
+        'Click >= 7.0',
+        'beancount >= 2.3.5',
+        'click_aliases >= 1.0.1',
+        'ofxparse >= 0.21',
+        'openpyxl >= 3.0.9',
+        'packaging >= 20.3',
+        'petl >= 1.7.4',
     ],
     entry_points={
         'console_scripts': [
