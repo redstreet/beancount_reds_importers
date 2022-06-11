@@ -134,25 +134,10 @@ def download(config_file, sites, site_type, dry_run, verbose):
 def config_template():
     """Output a template for download.cfg that you can then use to build your own."""
 
-    template = """\
-[DEFAULT]
-ofx_pre = pass show dummy > /dev/null; ofxget stmt --nokeyring -u
-
-[fidelity_mine]
-type = ofxget
-cmd = %(ofx_pre)s your_username         \\
-        --useragent randomstring        \\
-        --password $(pass fidelity)     \\
-        fidelity -i <accnum> -i <accnum \\
-        > ~/Downloads/fidelity.ofx
-
-[amazon_purchases]
-type = manual
-display = "Submit via: https://www.amazon.com/gp/privacycentral/dsar/preview.html"
-comment = "Internet-search for Request My Data, choose my orders. Last updated: 2022-02-22"
-"""
-
-    print(template)
+    path = os.path.dirname(os.path.realpath(__file__))
+    with open(os.path.join(*[path, 'template.cfg'])) as f:
+        for line in f:
+            print(line, end='')
 
 
 if __name__ == '__main__':
