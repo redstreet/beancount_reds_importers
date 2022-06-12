@@ -78,6 +78,11 @@ def complete_site_types(ctx, param, incomplete):
 @click.option('--verbose', is_flag=True, help="Verbose", default=False)
 def download(config_file, sites, site_type, dry_run, verbose):
     """Download statements for the specified institutions (sites)."""
+
+    def pverbose(*args, **kwargs):
+        if verbose:
+            print(*args, **kwargs)
+
     config = readConfigFile(config_file)
     if sites:
         sites = sites.split(',')
@@ -94,22 +99,18 @@ def download(config_file, sites, site_type, dry_run, verbose):
 
     async def download_site(i, site):
         tid = f'[{i+1}/{numsites} {site}]'
-        if verbose:
-            print(f'{tid}: Begin')
+        pverbose(f'{tid}: Begin')
         options = config[site]
         # We support cmd and display, and type to filter
         if 'display' in options:
             displays.append([site, f"{options['display']}"])
-            # print(f"{tid}: {options['display']}")
         if 'cmd' in options:
             cmd = os.path.expandvars(options['cmd'])
-            if verbose:
-                print(f"{tid}: Executing: {cmd}")
+            pverbose(f"{tid}: Executing: {cmd}")
             if dry_run:
                 await asyncio.sleep(2)
                 success.append(site)
-                if verbose:
-                    print(f"{tid}: Success")
+                pverbose(f"{tid}: Success")
             else:
                 # https://docs.python.org/3.8/library/asyncio-subprocess.html#asyncio.create_subprocess_exec
                 proc = await asyncio.create_subprocess_shell(
@@ -118,12 +119,11 @@ def download(config_file, sites, site_type, dry_run, verbose):
                     stderr=asyncio.subprocess.PIPE)
                 stdout, stderr = await proc.communicate()
 
-                if proc.returncode != 0:
+                if proc.returncode:
                     errors.append(site)
                 else:
                     success.append(site)
-                    if verbose:
-                        print(f"{tid}: Success")
+                    pverbose(f"{tid}: Success")
 
     async def perform_downloads(sites):
         tasks = [download_site(i, site) for i, site in enumerate(sites)]
@@ -142,7 +142,7 @@ def download(config_file, sites, site_type, dry_run, verbose):
         print()
         print(f"Unsuccessful sites: {errors}.")
     else:
-        print(f"{len(success)} downloads successful:", ','.join(success))
+        print(f"{len(success)} downloads successful:", ', '.join(success))
 
 
 @cli.command(aliases=['init'])
