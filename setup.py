@@ -26,6 +26,8 @@ setup(
         'openpyxl >= 3.0.9',
         'packaging >= 20.3',
         'petl >= 1.7.4',
+        'tabulate >= 0.8.9',
+        'tqdm >= 4.64.0',
     ],
     entry_points={
         'console_scripts': [

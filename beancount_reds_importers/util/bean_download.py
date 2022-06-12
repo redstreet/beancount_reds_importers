@@ -7,6 +7,8 @@ from click_aliases import ClickAliasedGroup
 import os
 import configparser
 import asyncio
+import tabulate
+import tqdm
 
 
 @click.group(cls=ClickAliasedGroup)
@@ -87,21 +89,27 @@ def download(config_file, sites, site_type, dry_run, verbose):
     errors = []
     success = []
     numsites = len(sites)
-    print(f"{numsites} to process.")
+    displays = []
+    print(f"Processing {numsites} institutions.")
 
     async def download_site(i, site):
         tid = f'[{i+1}/{numsites} {site}]'
-        print(f'{tid}: Begin')
+        if verbose:
+            print(f'{tid}: Begin')
         options = config[site]
         # We support cmd and display, and type to filter
         if 'display' in options:
-            print(f"{tid}: {options['display']}")
+            displays.append([site, f"{options['display']}"])
+            # print(f"{tid}: {options['display']}")
         if 'cmd' in options:
             cmd = os.path.expandvars(options['cmd'])
             if verbose:
                 print(f"{tid}: Executing: {cmd}")
             if dry_run:
                 await asyncio.sleep(2)
+                success.append(site)
+                if verbose:
+                    print(f"{tid}: Success")
             else:
                 # https://docs.python.org/3.8/library/asyncio-subprocess.html#asyncio.create_subprocess_exec
                 proc = await asyncio.create_subprocess_shell(
@@ -114,20 +122,27 @@ def download(config_file, sites, site_type, dry_run, verbose):
                     errors.append(site)
                 else:
                     success.append(site)
-                    print(f"{tid}: Success")
+                    if verbose:
+                        print(f"{tid}: Success")
 
     async def perform_downloads(sites):
         tasks = [download_site(i, site) for i, site in enumerate(sites)]
-        await asyncio.gather(*tasks)
+        for t in tqdm.tqdm(asyncio.as_completed(tasks), total=len(tasks)):
+            await t
 
     asyncio.run(perform_downloads(sites))
+
+    print()
+    displays = [[i + 1, *row] for i, row in enumerate(displays)]
+    print(tabulate.tabulate(displays, headers=["#", "Institution", "Instructions"], tablefmt="plain"))
+    print()
 
     if errors:
         print(f"Successful sites: {success}.")
         print()
         print(f"Unsuccessful sites: {errors}.")
     else:
-        print(f"{len(success)} Downloads successful:", ','.join(success))
+        print(f"{len(success)} downloads successful:", ','.join(success))
 
 
 @cli.command(aliases=['init'])

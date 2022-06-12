@@ -60,3 +60,9 @@ petl == 1.7.4
 # beancount_reds_importers/.eggs/setuptools_scm-6.4.2-py3.8.egg/setuptools_scm/integration.py: 4
 # beancount_reds_importers/setup.py: 2
 setuptools == 45.2.0
+
+# beancount_reds_importers/beancount_reds_importers/util/bean_download.py: 10
+tabulate == 0.8.9
+
+# beancount_reds_importers/beancount_reds_importers/util/bean_download.py: 11
+tqdm == 4.64.0
