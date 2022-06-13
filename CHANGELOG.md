@@ -5,13 +5,21 @@
 
 ### Improvements
 
-- Feat/util: ofx_summarize: sort by date. [Red S]
+- util: bean-download: display download progress bars; pretty output. [Red S]
+- util: bean-download template improvements. [Red S]
+
+  - separate template file
+  - working examples
+- util: ofx_summarize: sort by date. [Red S]
 
 ### Other
 
-- Doc: add changelog, and gitchangelog config. [Red S]
-- Build: requirements; gitchangelog. [Red S]
+- build: deps quoting. [Red S]
+- build: requirements; gitchangelog. [Red S]
+- doc: add changelog, and gitchangelog config. [Red S]
+- doc: gitchangelog exclude 'feat' [Red S]
 - README updates. [Red S]
+- refactor: print verbose. [Red S]
 
 
 ## 0.5.0 (2022-06-07)
