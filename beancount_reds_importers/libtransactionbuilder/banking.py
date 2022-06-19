@@ -75,6 +75,10 @@ class Importer(importer.ImporterProtocol):
         """For custom importers to override"""
         return []
 
+    # for custom importers to override
+    def skip_transaction(self, ot):
+        return False
+
     def extract(self, file, existing_entries=None):
         self.initialize(file)
         counter = itertools.count()
@@ -83,6 +87,8 @@ class Importer(importer.ImporterProtocol):
 
         self.read_file(file)
         for ot in self.get_transactions():
+            if self.skip_transaction(ot):
+                continue
             metadata = data.new_metadata(file.name, next(counter))
             # metadata['type'] = ot.type # Optional metadata, useful for debugging #TODO
             metadata.update(self.build_metadata(file,

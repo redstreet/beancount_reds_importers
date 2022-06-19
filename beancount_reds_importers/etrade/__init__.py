@@ -12,7 +12,7 @@ class Importer(investments.Importer, ofxreader.Importer):
         self.filename_pattern_def = '.*etrade'
         self.get_ticker_info = self.get_ticker_info_from_id
 
-    def skip_transactions(self, ot):
+    def skip_transaction(self, ot):
         if 'JNL' in ot.memo:
             return True
         return False

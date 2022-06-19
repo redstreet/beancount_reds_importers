@@ -149,7 +149,7 @@ class Importer(importer.ImporterProtocol):
         return self.config['main_account'].format(ticker=ticker)
 
     # for custom importers to override
-    def skip_transactions(self, ot):
+    def skip_transaction(self, ot):
         return False
 
     # extract() and supporting methods
@@ -288,7 +288,7 @@ class Importer(importer.ImporterProtocol):
         new_entries = []
         self.read_file(file)
         for ot in self.get_transactions():
-            if self.skip_transactions(ot):
+            if self.skip_transaction(ot):
                 continue
             if ot.type in ['buymf', 'sellmf', 'buystock', 'sellstock', 'buyother', 'sellother', 'reinvest']:
                 entry = self.generate_trade_entry(ot, file, counter)
