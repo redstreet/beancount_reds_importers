@@ -95,7 +95,7 @@ class Importer(reader.Reader, importer.ImporterProtocol):
 
         # fixup currencies
         def remove_non_numeric(x):
-            return re.sub("[^0-9\.-]", "", x.strip())  # noqa: W605
+            return re.sub("[^0-9\.-]", "", str(x).strip())  # noqa: W605
         currencies = ['unit_price', 'fees', 'total', 'amount']
         for i in currencies:
             if i in rdr.header():
