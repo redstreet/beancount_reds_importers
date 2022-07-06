@@ -12,9 +12,10 @@ class Importer(importer.ImporterProtocol):
         self.initialized = False
         self.reader_ready = False
         self.custom_init_run = False
-        self.get_transaction_type_desc = lambda ot: None
-        # NOTE: to include type in the description, use:
-        # self.get_transaction_type_desc = lambda ot: ot.type
+
+        # For overriding in custom_init()
+        self.get_payee = lambda ot: ot.payee
+        self.get_narration = lambda ot: ot.memo
 
         # REQUIRED_CONFIG = {
         #     'account_number'   : 'account number',
@@ -101,7 +102,7 @@ class Importer(importer.ImporterProtocol):
 
             # Build transaction entry
             entry = data.Transaction(metadata, ot.date.date(), self.FLAG,
-                                     self.get_transaction_type_desc(ot), ot.payee,
+                                     self.get_payee(ot), self.get_narration(ot),
                                      data.EMPTY_SET, data.EMPTY_SET, [])
             data.create_simple_posting(entry, config['main_account'], ot.amount, self.currency)
 
