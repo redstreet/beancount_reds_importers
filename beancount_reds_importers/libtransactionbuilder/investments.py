@@ -375,4 +375,4 @@ class Importer(importer.ImporterProtocol):
 
         new_entries += self.extract_custom_entries(file, counter)
 
-        return(new_entries)
+        return new_entries

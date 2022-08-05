@@ -114,4 +114,4 @@ class Importer(banking.Importer):
                                  None, config['desc'], data.EMPTY_SET, data.EMPTY_SET, [])
 
         entry = self.build_postings(entry)
-        return([entry])
+        return [entry]

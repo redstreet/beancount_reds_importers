@@ -136,8 +136,8 @@ def download(config_file, sites, site_type, dry_run, verbose):
 
     print()
     displays = [[i + 1, *row] for i, row in enumerate(displays)]
-    click.secho(tabulate.tabulate(displays, 
-        headers=["#", "Institution", "Instructions"], tablefmt="plain"), fg='blue')
+    click.secho(tabulate.tabulate(displays,
+                headers=["#", "Institution", "Instructions"], tablefmt="plain"), fg='blue')
     print()
 
     s = len(sites)
