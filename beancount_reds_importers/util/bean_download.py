@@ -30,7 +30,8 @@ def get_sites(sites, t, config):
 
 
 @cli.command(aliases=['list'])
-@click.option('-c', '--config-file', envvar='BEAN_DOWNLOAD_CONFIG', required=True, help='Config file',
+@click.option('-c', '--config-file', envvar='BEAN_DOWNLOAD_CONFIG', required=True,
+              help='Config file. The environment variable BEAN_DOWNLOAD_CONFIG can also be used to specify this',
               type=click.Path(exists=True))
 @click.option('-s', '--sort', is_flag=True, help='Sort output')
 def list_institutions(config_file, sort):
@@ -104,6 +105,7 @@ def download(config_file, sites, site_type, dry_run, verbose):
         # We support cmd and display, and type to filter
         if 'display' in options:
             displays.append([site, f"{options['display']}"])
+            success.append(site)
         if 'cmd' in options:
             cmd = os.path.expandvars(options['cmd'])
             pverbose(f"{tid}: Executing: {cmd}")
@@ -134,15 +136,15 @@ def download(config_file, sites, site_type, dry_run, verbose):
 
     print()
     displays = [[i + 1, *row] for i, row in enumerate(displays)]
-    print(tabulate.tabulate(displays, headers=["#", "Institution", "Instructions"], tablefmt="plain"))
+    click.secho(tabulate.tabulate(displays, 
+        headers=["#", "Institution", "Instructions"], tablefmt="plain"), fg='blue')
     print()
 
+    s = len(sites)
+    if success:
+        print(f"{len(success)}/{s} sites succeeded: {', '.join(success)}")
     if errors:
-        print(f"Successful sites: {success}.")
-        print()
-        print(f"Unsuccessful sites: {errors}.")
-    else:
-        print(f"{len(success)} downloads successful:", ', '.join(success))
+        click.secho(f"{len(errors)}/{s} sites failed:    {', '.join(errors)}", fg='red')
 
 
 @cli.command(aliases=['init'])
