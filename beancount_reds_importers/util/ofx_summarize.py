@@ -71,7 +71,11 @@ def summarize(filename, pdb_explore, num_transactions, stats_only):
             amount = t.amount if hasattr(t, 'amount') else t.total
             print(date, t.type, description, amount)
         if pdb_explore:
-            print("Hint: try dir(acc), dir(acc.statement.transactions)")
+            print("Hints:")
+            print("- try dir(acc), dir(acc.statement.transactions)")
+            print("- try the 'interact' command to start an interactive python interpreter")
+            if len(ofx.accounts) > 1:
+                print("- type 'c' to explore the next account in this file")
             import pdb
             pdb.set_trace()
         print()
