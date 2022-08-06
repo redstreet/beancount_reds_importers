@@ -109,7 +109,10 @@ pip3 install git+https://github.com/redstreet/beancount_reds_importers
 1. Create your own my.import. An example my.import is provided. At the least, include your account numbers
 2. Include fund information. Copy the included `fund_info.py` to start with.
 3. You can now run `bean-identify`, `bean-extract`, etc. See the included script: Run `./import.sh <your_input_ofx>`
-4. If cusip info is missing, the importer will let you know. Add it to your `fund_info.py`
+4. If identifier/cusip/isin info is missing, the importer will let you know. Add it to your
+   `fund_info.py` See
+   [this article](https://reds-rants.netlify.app/personal-finance/tickers-and-identifiers/)
+   for automating and managing identifier info
 
 ## Testing
 I run tests across hundreds of actual ofx and csv files, against reference outputs that
