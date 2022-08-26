@@ -4,7 +4,7 @@ from beancount_reds_importers.libreader import csvreader
 from beancount_reds_importers.libtransactionbuilder import investments
 
 
-class Importer(investments.Importer, csvreader.Importer):
+class Importer(csvreader.Importer, investments.Importer):
     IMPORTER_NAME = 'Schwab Brokerage CSV'
 
     def custom_init(self):
@@ -43,14 +43,18 @@ class Importer(investments.Importer, csvreader.Importer):
             'Reinvest Dividend':            'dividends',
             'Reinvest Shares':              'buystock',
             'Sell':                         'sellstock',
-            'Short Term Cap Gain Reinvest': 'capgains_st',
+            'Short Term Cap Gain Reinvest': 'capgainsd_st',
             'Wire Funds Received':          'transfer',
+            'Wire Received':                'transfer',
             'Funds Received':               'transfer',
+            'Stock Split':                  'transfer',
+            'Cash In Lieu':                 'transfer',  # TODO: not handled correctly
             }
         self.skip_transaction_types = ['Journal']
 
     def prepare_raw_columns(self, rdr):
-        rdr = rdr.cutout('')  # clean up last column
+        if '' in rdr.fieldnames():
+            rdr = rdr.cutout('')  # clean up last column
 
         def cleanup_date(d):
             """'11/16/2018 as of 11/15/2018' --> '11/16/2018'"""
