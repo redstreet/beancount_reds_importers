@@ -1,4 +1,4 @@
-""" Schwab csv importer."""
+""" Schwab Brokerage .csv importer."""
 
 from beancount_reds_importers.libreader import csvreader
 from beancount_reds_importers.libtransactionbuilder import investments

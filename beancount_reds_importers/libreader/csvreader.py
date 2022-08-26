@@ -96,7 +96,7 @@ class Importer(reader.Reader, importer.ImporterProtocol):
         # fixup currencies
         def remove_non_numeric(x):
             return re.sub("[^0-9\.-]", "", str(x).strip())  # noqa: W605
-        currencies = ['unit_price', 'fees', 'total', 'amount']
+        currencies = ['unit_price', 'fees', 'total', 'amount', 'balance']
         for i in currencies:
             if i in rdr.header():
                 rdr = rdr.convert(i, remove_non_numeric)
@@ -120,6 +120,8 @@ class Importer(reader.Reader, importer.ImporterProtocol):
             rdr = self.read_raw(file)
             rdr = rdr.skip(getattr(self, 'skip_head_rows', 0))                 # chop unwanted header rows
             rdr = rdr.head(len(rdr) - getattr(self, 'skip_tail_rows', 0) - 1)  # chop unwanted footer rows
+            rdr = rdr.skipcomments(getattr(self, 'skip_comments', ''))
+            rdr = rdr.rowslice(getattr(self, 'skip_data_rows', 0), None)
             rdr = self.prepare_raw_columns(rdr)
             rdr = rdr.rename(self.header_map)
             rdr = self.convert_columns(rdr)
