@@ -134,11 +134,12 @@ def download(config_file, sites, site_type, dry_run, verbose):
 
     asyncio.run(perform_downloads(sites))
 
-    print()
-    displays = [[i + 1, *row] for i, row in enumerate(displays)]
-    click.secho(tabulate.tabulate(displays,
-                headers=["#", "Institution", "Instructions"], tablefmt="plain"), fg='blue')
-    print()
+    if displays:
+        print()
+        displays = [[i + 1, *row] for i, row in enumerate(displays)]
+        click.secho(tabulate.tabulate(displays,
+                    headers=["#", "Institution", "Instructions"], tablefmt="plain"), fg='blue')
+        print()
 
     s = len(sites)
     if success:
