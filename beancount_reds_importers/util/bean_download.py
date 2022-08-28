@@ -2,11 +2,11 @@
 """Download account statements automatically when possible, or display a reminder of how to download them.
 Multi-threaded."""
 
-import click
 from click_aliases import ClickAliasedGroup
-import os
-import configparser
 import asyncio
+import click
+import configparser
+import os
 import tabulate
 import tqdm
 
@@ -71,13 +71,13 @@ def complete_site_types(ctx, param, incomplete):
 
 @cli.command()
 @click.option('-c', '--config-file', envvar='BEAN_DOWNLOAD_CONFIG', required=True, help='Config file')
-@click.option('-i', '--sites', '--institutions', help="Institutions to download; unspecified means all", default='',
-              shell_complete=complete_sites)
-@click.option('-t', '--site-type', '--institution-type', help="Download all institutions of a specified type",
+@click.option('-i', '--sites', '--institutions', help="Institutions to download (comma separated); unspecified means all",
+              default='', shell_complete=complete_sites)
+@click.option('-t', '--site-types', '--institution-types', help="Download all institutions of specified types (comma separated)",
               default='', shell_complete=complete_site_types)
 @click.option('--dry-run', is_flag=True, help="Do not actually download", default=False)
 @click.option('--verbose', is_flag=True, help="Verbose", default=False)
-def download(config_file, sites, site_type, dry_run, verbose):
+def download(config_file, sites, site_types, dry_run, verbose):
     """Download statements for the specified institutions (sites)."""
 
     def pverbose(*args, **kwargs):
@@ -89,8 +89,10 @@ def download(config_file, sites, site_type, dry_run, verbose):
         sites = sites.split(',')
     else:
         sites = config.sections()
-        if site_type:
-            sites = get_sites(sites, site_type, config)
+        if site_types:
+            site_types = site_types.split(',')
+            sites_lists = [get_sites(sites, site_type, config) for site_type in site_types]
+            sites = [j for i in sites_lists for j in i]
 
     errors = []
     success = []
