@@ -2,7 +2,7 @@
 beancount_reds_importers."""
 
 import datetime
-from ofxparse import OfxParser
+import ofxparse
 from collections import namedtuple
 from beancount.ingest import importer
 from beancount_reds_importers.libreader import reader
@@ -14,9 +14,12 @@ class Importer(reader.Reader, importer.ImporterProtocol):
     def initialize_reader(self, file):
         if getattr(self, 'file', None) != file:
             self.file = file
-            self.ofx = OfxParser.parse(open(file.name))
             self.ofx_account = None
             self.reader_ready = False
+            try:
+                self.ofx = ofxparse.OfxParser.parse(open(file.name))
+            except ofxparse.OfxParserException:
+                return
             for acc in self.ofx.accounts:
                 # account identifying info fieldname varies across institutions
                 # self.acc_num_field can be overridden in self.custom_init() if needed
