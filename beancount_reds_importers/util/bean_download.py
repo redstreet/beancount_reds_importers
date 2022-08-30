@@ -73,11 +73,12 @@ def complete_site_types(ctx, param, incomplete):
 @click.option('-c', '--config-file', envvar='BEAN_DOWNLOAD_CONFIG', required=True, help='Config file')
 @click.option('-i', '--sites', '--institutions', help="Institutions to download (comma separated); unspecified means all",
               default='', shell_complete=complete_sites)
-@click.option('-t', '--site-types', '--institution-types', help="Download all institutions of specified types (comma separated)",
+@click.option('-t', '--site-types', '--institution-types',
+              help="Download all institutions of specified types (comma separated)",
               default='', shell_complete=complete_site_types)
 @click.option('--dry-run', is_flag=True, help="Do not actually download", default=False)
 @click.option('--verbose', is_flag=True, help="Verbose", default=False)
-def download(config_file, sites, site_types, dry_run, verbose):
+def download(config_file, sites, site_types, dry_run, verbose):  # noqa: C901
     """Download statements for the specified institutions (sites)."""
 
     def pverbose(*args, **kwargs):

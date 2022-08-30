@@ -26,16 +26,17 @@ class Importer(csvreader.Importer, banking.Importer):
             "Withdrawal (-)": "withdrawal",
             "Deposit (+)":    "deposit",
             "RunningBalance": "balance"
-            }
+        }
         self.transaction_type_map = {
-                "INTADJUST": 'income',
-                "TRANSFER": 'transfer',
-                "ACH": 'transfer'
-            }
+            "INTADJUST": 'income',
+            "TRANSFER": 'transfer',
+            "ACH": 'transfer'
+        }
         self.skip_transaction_types = ['Journal']
 
     def prepare_raw_columns(self, rdr):
-        rdr = rdr.addfield('amount', lambda x: "-" + x['Withdrawal (-)'] if x['Withdrawal (-)'] != '' else x['Deposit (+)'])
+        rdr = rdr.addfield('amount',
+                           lambda x: "-" + x['Withdrawal (-)'] if x['Withdrawal (-)'] != '' else x['Deposit (+)'])
         rdr = rdr.addfield('memo', lambda x: '')
         return rdr
 
@@ -44,8 +45,8 @@ class Importer(csvreader.Importer, banking.Importer):
 
         max_date = self.get_max_transaction_date()
         if max_date:
-            for row in [self.rdr.namedtuples()[0], self.rdr.namedtuples()[len(self.rdr)-2]]:
-                date = row.date.date() + datetime.timedelta(days=1)  # See comment in get_max_transaction_date() for explanation
+            for row in [self.rdr.namedtuples()[0], self.rdr.namedtuples()[len(self.rdr) - 2]]:
+                date = row.date.date() + datetime.timedelta(days=1)
+                # See comment in get_max_transaction_date() for explanation of the above line
                 Balance = namedtuple('Balance', ['date', 'amount'])
                 yield Balance(date, row.balance)
-
