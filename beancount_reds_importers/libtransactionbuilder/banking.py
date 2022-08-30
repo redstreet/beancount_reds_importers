@@ -96,13 +96,16 @@ class Importer(importer.ImporterProtocol):
                                                 metatype='transaction',
                                                 data={'transaction': ot}))
 
-            # description fields:
-            # - beancount: (payee, narration):  # payee is optional, narration is mandatory
-            # - OFX: ot.payee tends to be the "main" description field, while ot.memo is optional
+            # description fields: With OFX, ot.payee tends to be the "main" description field,
+            # while ot.memo is optional
+            # 
+            # With Beancount, the grammar is (payee, narration). payee is optional, narration is
+            # mandatory. This is a bit unintuitive. In addition, smart_importer relies on
+            # narration, so keeping the order unchanged in the call below is important.
 
             # Build transaction entry
             entry = data.Transaction(metadata, ot.date.date(), self.FLAG,
-                                     self.get_payee(ot), self.get_narration(ot),
+                                      self.get_narration(ot), self.get_payee(ot),
                                      data.EMPTY_SET, data.EMPTY_SET, [])
             data.create_simple_posting(entry, config['main_account'], ot.amount, self.currency)
 
