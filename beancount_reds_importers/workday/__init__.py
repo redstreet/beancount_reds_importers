@@ -26,7 +26,8 @@ class Importer(paycheck.Importer, xlsx_multitable_reader.Importer):
         self.includes_balances = False
         self.date_format = '%m/%d/%Y'
         self.skip_head_rows = 1
-        self.skip_tail_rows = 1
+        # TODO: need to be smarter about this, and skip only when needed
+        self.skip_tail_rows = 0
         self.funds_db_txt = 'funds_by_ticker'
         self.header_map = {
             "Description": 'memo',
