@@ -29,6 +29,8 @@ class Importer(importer.ImporterProtocol):
         #     'main_account'     : 'Destination account of import',
         #     'cash_account'     : 'Cash account (usually same as the main account + a :{currency} appended)',
         #     'transfer'         : 'Account to which contributions and outgoing is transferred',
+        #     #                     transfer account is optional. If left off no target posting will be created.
+        #     #                     This allows for additional tools to handle this like smart importer.
         #     'dividends'        : 'Account to book dividends',
         #     'cg'               : 'Account to book capital gains/losses',
         #     'capgainsd_lt'     : 'Account to book long term capital gains distributions to'
@@ -84,13 +86,17 @@ class Importer(importer.ImporterProtocol):
             "capgainsd_lt": self.config['capgainsd_lt'],
             "capgainsd_st": self.config['capgainsd_st'],
             "income":       self.config['interest'],
-            "other":        self.config['transfer'],
-            "credit":       self.config['transfer'],
-            "debit":        self.config['transfer'],
-            "transfer":     self.config['transfer'],
-            "cash":         self.config['transfer'],
-            "dep":          self.config['transfer'],
         }
+
+        if 'transfer' in self.config:
+            self.target_account_map.update({
+                "other":    self.config['transfer'],
+                "credit":   self.config['transfer'],
+                "debit":    self.config['transfer'],
+                "transfer": self.config['transfer'],
+                "cash":     self.config['transfer'],
+                "dep":      self.config['transfer'],
+            })
 
     def build_metadata(self, file, metatype=None, data={}):
         """This method is for importers to override. The overridden method can
@@ -258,7 +264,9 @@ class Importer(importer.ImporterProtocol):
         # Build transaction entry
         entry = data.Transaction(metadata, date, self.FLAG,
                                  ot.memo, description, data.EMPTY_SET, data.EMPTY_SET, [])
-        target_acct = self.get_target_acct(ot, ticker).format(ticker=ticker)
+        target_acct = self.get_target_acct(ot, ticker)
+        if target_acct:
+            target_acct = target_acct.format(ticker=ticker)
 
         # Build postings
         if ot.type in ['income', 'dividends', 'capgainsd_st', 'capgainsd_lt']:  # cash
@@ -266,7 +274,8 @@ class Importer(importer.ImporterProtocol):
             data.create_simple_posting(entry, target_acct, -1 * ot.total, self.currency)
         else:
             data.create_simple_posting(entry, main_acct, units, ticker)
-            data.create_simple_posting(entry, target_acct, -1 * units, ticker)
+            if target_acct:
+                data.create_simple_posting(entry, target_acct, -1 * units, ticker)
         return entry
 
     def extract_transactions(self, file, counter):
@@ -364,7 +373,7 @@ class Importer(importer.ImporterProtocol):
         """For custom importers to override"""
         return []
 
-    def extract(self, file):
+    def extract(self, file, existing_entries=None):
         self.initialize(file)
         counter = itertools.count()
         new_entries = []
