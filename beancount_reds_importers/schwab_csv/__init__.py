@@ -16,16 +16,17 @@ class Importer(csvreader.Importer, investments.Importer):
         self.funds_db_txt = 'funds_by_ticker'
         self.skip_head_rows = 1
         self.skip_tail_rows = 1
+        self.get_payee = lambda ot: ot.type
         self.header_map = {
             "Action":      'type',
             "Date":        'date',
-            "tradeDate":   'tradeDate',
             "Description": 'memo',
             "Symbol":      'security',
             "Quantity":    'units',
             "Price":       'unit_price',
             "Amount":      'amount',
-            "total":       'total',
+            # "tradeDate":   'tradeDate',
+            # "total":       'total',
             "Fees & Comm": 'fees',
             }
         self.transaction_type_map = {
@@ -59,6 +60,7 @@ class Importer(csvreader.Importer, investments.Importer):
         def cleanup_date(d):
             """'11/16/2018 as of 11/15/2018' --> '11/16/2018'"""
             return d.split(' ', 1)[0]
+
         rdr = rdr.convert('Date', cleanup_date)
         rdr = rdr.addfield('tradeDate', lambda x: x['Date'])
         rdr = rdr.addfield('total', lambda x: x['Amount'])
