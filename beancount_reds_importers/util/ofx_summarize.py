@@ -24,7 +24,7 @@ def analyze(filename, ttype='dividends', pdb_explore=False):
 @click.option('-n', '--num-transactions', default=5, help='Number of transactions to show')
 @click.option('-e', '--pdb-explore', is_flag=True, help='Open a pdb shell to explore')
 @click.option('--stats-only', is_flag=True, help='Print total number of transactions contained in the file, and quit')
-def summarize(filename, pdb_explore, num_transactions, stats_only):
+def summarize(filename, pdb_explore, num_transactions, stats_only):  # noqa: C901
     """Quick and dirty way to summarize a .ofx file and peek inside it."""
     if os.stat(filename).st_size == 0:
         if stats_only:
