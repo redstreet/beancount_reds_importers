@@ -19,6 +19,10 @@ class Importer(importer.ImporterProtocol):
         self.custom_init_run = False
         self.includes_balances = False
         self.price_cost_both_zero_handler = None
+
+        # For overriding in custom_init()
+        self.get_payee = lambda ot: ot.memo
+
         # REQUIRED_CONFIG = {
         #     #                  : # The string "{ticker}" will be replaced with the ticker symbol. Use this
         #                            to obtain account names that end with the commodity (commodity leaf
@@ -175,7 +179,7 @@ class Importer(importer.ImporterProtocol):
         if getattr(ot, 'settleDate', None) is not None and ot.settleDate != ot.tradeDate:
             metadata['settlement_date'] = str(ot.settleDate.date())
 
-        description = f'[{ticker}] {ticker_long_name}'
+        narration = f'[{ticker}] {ticker_long_name}'
         target_acct = self.get_target_acct(ot, ticker)
         units = ot.units
         total = ot.total
@@ -192,7 +196,8 @@ class Importer(importer.ImporterProtocol):
 
         # Build transaction entry
         entry = data.Transaction(metadata, ot.tradeDate.date(), self.FLAG,
-                                 ot.memo, description, data.EMPTY_SET, data.EMPTY_SET, [])
+                                 self.get_payee(ot), narration,
+                                 data.EMPTY_SET, data.EMPTY_SET, [])
 
         # Main posting(s):
         main_acct = self.main_acct(ticker)
@@ -257,16 +262,17 @@ class Importer(importer.ImporterProtocol):
         if ot.type in ['income', 'dividends', 'capgainsd_lt',
                        'capgainsd_st', 'transfer'] and (hasattr(ot, 'security') and ot.security):
             ticker, ticker_long_name = self.get_ticker_info(ot.security)
-            description = f'[{ticker}] {ticker_long_name}'
+            narration = f'[{ticker}] {ticker_long_name}'
             main_acct = self.main_acct(ticker)
         else:  # cash transaction
-            description = ot.type
+            narration = ot.type
             ticker = self.currency
             main_acct = config['cash_account']
 
         # Build transaction entry
         entry = data.Transaction(metadata, date, self.FLAG,
-                                 ot.memo, description, data.EMPTY_SET, data.EMPTY_SET, [])
+                                 self.get_payee(ot), narration,
+                                 data.EMPTY_SET, data.EMPTY_SET, [])
         target_acct = self.get_target_acct(ot, ticker)
         if target_acct:
             target_acct = target_acct.format(ticker=ticker)
