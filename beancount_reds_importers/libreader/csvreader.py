@@ -120,7 +120,9 @@ class Importer(reader.Reader, importer.ImporterProtocol):
             rdr = self.read_raw(file)
             rdr = rdr.skip(getattr(self, 'skip_head_rows', 0))                 # chop unwanted header rows
             rdr = rdr.head(len(rdr) - getattr(self, 'skip_tail_rows', 0) - 1)  # chop unwanted footer rows
-            rdr = rdr.skipcomments(getattr(self, 'skip_comments', ''))
+
+            if hasattr(self, 'skip_comments'):
+                rdr = rdr.skipcomments(self.skip_comments)
             rdr = rdr.rowslice(getattr(self, 'skip_data_rows', 0), None)
             rdr = self.prepare_raw_columns(rdr)
             rdr = rdr.rename(self.header_map)
