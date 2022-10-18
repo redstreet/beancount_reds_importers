@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
 """Import configuration."""
 
+import beangulp
 import sys
 from os import path
 
 sys.path.insert(0, path.join(path.dirname(__file__)))
 
-from beancount_reds_importers import vanguard
-from beancount_reds_importers import schwab_csv
+from beancount_reds_importers.importers import vanguard
+from beancount_reds_importers.importers import schwab_csv
 from fund_info import *
 # For a better solution for fund_info, see: https://reds-rants.netlify.app/personal-finance/tickers-and-identifiers/
 
-# Setting this variable provides a list of importer instances.
-CONFIG = [
+importers = [
 
     # Investments
     # --------------------------------------------------------------------------------------
@@ -63,3 +63,9 @@ CONFIG = [
     }),
 
 ]
+
+
+if __name__ == '__main__':
+    hooks = []
+    ingest = beangulp.Ingest(importers, hooks)
+    ingest()
