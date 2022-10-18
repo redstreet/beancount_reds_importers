@@ -28,7 +28,7 @@ from beancount_reds_importers.libreader import csvreader
 # The reader assumes that any line with a single field marks the beginning of a new section, with that field
 # as the title of the section. The next line is assumed to be the header for that new section.
 #
-# This file format is common enough to warrant this reader.
+# This filepath format is common enough to warrant this reader.
 # The xlsx_multitable reader is built on top of this reader
 
 
@@ -37,26 +37,26 @@ class NotImplementedError(Exception):
 
 
 class Importer(csvreader.Importer):
-    def initialize_reader(self, file):
-        csvreader.Importer.initialize_reader(self, file)
+    def initialize_reader(self, filepath):
+        csvreader.Importer.initialize_reader(self, filepath)
 
-    def file_date(self, file):
-        "Get the maximum date from the file."
-        self.read_file(file)
+    def file_date(self, filepath):
+        "Get the maximum date from the filepath."
+        self.read_file(filepath)
         raise "Not yet implemented"
         pass
 
     def convert_columns(self, rdr):
         pass
 
-    def read_raw(self, file):
-        return etl.fromcsv(file.name)
+    def read_raw(self, filepath):
+        return etl.fromcsv(filepath)
 
     def is_section_title(self, row):
         # Match against rows that contain section titles. Eg: 'section1', 'section2', ...
         return len(row) == 1
 
-    def read_file(self, file):
+    def read_file(self, filepath):
         # read csv
         # identify and separate out tables
         # clean up each table
@@ -65,10 +65,10 @@ class Importer(csvreader.Importer):
         if self.file_read_done:
             return
 
-        self.raw_rdr = rdr = self.read_raw(file)
+        self.raw_rdr = rdr = self.read_raw(filepath)
 
-        rdr = rdr.skip(getattr(self, 'skip_head_rows', 0))                 # chop unwanted file header rows
-        rdr = rdr.head(len(rdr) - getattr(self, 'skip_tail_rows', 0) - 1)  # chop unwanted file footer rows
+        rdr = rdr.skip(getattr(self, 'skip_head_rows', 0))                 # chop unwanted filepath header rows
+        rdr = rdr.head(len(rdr) - getattr(self, 'skip_tail_rows', 0) - 1)  # chop unwanted filepath footer rows
 
         #     [0, 2, 10] <-- starts
         # [-1, 1, 9]     <-- ends

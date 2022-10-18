@@ -8,6 +8,7 @@ from beancount.ingest import importer
 from beancount.core.number import D
 import petl as etl
 from beancount_reds_importers.libreader import reader
+from beangulp import cache
 
 # This csv reader uses petl to read a .csv into a table for maniupulation. The output of this reader is a list
 # of namedtuples corresponding roughly to ofx transactions. The following steps achieve this. When writing
@@ -57,13 +58,13 @@ from beancount_reds_importers.libreader import reader
 # - The table is now ready for use by the importer. petl makes each row available via namedtuples
 
 
-class Importer(reader.Reader, importer.ImporterProtocol):
+class Importer(reader.Reader):
     FILE_EXT = 'csv'
 
-    def initialize_reader(self, file):
-        if getattr(self, 'file', None) != file:
-            self.file = file
-            self.reader_ready = re.match(self.header_identifier, file.head())
+    def initialize_reader(self, filepath):
+        if getattr(self, 'filepath', None) != filepath:
+            self.filepath = filepath
+            self.reader_ready = re.match(self.header_identifier, cache.get_file(filepath).head())
             if self.reader_ready:
                 # TODO: move out elsewhere?
                 # self.currency = self.ofx_account.statement.currency.upper()
@@ -73,11 +74,11 @@ class Importer(reader.Reader, importer.ImporterProtocol):
                 self.file_read_done = False
             # else:
             #     print("header_identifier failed---------------:")
-            #     print(self.header_identifier, file.head())
+            #     print(self.header_identifier, filepath.head())
 
-    def file_date(self, file):
-        "Get the maximum date from the file."
-        self.read_file(file)
+    def file_date(self, filepath):
+        "Get the maximum date from the filepath."
+        self.read_file(filepath)
         return max(ot.date for ot in self.get_transactions()).date()
 
     def prepare_raw_columns(self, rdr):
@@ -112,12 +113,12 @@ class Importer(reader.Reader, importer.ImporterProtocol):
 
         return rdr
 
-    def read_raw(self, file):
-        return etl.fromcsv(file.name)
+    def read_raw(self, filepath):
+        return etl.fromcsv(filepath)
 
-    def read_file(self, file):
+    def read_file(self, filepath):
         if not self.file_read_done:
-            rdr = self.read_raw(file)
+            rdr = self.read_raw(filepath)
             rdr = rdr.skip(getattr(self, 'skip_head_rows', 0))                 # chop unwanted header rows
             rdr = rdr.head(len(rdr) - getattr(self, 'skip_tail_rows', 0) - 1)  # chop unwanted footer rows
 
@@ -128,7 +129,6 @@ class Importer(reader.Reader, importer.ImporterProtocol):
             rdr = rdr.rename(self.header_map)
             rdr = self.convert_columns(rdr)
             self.rdr = rdr
-            self.ifile = file
             self.file_read_done = True
 
     def get_transactions(self):

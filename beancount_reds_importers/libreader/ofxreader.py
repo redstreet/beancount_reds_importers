@@ -8,16 +8,16 @@ from beancount.ingest import importer
 from beancount_reds_importers.libreader import reader
 
 
-class Importer(reader.Reader, importer.ImporterProtocol):
+class Importer(reader.Reader):
     FILE_EXT = 'fx'
 
-    def initialize_reader(self, file):
-        if getattr(self, 'file', None) != file:
-            self.file = file
+    def initialize_reader(self, filepath):
+        if getattr(self, 'filepath', None) != filepath:
+            self.filepath = filepath
             self.ofx_account = None
             self.reader_ready = False
             try:
-                self.ofx = ofxparse.OfxParser.parse(open(file.name))
+                self.ofx = ofxparse.OfxParser.parse(open(filepath))
             except ofxparse.OfxParserException:
                 return
             for acc in self.ofx.accounts:
@@ -37,11 +37,11 @@ class Importer(reader.Reader, importer.ImporterProtocol):
         the full account number. Override this method to handle these cases."""
         return file_account == config_account
 
-    def file_date(self, file):
-        "Get the maximum date from the file."
+    def file_date(self, filepath):
+        "Get the maximum date from the filepath."
         return self.ofx_account.statement.end_date
 
-    def read_file(self, file):
+    def read_file(self, filepath):
         pass
 
     def get_transactions(self):

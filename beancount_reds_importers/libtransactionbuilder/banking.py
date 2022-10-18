@@ -4,9 +4,12 @@ import itertools
 from beancount.core import data
 from beancount.core import amount
 from beancount.ingest import importer
+import beangulp
+from beancount.core import flags
 
 
-class Importer(importer.ImporterProtocol):
+class Importer(beangulp.Importer):
+    FLAG = flags.FLAG_OKAY
     def __init__(self, config):
         self.config = config
         self.initialized = False
@@ -22,10 +25,10 @@ class Importer(importer.ImporterProtocol):
         #     'main_account'     : 'destination of import',
         # }
 
-    def initialize(self, file):
+    def initialize(self, filepath):
         if not self.initialized:
             self.custom_init()
-            self.initialize_reader(file)
+            self.initialize_reader(filepath)
             self.initialized = True
 
     def build_account_map(self):
@@ -38,7 +41,7 @@ class Importer(importer.ImporterProtocol):
         # }
         pass
 
-    def build_metadata(self, file, metatype=None, data={}):
+    def build_metadata(self, filepath, metatype=None, data={}):
         """This method is for importers to override. The overridden method can
         look at the metatype ('transaction', 'balance', 'account', 'commodity', etc.)
         and the data dictionary to return additional metadata"""
@@ -59,10 +62,10 @@ class Importer(importer.ImporterProtocol):
 
     # --------------------------------------------------------------------------------
 
-    def extract_balance(self, file, counter):
+    def extract_balance(self, filepath, counter):
         entries = []
-        metadata = data.new_metadata(file.name, counter)
-        metadata.update(self.build_metadata(file, metatype='balance'))
+        metadata = data.new_metadata(filepath, counter)
+        metadata.update(self.build_metadata(filepath, metatype='balance'))
 
         for bal in self.get_balance_statement():
             if bal:
@@ -72,7 +75,7 @@ class Importer(importer.ImporterProtocol):
                 entries.append(balance_entry)
         return entries
 
-    def extract_custom_entries(self, file, counter):
+    def extract_custom_entries(self, filepath, counter):
         """For custom importers to override"""
         return []
 
@@ -80,19 +83,19 @@ class Importer(importer.ImporterProtocol):
     def skip_transaction(self, ot):
         return False
 
-    def extract(self, file, existing_entries=None):
-        self.initialize(file)
+    def extract(self, filepath, existing_entries=None):
+        self.initialize(filepath)
         counter = itertools.count()
         new_entries = []
         config = self.config
 
-        self.read_file(file)
+        self.read_file(filepath)
         for ot in self.get_transactions():
             if self.skip_transaction(ot):
                 continue
-            metadata = data.new_metadata(file.name, next(counter))
+            metadata = data.new_metadata(filepath, next(counter))
             # metadata['type'] = ot.type # Optional metadata, useful for debugging #TODO
-            metadata.update(self.build_metadata(file,
+            metadata.update(self.build_metadata(filepath,
                                                 metatype='transaction',
                                                 data={'transaction': ot}))
 
@@ -116,8 +119,8 @@ class Importer(importer.ImporterProtocol):
             new_entries.append(entry)
 
         if self.includes_balances:
-            new_entries += self.extract_balance(file, counter)
+            new_entries += self.extract_balance(filepath, counter)
 
-        new_entries += self.extract_custom_entries(file, counter)
+        new_entries += self.extract_custom_entries(filepath, counter)
 
         return new_entries

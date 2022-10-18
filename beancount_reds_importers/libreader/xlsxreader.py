@@ -8,17 +8,17 @@ from beancount_reds_importers.libreader import csvreader
 class Importer(csvreader.Importer):
     FILE_EXT = 'xlsx'
 
-    def initialize_reader(self, file):
-        if getattr(self, 'file', None) != file:
-            self.file = file
+    def initialize_reader(self, filepath):
+        if getattr(self, 'filepath', None) != filepath:
+            self.filepath = filepath
             self.file_read_done = False
             self.reader_ready = True
 
             self.currency = self.config.get('currency', 'USD')
             self.includes_balances = False
 
-    def read_raw(self, file):
-        rdr = etl.fromxlsx(file.name, read_only=True)
+    def read_raw(self, filepath):
+        rdr = etl.fromxlsx(filepath, read_only=True)
         # openpyxl gives us typed columns from the xlsx files (e.g. `float` for numeric
         # values, `datetime.datetime` for dates). Since xlsxreader currently inherits from csvreader,
         # converting these to be plain strings. Consider building a new xlsxreader that doesn't have to

@@ -9,9 +9,12 @@ from beancount.core import amount
 from beancount.ingest import importer
 from beancount.core.position import CostSpec
 from beancount_reds_importers.libtransactionbuilder import common
+import beangulp
+from beancount.core import flags
 
 
-class Importer(importer.ImporterProtocol):
+class Importer(beangulp.Importer):
+    FLAG = flags.FLAG_OKAY
     def __init__(self, config):
         self.config = config
         self.initialized = False
@@ -58,10 +61,10 @@ class Importer(importer.ImporterProtocol):
         #     'rounding_error' : 'Equity:Rounding-Errors:Imports',
         #     'fund_info'       : fund_info, }
 
-    def initialize(self, file):
+    def initialize(self, filepath):
         if not self.initialized:
             self.custom_init()
-            self.initialize_reader(file)
+            self.initialize_reader(filepath)
             if self.reader_ready:
                 # self.currency is defined by the reader (ofx, csv, etc.)
                 d = {'currency': self.currency, 'ticker': '{ticker}'}
@@ -102,7 +105,7 @@ class Importer(importer.ImporterProtocol):
                 "dep":      self.config['transfer'],
             })
 
-    def build_metadata(self, file, metatype=None, data={}):
+    def build_metadata(self, filepath, metatype=None, data={}):
         """This method is for importers to override. The overridden method can
         look at the metatype ('transaction', 'balance', 'account', 'commodity', etc.)
         and the data dictionary to return additional metadata"""
@@ -122,7 +125,7 @@ class Importer(importer.ImporterProtocol):
             # isin might look like "US293409829" while the ofx use only a substring like "29340982"
             ticker, ticker_long_name = [v for k, v in self.funds_db.items() if security_id in k][0]
         except IndexError:
-            print(f"Error: fund info not found for {security_id}", file=sys.stderr)
+            print(f"Error: fund info not found for {security_id}", filepath=sys.stderr)
             securities = self.get_security_list()
             securities_missing = [s for s in securities]
             for s in securities:
@@ -130,7 +133,7 @@ class Importer(importer.ImporterProtocol):
                     if s in k:
                         securities_missing.remove(s)
             # securities_missing = [s for s in securities if s not in self.funds_db]
-            print(f"List of securities without fund info: {securities_missing}", file=sys.stderr)
+            print(f"List of securities without fund info: {securities_missing}", filepath=sys.stderr)
             # import pdb; pdb.set_trace()
             sys.exit(1)
         return ticker, ticker_long_name
@@ -165,7 +168,7 @@ class Importer(importer.ImporterProtocol):
     # extract() and supporting methods
     # --------------------------------------------------------------------------------
 
-    def generate_trade_entry(self, ot, file, counter):
+    def generate_trade_entry(self, ot, filepath, counter):
         """ Involves a commodity. One of: ['buymf', 'sellmf', 'buystock', 'sellstock', 'buyother',
         'sellother', 'reinvest']"""
 
@@ -174,8 +177,8 @@ class Importer(importer.ImporterProtocol):
         is_money_market = ticker in self.money_market_funds
 
         # Build metadata
-        metadata = data.new_metadata(file.name, next(counter))
-        metadata.update(self.build_metadata(file, metatype='transaction_trade', data={'transaction': ot}))
+        metadata = data.new_metadata(filepath, next(counter))
+        metadata.update(self.build_metadata(filepath, metatype='transaction_trade', data={'transaction': ot}))
         if getattr(ot, 'settleDate', None) is not None and ot.settleDate != ot.tradeDate:
             metadata['settlement_date'] = str(ot.settleDate.date())
 
@@ -235,12 +238,12 @@ class Importer(importer.ImporterProtocol):
 
         return entry
 
-    def generate_transfer_entry(self, ot, file, counter):
+    def generate_transfer_entry(self, ot, filepath, counter):
         """ Cash transactions, or in-kind transfers. One of:
             [credit, debit, dep, transfer, income, dividends, capgainsd_lt, capgainsd_st, other]"""
         config = self.config
-        metadata = data.new_metadata(file.name, next(counter))
-        metadata.update(self.build_metadata(file, metatype='transaction_transfer', data={'transaction': ot}))
+        metadata = data.new_metadata(filepath, next(counter))
+        metadata.update(self.build_metadata(filepath, metatype='transaction_transfer', data={'transaction': ot}))
         ticker = None
         date = getattr(ot, 'tradeDate', None)
         if not date:
@@ -287,7 +290,7 @@ class Importer(importer.ImporterProtocol):
                 data.create_simple_posting(entry, target_acct, -1 * units, ticker)
         return entry
 
-    def extract_transactions(self, file, counter):
+    def extract_transactions(self, filepath, counter):
         # Required transaction fields: ({ofx, csv, ...}reader.py need to provide these fields)
         # 'type': 'buymf',
         # 'tradeDate': datetime.datetime(2018, 6, 25, 19, 0),
@@ -304,15 +307,15 @@ class Importer(importer.ImporterProtocol):
         # 'fees': Decimal('0'),
 
         new_entries = []
-        self.read_file(file)
+        self.read_file(filepath)
         for ot in self.get_transactions():
             if self.skip_transaction(ot):
                 continue
             if ot.type in ['buymf', 'sellmf', 'buystock', 'sellstock', 'buyother', 'sellother', 'reinvest']:
-                entry = self.generate_trade_entry(ot, file, counter)
+                entry = self.generate_trade_entry(ot, filepath, counter)
             elif ot.type in ['other', 'credit', 'debit', 'transfer', 'dep', 'income',
                              'dividends', 'capgainsd_st', 'capgainsd_lt', 'cash']:
-                entry = self.generate_transfer_entry(ot, file, counter)
+                entry = self.generate_transfer_entry(ot, filepath, counter)
             else:
                 print("ERROR: unknown entry type:", ot.type)
                 raise Exception('Unknown entry type')
@@ -320,7 +323,7 @@ class Importer(importer.ImporterProtocol):
             new_entries.append(entry)
         return new_entries
 
-    def extract_balances_and_prices(self, file, counter):
+    def extract_balances_and_prices(self, filepath, counter):
         new_entries = []
         date = self.get_max_transaction_date()
         if date:
@@ -332,10 +335,10 @@ class Importer(importer.ImporterProtocol):
         settlement_fund_balance = 0
         for pos in self.get_balance_positions():
             ticker, ticker_long_name = self.get_ticker_info(pos.security)
-            metadata = data.new_metadata(file.name, next(counter))
-            metadata.update(self.build_metadata(file, metatype='balance', data={'pos': pos}))
+            metadata = data.new_metadata(filepath, next(counter))
+            metadata.update(self.build_metadata(filepath, metatype='balance', data={'pos': pos}))
 
-            # if there are no transactions, use the date in the source file for the balance. This gives us the
+            # if there are no transactions, use the date in the source filepath for the balance. This gives us the
             # bonus of an updated, recent balance assertion
             bal_date = date if date else pos.date.date()
             balance_entry = data.Balance(metadata, bal_date, self.main_acct(ticker),
@@ -347,8 +350,8 @@ class Importer(importer.ImporterProtocol):
 
             # extract price info if available
             if hasattr(pos, 'unit_price') and hasattr(pos, 'date'):
-                metadata = data.new_metadata(file.name, next(counter))
-                metadata.update(self.build_metadata(file, metatype='price', data={'pos': pos}))
+                metadata = data.new_metadata(filepath, next(counter))
+                metadata.update(self.build_metadata(filepath, metatype='price', data={'pos': pos}))
                 price_entry = data.Price(metadata, pos.date.date(), ticker,
                                          amount.Amount(pos.unit_price, self.currency))
                 new_entries.append(price_entry)
@@ -357,10 +360,10 @@ class Importer(importer.ImporterProtocol):
         available_cash = self.get_available_cash()
         if available_cash is not None:
             balance = available_cash - settlement_fund_balance
-            metadata = data.new_metadata(file.name, next(counter))
-            metadata.update(self.build_metadata(file, metatype='balance_cash'))
+            metadata = data.new_metadata(filepath, next(counter))
+            metadata.update(self.build_metadata(filepath, metatype='balance_cash'))
             try:
-                bal_date = date if date else self.file_date(file).date()  # unavailable file_date raises AttributeError
+                bal_date = date if date else self.file_date(filepath).date()  # unavailable file_date raises AttributeError
                 balance_entry = data.Balance(metadata, bal_date, self.config['cash_account'],
                                              amount.Amount(balance, self.currency),
                                              None, None)
@@ -378,19 +381,19 @@ class Importer(importer.ImporterProtocol):
             if getattr(ot, 'commission', 0) != 0:
                 data.create_simple_posting(entry, config['fees'], ot.commission, self.currency)
 
-    def extract_custom_entries(self, file, counter):
+    def extract_custom_entries(self, filepath, counter):
         """For custom importers to override"""
         return []
 
-    def extract(self, file, existing_entries=None):
-        self.initialize(file)
+    def extract(self, filepath, existing_entries=None):
+        self.initialize(filepath)
         counter = itertools.count()
         new_entries = []
 
-        new_entries += self.extract_transactions(file, counter)
+        new_entries += self.extract_transactions(filepath, counter)
         if self.includes_balances:
-            new_entries += self.extract_balances_and_prices(file, counter)
+            new_entries += self.extract_balances_and_prices(filepath, counter)
 
-        new_entries += self.extract_custom_entries(file, counter)
+        new_entries += self.extract_custom_entries(filepath, counter)
 
         return new_entries

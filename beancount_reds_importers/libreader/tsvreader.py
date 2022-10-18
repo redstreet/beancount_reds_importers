@@ -7,8 +7,8 @@ import petl as etl
 from beancount_reds_importers.libreader import csvreader
 
 
-class Importer(csvreader.Importer, importer.ImporterProtocol):
+class Importer(csvreader.Importer):
     FILE_EXT = 'tsv'
 
-    def read_raw(self, file):
-        return etl.fromtsv(file.name)
+    def read_raw(self, filepath):
+        return etl.fromtsv(filepath)

@@ -36,8 +36,8 @@ class Importer(paycheck.Importer, xlsx_multitable_reader.Importer):
             "Price":       'unit_price',
             }
 
-    def paycheck_date(self, input_file):
-        self.read_file(input_file)
+    def paycheck_date(self, filepath):
+        self.read_file(filepath)
         d = self.alltables['Payslip Information'].namedtuples()[0].check_date
         self.date = datetime.datetime.strptime(d, self.date_format)
         return self.date.date()

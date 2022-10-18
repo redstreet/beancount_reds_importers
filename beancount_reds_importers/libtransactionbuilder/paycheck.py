@@ -54,8 +54,8 @@ def flip_if_needed(amount, account):
 
 
 class Importer(banking.Importer):
-    def file_date(self, input_file):
-        return self.paycheck_date(input_file)
+    def file_date(self, filepath):
+        return self.paycheck_date(filepath)
 
     def get_max_transaction_date(self):
         return self.date.date()
@@ -97,20 +97,20 @@ class Importer(banking.Importer):
         newentry = entry._replace(postings=postings)
         return newentry
 
-    def build_metadata(self, file, metatype=None, data={}):
+    def build_metadata(self, filepath, metatype=None, data={}):
         """This method is for importers to override. The overridden method can
         look at the metatype ('transaction', 'balance', 'account', 'commodity', etc.)
         and the data dictionary to return additional metadata"""
         return {}
 
-    def extract(self, file, existing_entries=None):
-        self.initialize(file)
+    def extract(self, filepath, existing_entries=None):
+        self.initialize(filepath)
         config = self.config
 
-        self.read_file(file)
-        metadata = data.new_metadata(file.name, 0)
-        metadata.update(self.build_metadata(file, metatype='transaction'))
-        entry = data.Transaction(metadata, self.paycheck_date(file), self.FLAG,
+        self.read_file(filepath)
+        metadata = data.new_metadata(filepath, 0)
+        metadata.update(self.build_metadata(filepath, metatype='transaction'))
+        entry = data.Transaction(metadata, self.paycheck_date(filepath), self.FLAG,
                                  None, config['desc'], data.EMPTY_SET, data.EMPTY_SET, [])
 
         entry = self.build_postings(entry)

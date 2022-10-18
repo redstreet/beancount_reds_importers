@@ -19,21 +19,19 @@ class NotImplementedError(Exception):
 class Importer(csv_multitable_reader.Importer):
     FILE_EXT = 'xlsx'
 
-    def initialize_reader(self, file):
-        if getattr(self, 'file', None) != file:
-            self.file = file
+    def initialize_reader(self, filepath):
+        if getattr(self, 'filepath', None) != filepath:
+            self.filepath = filepath
             self.file_read_done = False
             self.reader_ready = True
 
-    def read_raw(self, file):
-        # return etl.fromcsv(file.name)
-
+    def read_raw(self, filepath):
         in_memory_file = StringIO()
         csv_writer = csv.writer(in_memory_file)
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            wb = openpyxl.load_workbook(file.name)
+            wb = openpyxl.load_workbook(filepath)
             sh = wb.worksheets[0]
 
         for r in sh.rows:
