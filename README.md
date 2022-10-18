@@ -85,14 +85,25 @@ for f in ~/.zcomplete/*; do source $f; done
   for automating downloads via `ofxclient`, connecting to `smart_importer` to
   auto-classify transactions, and more
 
+## Compatibility
+beancount_reds_importers until version 0.5.1 is compatible with the ingest framework in
+beancount v2. Beyond this, development has moved to compatibility with beangulp only.
+
+beancount v2 ingest will not be supported in the future. Updating your files from
+v2-ingest to beangulp should be pretty simple.
+
 
 ## Installation
+
+The latest PyPI version is still made for beancount v2 ingest:
 ```
 pip3 install beancount-reds-importers
 ```
 
-Or to install the bleeding edge version from git:
+The bleeding edge version from git is for beangulp-only.
+To install the bleeding edge version from git:
 ```
+pip3 install git+https://github.com/beancount/beangulp.git  # Until this is in PyPI
 pip3 install git+https://github.com/redstreet/beancount_reds_importers
 ```
 
