@@ -3,7 +3,7 @@ from beancount_reds_importers.libreader import ofxreader
 from beancount_reds_importers.libtransactionbuilder import investments
 
 
-class Importer(investments.Importer, ofxreader.Importer):
+class Importer(ofxreader.Importer, investments.Importer):
     IMPORTER_NAME = 'TDAmeritrade'
 
     def custom_init(self):

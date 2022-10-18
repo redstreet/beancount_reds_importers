@@ -5,7 +5,7 @@ from beancount_reds_importers.libreader import tsvreader
 from beancount_reds_importers.libtransactionbuilder import investments
 
 
-class Importer(investments.Importer, tsvreader.Importer):
+class Importer(tsvreader.Importer, investments.Importer):
     IMPORTER_NAME = 'Vanguard screensrape tsv'
 
     def custom_init(self):

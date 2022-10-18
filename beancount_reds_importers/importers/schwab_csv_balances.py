@@ -7,7 +7,7 @@ from beancount_reds_importers.libreader import csv_multitable_reader
 from beancount_reds_importers.libtransactionbuilder import investments
 
 
-class Importer(investments.Importer, csv_multitable_reader.Importer):
+class Importer(csv_multitable_reader.Importer, investments.Importer):
     IMPORTER_NAME = 'Schwab Brokerage Balances CSV'
 
     def custom_init(self):

@@ -16,7 +16,7 @@ from beancount_reds_importers.libtransactionbuilder import paycheck
 #     }),
 
 
-class Importer(paycheck.Importer, xlsx_multitable_reader.Importer):
+class Importer(xlsx_multitable_reader.Importer, paycheck.Importer):
     IMPORTER_NAME = 'Workday Paycheck'
 
     def custom_init(self):
