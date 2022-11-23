@@ -148,6 +148,10 @@ class Importer(importer.ImporterProtocol):
             return self.target_account_map.get('dividends', None)
         return self.target_account_map.get(transaction.type, None)
 
+    def security_narration(self, ot):
+        ticker, ticker_long_name = self.get_ticker_info(ot.security)
+        return f"[{ticker}] {ticker_long_name}"
+
     def get_security_list(self):
         tickers = set()
         for ot in self.get_transactions():
@@ -179,7 +183,7 @@ class Importer(importer.ImporterProtocol):
         if getattr(ot, 'settleDate', None) is not None and ot.settleDate != ot.tradeDate:
             metadata['settlement_date'] = str(ot.settleDate.date())
 
-        narration = f'[{ticker}] {ticker_long_name}'
+        narration = self.security_narration(ot)
         target_acct = self.get_target_acct(ot, ticker)
         units = ot.units
         total = ot.total
@@ -262,7 +266,7 @@ class Importer(importer.ImporterProtocol):
         if ot.type in ['income', 'dividends', 'capgainsd_lt',
                        'capgainsd_st', 'transfer'] and (hasattr(ot, 'security') and ot.security):
             ticker, ticker_long_name = self.get_ticker_info(ot.security)
-            narration = f'[{ticker}] {ticker_long_name}'
+            narration = self.security_narration(ot)
             main_acct = self.main_acct(ticker)
         else:  # cash transaction
             narration = ot.type
