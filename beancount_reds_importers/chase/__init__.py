@@ -10,5 +10,5 @@ class Importer(banking.Importer, ofxreader.Importer):
     def custom_init(self):
         if not self.custom_init_run:
             self.max_rounding_error = 0.04
-            self.filename_pattern_def = '.*chase'
+            self.filename_pattern_def = '.*[Cc]hase'
             self.custom_init_run = True
