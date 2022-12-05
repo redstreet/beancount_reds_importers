@@ -85,7 +85,8 @@ class Importer(reader.Reader, importer.ImporterProtocol):
 
     def convert_columns(self, rdr):
         # convert data in transaction types column
-        rdr = rdr.convert('type', self.transaction_type_map)
+        if 'type' in rdr.header():
+            rdr = rdr.convert('type', self.transaction_type_map)
 
         # fixup decimals
         decimals = ['units']
@@ -145,7 +146,7 @@ class Importer(reader.Reader, importer.ImporterProtocol):
 
     # TOOD: custom, overridable
     def skip_transaction(self, row):
-        return row.type in self.skip_transaction_types
+        return getattr(row, 'type', 'NO_TYPE') in self.skip_transaction_types
 
     def get_max_transaction_date(self):
         try:
