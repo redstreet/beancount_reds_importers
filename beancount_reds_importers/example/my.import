@@ -30,6 +30,11 @@ CONFIG = [
         'fees'           : 'Expenses:Brokerage-Fees:TradIRA',
         'rounding_error' : 'Equity:Rounding-Errors:Imports',
         'fund_info'       : fund_info,
+
+        # Not necessary as this is the default, but here for demo/documentation. 'filename_pattern'
+        # is useful when your downloads have custom filenames to differentiate amongst accounts and
+        # such
+        'filename_pattern': 'OfxDownload',
     }),
 
     vanguard.Importer({
