@@ -22,3 +22,8 @@ class Importer(csvreader.Importer, banking.Importer):
 
     def skip_transaction(self, ot):
         return False
+
+    def prepare_processed_columns(self, rdr):
+        # Need to invert numbers supplied by Discover
+        rdr = rdr.convert('amount', lambda x: -1 * x)
+        return rdr
