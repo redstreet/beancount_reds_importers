@@ -42,27 +42,7 @@ class Importer(paycheck.Importer, xlsx_multitable_reader.Importer):
         self.date = datetime.datetime.strptime(d, self.date_format)
         return self.date.date()
 
-    def prepare_raw_columns(self, rdr):
-        return rdr
-
-    def convert_columns(self, rdr):
-        # fixup decimals
-        decimals = ['units']
-        for i in decimals:
-            rdr = rdr.convert(i, D)
-
-        # fixup currencies
-        def remove_non_numeric(x):
-            return re.sub("[^0-9\.]", "", x)  # noqa: W605
-        currencies = ['unit_price']
-        for i in currencies:
-            rdr = rdr.convert(i, remove_non_numeric)
-            rdr = rdr.convert(i, D)
-
-        return rdr
-
     def prepare_tables(self):
-
         def valid_header_label(label):
             return label.lower().replace(' ', '_')
 
