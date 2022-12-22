@@ -1,8 +1,6 @@
 """ Workday paycheck importer."""
 
 import datetime
-import re
-from beancount.core.number import D
 from beancount_reds_importers.libreader import xlsx_multitable_reader
 from beancount_reds_importers.libtransactionbuilder import paycheck
 
