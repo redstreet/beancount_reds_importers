@@ -30,7 +30,7 @@ class Importer(reader.Reader, importer.ImporterProtocol):
                     self.reader_ready = True
             if self.reader_ready:
                 self.currency = self.ofx_account.statement.currency.upper()
-                self.includes_balances = True
+                self.includes_balances = hasattr(self.ofx_account.statement, 'balance')
 
     def match_account_number(self, file_account, config_account):
         """We many not want to store entire credit card numbers in our config. Or a given ofx may not contain
