@@ -79,4 +79,4 @@ class Importer(importer.ImporterProtocol):
             data.create_simple_posting(entry, config['target_account'], None, None)
             new_entries.append(entry)
 
-        return new_entries 
+        return new_entries
