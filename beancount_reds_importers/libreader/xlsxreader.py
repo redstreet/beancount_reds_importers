@@ -15,7 +15,6 @@ class Importer(csvreader.Importer):
             self.reader_ready = True
 
             self.currency = self.config.get('currency', 'USD')
-            self.includes_balances = False
 
     def read_raw(self, file):
         rdr = etl.fromxlsx(file.name, read_only=True)

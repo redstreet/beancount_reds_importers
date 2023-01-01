@@ -17,7 +17,6 @@ class Importer(importer.ImporterProtocol):
         self.initialized = False
         self.reader_ready = False
         self.custom_init_run = False
-        self.includes_balances = False
         self.price_cost_both_zero_handler = None
 
         # For overriding in custom_init()
@@ -392,8 +391,7 @@ class Importer(importer.ImporterProtocol):
         new_entries = []
 
         new_entries += self.extract_transactions(file, counter)
-        if self.includes_balances:
-            new_entries += self.extract_balances_and_prices(file, counter)
+        new_entries += self.extract_balances_and_prices(file, counter)
 
         new_entries += self.extract_custom_entries(file, counter)
 

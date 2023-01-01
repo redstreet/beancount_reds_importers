@@ -17,7 +17,6 @@ class Importer(csvreader.Importer, banking.Importer):
         self.skip_head_rows = 1
         self.skip_tail_rows = 0
         self.skip_comments = '# '
-        self.includes_balances = True
         self.header_map = {
             "Date":           "date",
             "Type":           "type",

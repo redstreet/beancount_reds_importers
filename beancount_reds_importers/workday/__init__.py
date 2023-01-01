@@ -21,7 +21,6 @@ class Importer(paycheck.Importer, xlsx_multitable_reader.Importer):
         self.max_rounding_error = 0.04
         self.filename_pattern_def = '.*_Complete'
         self.header_identifier = '- Complete' + self.config.get('custom_header', '')
-        self.includes_balances = False
         self.date_format = '%m/%d/%Y'
         self.skip_head_rows = 1
         # TODO: need to be smarter about this, and skip only when needed

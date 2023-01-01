@@ -31,3 +31,12 @@ class Reader():
 
     def file_account(self, _):
         return self.config['main_account'].replace(':{ticker}', '').replace(':{currency}', '')
+
+    def get_balance_statement(self):
+        return []
+
+    def get_balance_positions(self):
+        return []
+
+    def get_available_cash(self):
+        return None

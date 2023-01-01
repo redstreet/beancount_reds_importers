@@ -30,7 +30,6 @@ class Importer(reader.Reader, importer.ImporterProtocol):
                     self.reader_ready = True
             if self.reader_ready:
                 self.currency = self.ofx_account.statement.currency.upper()
-                self.includes_balances = hasattr(self.ofx_account.statement, 'balance')
 
     def match_account_number(self, file_account, config_account):
         """We many not want to store entire credit card numbers in our config. Or a given ofx may not contain
@@ -45,10 +44,11 @@ class Importer(reader.Reader, importer.ImporterProtocol):
         pass
 
     def get_transactions(self):
-        for ot in self.ofx_account.statement.transactions:
-            yield ot
+        yield from self.ofx_account.statement.transactions
 
     def get_balance_statement(self):
+        if not hasattr(self.ofx_account.statement, 'balance'):
+            return []
         date = self.get_max_transaction_date()
         if date:
             date += datetime.timedelta(days=1)  # See comment in get_max_transaction_date() for explanation
@@ -56,8 +56,9 @@ class Importer(reader.Reader, importer.ImporterProtocol):
             yield Balance(date, self.ofx_account.statement.balance)
 
     def get_balance_positions(self):
-        for pos in self.ofx_account.statement.positions:
-            yield pos
+        if not hasattr(self.ofx_account.statement, 'positions'):
+            return []
+        yield from self.ofx_account.statement.positions
 
     def get_available_cash(self):
         return getattr(self.ofx_account.statement, 'available_cash', None)

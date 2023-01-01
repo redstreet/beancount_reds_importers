@@ -68,7 +68,6 @@ class Importer(reader.Reader, importer.ImporterProtocol):
                 # TODO: move out elsewhere?
                 # self.currency = self.ofx_account.statement.currency.upper()
                 self.currency = self.config.get('currency', 'USD')
-                self.includes_balances = False
                 self.date_format = '%m/%d/%Y'  # TODO: move into class variable, into reader.Reader
                 self.file_read_done = False
             # else:

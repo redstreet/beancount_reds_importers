@@ -115,9 +115,7 @@ class Importer(importer.ImporterProtocol):
 
             new_entries.append(entry)
 
-        if self.includes_balances:
-            new_entries += self.extract_balance(file, counter)
-
+        new_entries += self.extract_balance(file, counter)
         new_entries += self.extract_custom_entries(file, counter)
 
         return new_entries
