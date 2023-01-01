@@ -254,7 +254,7 @@ class Importer(importer.ImporterProtocol):
         try:
             if ot.type in ['transfer']:
                 units = ot.units
-            elif ot.type in ['other', 'credit', 'debit', 'dep', 'cash']:
+            elif ot.type in ['other', 'credit', 'debit', 'dep', 'cash', 'payment']:
                 units = ot.amount
             else:
                 units = ot.total
@@ -315,7 +315,7 @@ class Importer(importer.ImporterProtocol):
             if ot.type in ['buymf', 'sellmf', 'buystock', 'sellstock', 'buyother', 'sellother', 'reinvest']:
                 entry = self.generate_trade_entry(ot, file, counter)
             elif ot.type in ['other', 'credit', 'debit', 'transfer', 'dep', 'income',
-                             'dividends', 'capgainsd_st', 'capgainsd_lt', 'cash']:
+                             'dividends', 'capgainsd_st', 'capgainsd_lt', 'cash', 'payment']:
                 entry = self.generate_transfer_entry(ot, file, counter)
             else:
                 print("ERROR: unknown entry type:", ot.type)
