@@ -129,7 +129,17 @@ class Importer(importer.ImporterProtocol):
                     if s in k:
                         securities_missing.remove(s)
             # securities_missing = [s for s in securities if s not in self.funds_db]
-            print(f"List of securities without fund info: {securities_missing}", file=sys.stderr)
+            # try to extract security info from ofx
+            ofx_securities = dict()
+            try:
+                for o in self.ofx.security_list:
+                    ofx_securities[o.ticker] = o.name
+            except AttributeError:
+                # ofx doesn't have a security list
+                pass
+            for m in securities_missing:
+                print(f"%s: %s" % (m, ofx_securities.get(m, "???")), file=sys.stderr)
+            # print(f"List of securities without fund info: {securities_missing}", file=sys.stderr)
             # import pdb; pdb.set_trace()
             sys.exit(1)
         return ticker, ticker_long_name
