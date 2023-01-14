@@ -140,7 +140,7 @@ class Importer(importer.ImporterProtocol):
 
             print(f"List of securities without fund info:", file=sys.stderr)
             for m in securities_missing:
-                print(f"%s: %s" % (m, ofx_securities.get(m, "???")), file=sys.stderr)
+                print("%s: %s" % (m, ofx_securities.get(m, "???")), file=sys.stderr)
             # print(f"List of securities without fund info: {securities_missing}", file=sys.stderr)
             # import pdb; pdb.set_trace()
             sys.exit(1)
