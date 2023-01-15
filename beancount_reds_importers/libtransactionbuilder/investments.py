@@ -151,7 +151,7 @@ class Importer(importer.ImporterProtocol):
                 # ofx doesn't have a security list
                 pass
 
-            print(f"List of securities without fund info:", file=sys.stderr)
+            print("List of securities without fund info:", file=sys.stderr)
             for m in securities_missing:
                 print("%s: %s" % (m, ofx_securities.get(m, "???")), file=sys.stderr)
             # print(f"List of securities without fund info: {securities_missing}", file=sys.stderr)
