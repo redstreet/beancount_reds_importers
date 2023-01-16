@@ -9,7 +9,7 @@ class Importer(investments.Importer, ofxreader.Importer):
     IMPORTER_NAME = 'Fidelity Net Benefits / Fidelity Investments OFX'
 
     def custom_init(self):
-        self.max_rounding_error = 0.14
+        self.max_rounding_error = 0.18
         self.filename_pattern_def = '.*fidelity'
         self.get_ticker_info = self.get_ticker_info_from_id
         self.get_payee = lambda ot: ot.memo.split(";", 1)[0] if ';' in ot.memo else ot.memo
