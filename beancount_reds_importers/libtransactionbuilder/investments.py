@@ -129,7 +129,32 @@ class Importer(importer.ImporterProtocol):
                     if s in k:
                         securities_missing.remove(s)
             # securities_missing = [s for s in securities if s not in self.funds_db]
-            print(f"List of securities without fund info: {securities_missing}", file=sys.stderr)
+
+            # try to extract security info from ofx
+            ofx_securities = dict()
+            try:
+                for o in self.ofx.security_list:
+                    # It seems that because of the way investment transactions are reported
+                    # in ofx the securities returned by self.get_security_list() are a list
+                    # of cusip codes.  In the section of the ofx that lists all securities
+                    # and is found in self.ofx.security_list these codes are generally
+                    # referred to as UNIQUEID (though the presence of another key called
+                    # UNIQUEIDTYPE suggests that UNIQUEID is not always a cusip).
+                    # because of this the key for the ofx_securities dict is uniqueid which
+                    # corresponds to the items in the securities_missing list.  The values
+                    # of this dict are the best guess at what an entry for fund_info.py should
+                    # be: a tuple of (ticker, cusip, name).  Note in the case of bonds the
+                    # ticker will match the cusip (at least in examples I have) and not be
+                    # literally usable as a beancount symbol
+                    ofx_securities[o.uniqueid] = (o.ticker, o.uniqueid, o.name)
+            except AttributeError:
+                # ofx doesn't have a security list
+                pass
+
+            print("List of securities without fund info:", file=sys.stderr)
+            for m in securities_missing:
+                print("%s: %s" % (m, ofx_securities.get(m, "???")), file=sys.stderr)
+            # print(f"List of securities without fund info: {securities_missing}", file=sys.stderr)
             # import pdb; pdb.set_trace()
             sys.exit(1)
         return ticker, ticker_long_name
