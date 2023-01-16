@@ -68,7 +68,6 @@ class Importer(reader.Reader, importer.ImporterProtocol):
                 # TODO: move out elsewhere?
                 # self.currency = self.ofx_account.statement.currency.upper()
                 self.currency = self.config.get('currency', 'USD')
-                self.date_format = '%m/%d/%Y'  # TODO: move into class variable, into reader.Reader
                 self.file_read_done = False
             # else:
             #     print("header_identifier failed---------------:")
@@ -76,6 +75,7 @@ class Importer(reader.Reader, importer.ImporterProtocol):
 
     def file_date(self, file):
         "Get the maximum date from the file."
+        self.initialize(file)  # self.date_format gets set via this
         self.read_file(file)
         return max(ot.date for ot in self.get_transactions()).date()
 
