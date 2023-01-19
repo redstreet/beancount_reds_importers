@@ -119,7 +119,11 @@ class Importer(importer.ImporterProtocol):
     def get_ticker_info_from_id(self, security_id):
         try:
             # isin might look like "US293409829" while the ofx use only a substring like "29340982"
-            ticker, ticker_long_name = [v for k, v in self.funds_db.items() if security_id in k][0]
+            # first try a full match, fall back to substring
+            ticker = None
+            ticker, ticker_long_name = [v for k, v in self.funds_db.items() if security_id == k][0]
+            if ticker is None:
+                ticker, ticker_long_name = [v for k, v in self.funds_db.items() if security_id in k][0]
         except IndexError:
             print(f"Error: fund info not found for {security_id}", file=sys.stderr)
             securities = self.get_security_list()
