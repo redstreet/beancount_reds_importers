@@ -6,7 +6,7 @@ from beancount_reds_importers.libreader import csvreader
 
 
 class Importer(csvreader.Importer):
-    FILE_EXT = 'xlsx'
+    FILE_EXTS = ['xlsx']
 
     def initialize_reader(self, file):
         if getattr(self, 'file', None) != file:

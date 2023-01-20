@@ -8,7 +8,7 @@ from beancount_reds_importers.libreader import csvreader
 
 
 class Importer(csvreader.Importer, importer.ImporterProtocol):
-    FILE_EXT = 'tsv'
+    FILE_EXTS = ['tsv']
 
     def read_raw(self, file):
         return etl.fromtsv(file.name)

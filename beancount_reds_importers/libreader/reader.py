@@ -6,7 +6,7 @@ import re
 
 
 class Reader():
-    FILE_EXT = ''
+    FILE_EXTS = ['']
     IMPORTER_NAME = 'NOT SET'
 
     def identify(self, file):
@@ -14,7 +14,7 @@ class Reader():
         # print()
         # print('------------------', self.IMPORTER_NAME, '(' + self.FILE_EXT + ')')
         # print(file.name.lower())
-        if not file.name.lower().endswith(self.FILE_EXT):
+        if not any(file.name.lower().endswith(ext) for ext in self.FILE_EXTS):
             # print("No match on extension")
             return False
         self.custom_init()

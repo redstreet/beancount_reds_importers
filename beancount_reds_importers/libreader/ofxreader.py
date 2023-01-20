@@ -9,7 +9,7 @@ from beancount_reds_importers.libreader import reader
 
 
 class Importer(reader.Reader, importer.ImporterProtocol):
-    FILE_EXT = 'fx'
+    FILE_EXTS = ['ofx', 'qfx']
 
     def initialize_reader(self, file):
         if getattr(self, 'file', None) != file:

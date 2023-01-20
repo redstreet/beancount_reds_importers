@@ -59,7 +59,7 @@ import sys
 
 
 class Importer(reader.Reader, importer.ImporterProtocol):
-    FILE_EXT = 'csv'
+    FILE_EXTS = ['csv']
 
     def initialize_reader(self, file):
         if getattr(self, 'file', None) != file:
