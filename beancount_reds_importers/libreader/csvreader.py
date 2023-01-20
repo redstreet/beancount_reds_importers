@@ -8,6 +8,7 @@ from beancount.ingest import importer
 from beancount.core.number import D
 import petl as etl
 from beancount_reds_importers.libreader import reader
+import sys
 
 # This csv reader uses petl to read a .csv into a table for maniupulation. The output of this reader is a list
 # of namedtuples corresponding roughly to ofx transactions. The following steps achieve this. When writing
@@ -82,6 +83,9 @@ class Importer(reader.Reader, importer.ImporterProtocol):
     def prepare_raw_columns(self, rdr):
         return rdr
 
+    def prepare_raw_rows(self, rdr):
+        return rdr
+
     def prepare_processed_columns(self, rdr):
         return rdr
 
@@ -118,11 +122,30 @@ class Importer(reader.Reader, importer.ImporterProtocol):
     def read_raw(self, file):
         return etl.fromcsv(file.name)
 
+    def skip_until_main_table(self, rdr, col_labels=None):
+        # TODO: allow additional fields to show up anywhere
+        if not col_labels:
+            if hasattr(self, 'column_labels_line'):
+                col_labels = self.column_labels_line.split(',')
+            else:
+                return rdr
+        skip = None
+        for n, r in enumerate(rdr):
+            if list(r) == col_labels:
+                skip = n
+        if skip is None:
+            print("Error: header line not found:")
+            print(self.column_labels_line)
+            sys.exit(1)
+        return rdr.skip(skip)
+
     def read_file(self, file):
         if not self.file_read_done:
             rdr = self.read_raw(file)
+            rdr = self.prepare_raw_rows(rdr)
             rdr = rdr.skip(getattr(self, 'skip_head_rows', 0))                 # chop unwanted header rows
             rdr = rdr.head(len(rdr) - getattr(self, 'skip_tail_rows', 0) - 1)  # chop unwanted footer rows
+            rdr = self.skip_until_main_table(rdr)
 
             if hasattr(self, 'skip_comments'):
                 rdr = rdr.skipcomments(self.skip_comments)
