@@ -46,7 +46,7 @@ class Importer(reader.Reader, importer.ImporterProtocol):
     def get_transactions(self):
         yield from self.ofx_account.statement.transactions
 
-    def get_balance_statement(self):
+    def get_balance_statement(self, file=None):
         if not hasattr(self.ofx_account.statement, 'balance'):
             return []
         date = self.get_max_transaction_date()

@@ -64,10 +64,10 @@ class Importer(importer.ImporterProtocol):
         metadata = data.new_metadata(file.name, counter)
         metadata.update(self.build_metadata(file, metatype='balance'))
 
-        for bal in self.get_balance_statement():
+        for bal in self.get_balance_statement(file=file):
             if bal:
                 balance_entry = data.Balance(metadata, bal.date, self.config['main_account'],
-                                             amount.Amount(bal.amount, self.currency),
+                                             amount.Amount(bal.amount, self.get_currency(bal)),
                                              None, None)
                 entries.append(balance_entry)
         return entries
@@ -75,6 +75,12 @@ class Importer(importer.ImporterProtocol):
     def extract_custom_entries(self, file, counter):
         """For custom importers to override"""
         return []
+
+    def get_currency(self, ot):
+        try:
+            return ot.currency
+        except AttributeError:
+            return self.currency
 
     # for custom importers to override
     def skip_transaction(self, ot):
@@ -107,7 +113,7 @@ class Importer(importer.ImporterProtocol):
             entry = data.Transaction(metadata, ot.date.date(), self.FLAG,
                                      self.get_narration(ot), self.get_payee(ot),
                                      data.EMPTY_SET, data.EMPTY_SET, [])
-            data.create_simple_posting(entry, config['main_account'], ot.amount, self.currency)
+            data.create_simple_posting(entry, config['main_account'], ot.amount, self.get_currency(ot))
 
             # TODO: Commented out so smart_importer can fill this in
             # target_acct = self.get_target_acct(ot)

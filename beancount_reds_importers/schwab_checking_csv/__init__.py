@@ -39,7 +39,7 @@ class Importer(csvreader.Importer, banking.Importer):
         rdr = rdr.addfield('memo', lambda x: '')
         return rdr
 
-    def get_balance_statement(self):
+    def get_balance_statement(self, file=None):
         """Return the balance on the first and last dates"""
 
         max_date = self.get_max_transaction_date()
