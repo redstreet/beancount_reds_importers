@@ -32,10 +32,6 @@ from beancount_reds_importers.libreader import csvreader
 # The xlsx_multitable reader is built on top of this reader
 
 
-class NotImplementedError(Exception):
-    pass
-
-
 class Importer(csvreader.Importer):
     def initialize_reader(self, file):
         csvreader.Importer.initialize_reader(self, file)

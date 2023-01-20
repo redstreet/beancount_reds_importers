@@ -8,10 +8,6 @@ import openpyxl
 import warnings
 from beancount_reds_importers.libreader import csv_multitable_reader
 
-
-class NotImplementedError(Exception):
-    pass
-
 # This xlsx reader uses petl to read a .csv with multiple tables into a dictionary of petl tables. The section
 # title is the key. See csv_multitable_reader for more.
 
