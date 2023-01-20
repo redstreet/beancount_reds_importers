@@ -62,7 +62,7 @@ class Importer(importer.ImporterProtocol):
             self.custom_init()
             self.initialize_reader(file)
             if self.reader_ready:
-                # self.currency is defined by the reader (ofx, csv, etc.)
+                # TODO: get self.currency to be defined by the reader (ofx, csv, etc.), overridable by config
                 d = {'currency': self.currency, 'ticker': '{ticker}'}
                 self.config = {k: v.format(**d) if isinstance(v, str) else v for k, v in self.config.items()}
                 self.money_market_funds = self.config['fund_info']['money_market']
@@ -260,7 +260,7 @@ class Importer(importer.ImporterProtocol):
         rounding_error = (reverser * total) + (ot.unit_price * units)
         if 0.0005 <= abs(rounding_error) <= self.max_rounding_error:
             data.create_simple_posting(
-                entry, config['rounding_error'], -1 * rounding_error, 'USD')
+                entry, config['rounding_error'], -1 * rounding_error, self.currency)
         # if abs(rounding_error) > self.max_rounding_error:
         #     print("Transactions legs do not sum up! Difference: {}. Entry: {}, ot: {}".format(
         #         rounding_error, entry, ot))

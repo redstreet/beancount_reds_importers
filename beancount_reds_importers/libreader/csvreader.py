@@ -68,7 +68,7 @@ class Importer(reader.Reader, importer.ImporterProtocol):
             if self.reader_ready:
                 # TODO: move out elsewhere?
                 # self.currency = self.ofx_account.statement.currency.upper()
-                self.currency = self.config.get('currency', 'USD')
+                self.currency = self.config.get('currency', 'CURRENCY_NOT_CONFIGURED')
                 self.file_read_done = False
             # else:
             #     print("header_identifier failed---------------:")

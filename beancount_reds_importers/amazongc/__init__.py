@@ -37,7 +37,7 @@ from beancount.core.number import D
 class Importer(importer.ImporterProtocol):
     def __init__(self, config):
         self.config = config
-        self.currency = self.config.get('currency', 'USD')
+        self.currency = self.config.get('currency', 'CURRENCY_NOT_CONFIGURED')
         self.filename_pattern_def = 'amazon-gift-card.tsv'
 
     def identify(self, file):
