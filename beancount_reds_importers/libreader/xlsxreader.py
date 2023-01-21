@@ -17,7 +17,7 @@ class Importer(csvreader.Importer):
             self.currency = self.config.get('currency', 'CURRENCY_NOT_CONFIGURED')
 
     def read_raw(self, file):
-        rdr = etl.fromxlsx(file.name, read_only=True)
+        rdr = etl.fromxlsx(file.name)
         # openpyxl gives us typed columns from the xlsx files (e.g. `float` for numeric
         # values, `datetime.datetime` for dates). Since xlsxreader currently inherits from csvreader,
         # converting these to be plain strings. Consider building a new xlsxreader that doesn't have to

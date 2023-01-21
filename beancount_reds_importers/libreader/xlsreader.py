@@ -17,4 +17,4 @@ class Importer(csvreader.Importer):
             self.currency = self.config.get('currency', 'USD')
 
     def read_raw(self, file):
-        return etl.fromxls(file.name, read_only=True)
+        return etl.fromxls(file.name)
