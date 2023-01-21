@@ -22,6 +22,7 @@ class Reader():
         if not re.match(self.filename_pattern, path.basename(file.name)):
             # print("No match on filename_pattern", self.filename_pattern, path.basename(file.name))
             return False
+        self.currency = self.config.get('currency', 'CURRENCY_NOT_CONFIGURED')
         self.initialize_reader(file)
         # print("reader_ready:", self.reader_ready)
         return self.reader_ready

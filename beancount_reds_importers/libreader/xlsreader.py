@@ -14,7 +14,5 @@ class Importer(csvreader.Importer):
             self.file_read_done = False
             self.reader_ready = True
 
-            self.currency = self.config.get('currency', 'CURRENCY_NOT_CONFIGURED')
-
     def read_raw(self, file):
         return etl.fromxls(file.name)

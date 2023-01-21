@@ -14,8 +14,6 @@ class Importer(csvreader.Importer):
             self.file_read_done = False
             self.reader_ready = True
 
-            self.currency = self.config.get('currency', 'CURRENCY_NOT_CONFIGURED')
-
     def read_raw(self, file):
         rdr = etl.fromxlsx(file.name)
         # openpyxl gives us typed columns from the xlsx files (e.g. `float` for numeric
