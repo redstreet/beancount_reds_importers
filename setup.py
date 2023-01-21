@@ -11,7 +11,7 @@ setup(
     description='Importers for various institutions for Beancount',
     long_description=LONG_DESCRIPTION,
     long_description_content_type='text/markdown',
-    url='https://github.com/redstreet/beancount_reds_ingestor',
+    url='https://github.com/redstreet/beancount_reds_importers',
     author='Red Street',
     author_email='redstreet@users.noreply.github.com',
     keywords='importer ingestor beancount accounting',
