@@ -192,3 +192,14 @@ class Importer(reader.Reader, importer.ImporterProtocol):
             return False
 
         return date
+
+    def get_row_by_label(self, file, label):
+        """Return a row from file where the first cell (column) matches label. This is a common
+        operation in csv files, and is thus provided here as a utility. Eg:
+           "Account Statement:,123456,EUR"
+        """
+        # Read from scratch, as we don't want to throw away headers or footers, which is where our
+        # label is likely to be found
+        rdr = self.read_raw(file)
+        rdr = self.prepare_raw_rows(rdr)
+        return rdr.select(lambda r: r[0] == label)[1]
