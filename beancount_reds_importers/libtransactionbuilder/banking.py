@@ -4,6 +4,7 @@ import itertools
 from beancount.core import data
 from beancount.core import amount
 from beancount.ingest import importer
+from beancount_reds_importers.libtransactionbuilder import common
 
 
 class Importer(importer.ImporterProtocol):
@@ -56,6 +57,10 @@ class Importer(importer.ImporterProtocol):
     # def get_target_acct(self, transaction):
     #     # Not needed for accounts using smart_importer
     #     return self.target_account_map.get(transaction.type, None)
+
+    @staticmethod
+    def fields_contain_data(ot, fields):
+        return all(hasattr(ot, f) and getattr(ot, f) for f in fields)
 
     # --------------------------------------------------------------------------------
 
@@ -110,10 +115,18 @@ class Importer(importer.ImporterProtocol):
             # narration, so keeping the order unchanged in the call below is important.
 
             # Build transaction entry
+            # Banking transactions might include foreign currency transactions. TODO: figure out
+            # how ofx handles this and use the same interface for csv and other files
             entry = data.Transaction(metadata, ot.date.date(), self.FLAG,
                                      self.get_narration(ot), self.get_payee(ot),
                                      data.EMPTY_SET, data.EMPTY_SET, [])
-            data.create_simple_posting(entry, config['main_account'], ot.amount, self.get_currency(ot))
+
+            if self.fields_contain_data(ot, ['foreign_amount', 'foreign_currency']):
+                common.create_simple_posting_with_price(entry, config['main_account'],
+                                                        ot.foreign_amount, ot.foreign_currency,
+                                                        ot.amount, self.get_currency(ot))
+            else:
+                data.create_simple_posting(entry, config['main_account'], ot.amount, self.get_currency(ot))
 
             # TODO: Commented out so smart_importer can fill this in
             # target_acct = self.get_target_acct(ot)
