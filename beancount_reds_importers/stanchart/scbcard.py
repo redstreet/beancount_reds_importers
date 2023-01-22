@@ -70,9 +70,8 @@ class Importer(csvreader.Importer, banking.Importer):
         """Return the balance on the first and last dates"""
         max_date = self.get_max_transaction_date()
         if max_date:
-            rdr = self.read_raw(file)
-            rdr = self.prepare_raw_file(rdr)
-            _, currency, amount, _ = rdr.select(lambda r: r[0] == 'Current Balance')[1]
+            balance_row = self.get_row_by_label(file, 'Current Balance')
+            currency, amount = balance_row[1], balance_row[2]
             units, debitcredit = amount.split()
             if debitcredit != 'CR':
                 units = '-' + units

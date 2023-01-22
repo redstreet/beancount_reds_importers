@@ -52,6 +52,6 @@ class Importer(xlsreader.Importer, banking.Importer):
             Balance = namedtuple('Balance', ['date', 'amount', 'currency'])
 
             # Get currency from input file
-            _, _, currency, _, _ = self.get_row_by_label(file, 'Account Number:')
+            currency = self.get_row_by_label(file, 'Account Number:')[2]
 
             yield Balance(date, D(str(row.balance)), currency)

@@ -60,8 +60,10 @@ class Importer(xlsreader.Importer, banking.Importer):
         """Return the balance on the first and last dates"""
         max_date = self.get_max_transaction_date()
         if max_date:
-            _, units, currency, _, _, _, _ = self.get_row_by_label(file, 'Statement Balance:')
+            balance_row = self.get_row_by_label(file, 'Statement Balance:')
+            units, currency = balance_row[1], balance_row[2]
+
             date = max_date + datetime.timedelta(days=1)
             Balance = namedtuple('Balance', ['date', 'amount', 'currency'])
 
-            yield Balance(date, D(str(units)), currency)
+            yield Balance(date, -1 * D(str(units)), currency)
