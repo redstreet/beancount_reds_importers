@@ -1,6 +1,69 @@
 # Changelog
 
-## (unreleased)
+## 0.6.0 (2023-01-22)
+
+### New Importers
+
+- add schwab_checking_csv. [Red S]
+- importer: amazon gift card importer. [Red S]
+- add Discover credit card csv importer. [Red S]
+- importer: add capitalone 360 ofx. [Red S]
+- add becu (Boeing Employees Credit Union) (#34) [Patrick Baker]
+
+### Improvements
+
+- Better missing security reporting (#43) [thehilll]
+
+  * if get_ticker_info_from_id finds an id not present in fund_info.py try to use self.ofx.security_list
+  to report more useful information.  At least in Fidelity ofx files both the symbol and security name
+  are present, so in most cases the required additions to fund_info.py are already in the file.
+
+  * Slightly better reportings...print a summary line before list of securities
+
+  * remove unused f string
+
+  * 1. Comments to explain what is going on
+  2. Key the extracted securities dict by CUSIP (not symbol) which matches what is found
+       in the transaction entries (not for bonds symbol generally matches CUSIP)
+  3. Values of dict are now a tuple of (symbol, cusip, name) which for stocks should be all
+       that is needed for fund_info.py
+
+  * Remove another unnecessary f string
+
+- Convert value to str before applying regex in remove_non_numeric (#32) [Balazs Keresztury]
+- add overridable security_narration() method; use it in Fidelity. [Red S]
+- add ability to use smart importer with investments (#36) [Patrick Baker]
+- bean-download accepts a comma separated institution list. [Red S]
+- bean-download display. [Red S]
+- add skip_transaction to banking. [Red S]
+- minor: workday importer now specifies filing account. [Red S]
+- minor: add overridable post process step for csv. [Red S]
+- minor: add etrade to direct download template. [Red S]
+- minor: Chase filename regex is now [Cc]hase. [Red S]
+- minor: allow overriding payee in investments. [Red S]
+
+### Fixes
+
+- fidelity rounding errors are frequently higher than current value. [Red S]
+- date format wasn't getting set during bean-file. [Red S]
+- #41 add 'check' to ofx transaction types. [Red S]
+- #41 add 'payment' to ofx transaction types. [Red S]
+  for investment accounts with banking features
+- #40 check if ofx file provides balances instead of assuming it does. [Red S]
+- #37 document `filename_pattern` in the demo example. [Red S]
+- schwab_csv: update csv fields; custom payee. [Red S]
+- csvreader returned blank when skip_comments was not present. [Red S]
+- handle vanguard annoyance. [Red S]
+- workday: skip last row to zero. [Red S]
+- banking: fix the payee/narration order issue caused by 9057fcf j 9057fcf: #33. allow importers to override payee and narration fields. [Red S]
+- catch ofxparse exceptions. [Red S]
+- fix; schwab_checking_csv: withdrawals should be negative. [Red S]
+- schwab_csv bug fixes. [Red S]
+- #33. allow importers to override payee and narration fields. [Red S]
+- when matching ofx security_id to funds_db prefer a complete match, if none found fall back to substring (#45) [thehilll]
+
+
+## 0.5.1 (2022-06-14)
 
 
 ### Improvements
