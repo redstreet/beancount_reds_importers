@@ -45,9 +45,6 @@ class Importer(csvreader.Importer):
     def convert_columns(self, rdr):
         pass
 
-    def read_raw(self, file):
-        return etl.fromcsv(file.name)
-
     def is_section_title(self, row):
         # Match against rows that contain section titles. Eg: 'section1', 'section2', ...
         return len(row) == 1
