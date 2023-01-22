@@ -1,7 +1,6 @@
 """csv importer module for beancount to be used along with investment/banking/other importer modules in
 beancount_reds_importers."""
 
-import petl as etl
 from beancount_reds_importers.libreader import csvreader
 
 # This is a reader that converts:

@@ -24,6 +24,5 @@ class Importer(csvreader.Importer):
             if re.match(self.header_identifier, header):
                 self.reader_ready = True
 
-
     def read_raw(self, file):
         return etl.fromxls(file.name)
