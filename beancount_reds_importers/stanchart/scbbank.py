@@ -13,7 +13,7 @@ class Importer(csvreader.Importer, banking.Importer):
     def custom_init(self):
         self.max_rounding_error = 0.04
         self.filename_pattern_def = 'AccountTransactions[0-9]*'
-        self.header_identifier = 'Account transactions shown:'
+        self.header_identifier = self.config.get('custom_header', 'Account transactions shown:')
         self.column_labels_line = 'Date,Transaction,Currency,Deposit,Withdrawal,Running Balance,SGD Equivalent Balance'
         self.balance_column_labels_line = 'Account Name,Account Number,Currency,Current Balance,Available Balance,,'
         self.date_format = '%d/%m/%Y'

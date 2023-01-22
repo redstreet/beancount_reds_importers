@@ -13,7 +13,7 @@ class Importer(xlsreader.Importer, banking.Importer):
     def custom_init(self):
         self.max_rounding_error = 0.04
         self.filename_pattern_def = 'ACC_TXN_History[0-9]*'
-        self.header_identifier = 'United Overseas Bank Limited.*Account Type:Uniplus Account'
+        self.header_identifier = self.config.get('custom_header', 'United Overseas Bank Limited.*Account Type:Uniplus Account')
         self.column_labels_line = 'Transaction Date,Transaction Description,Withdrawal,Deposit,Available Balance'
         self.date_format = '%d %b %Y'
         self.header_map = {

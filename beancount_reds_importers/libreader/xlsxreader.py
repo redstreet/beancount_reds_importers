@@ -5,14 +5,8 @@ import petl as etl
 from beancount_reds_importers.libreader import csvreader
 
 
-class Importer(csvreader.Importer):
+class Importer(xlsreader.Importer):
     FILE_EXTS = ['xlsx']
-
-    def initialize_reader(self, file):
-        if getattr(self, 'file', None) != file:
-            self.file = file
-            self.file_read_done = False
-            self.reader_ready = True
 
     def read_raw(self, file):
         rdr = etl.fromxlsx(file.name)

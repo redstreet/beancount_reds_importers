@@ -14,7 +14,7 @@ class Importer(csvreader.Importer, banking.Importer):
     def custom_init(self):
         self.max_rounding_error = 0.04
         self.filename_pattern_def = 'CardTransactions[0-9]*'
-        self.header_identifier = 'PRIORITY BANKING VISA INFINITE CARD'
+        self.header_identifier = self.config.get('custom_header', 'PRIORITY BANKING VISA INFINITE CARD')
         self.column_labels_line = 'Date,DESCRIPTION,Foreign Currency Amount,SGD Amount'
         self.date_format = '%d/%m/%Y'
         self.skip_tail_rows = 6

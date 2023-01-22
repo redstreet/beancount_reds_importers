@@ -13,7 +13,7 @@ class Importer(xlsreader.Importer, banking.Importer):
     def custom_init(self):
         self.max_rounding_error = 0.04
         self.filename_pattern_def = '^CC_TXN_History[0-9]*'
-        self.header_identifier = 'United Overseas Bank Limited.*Account Type:VISA SIGNATURE'
+        self.header_identifier = self.config.get('custom_header', 'United Overseas Bank Limited.*Account Type:VISA SIGNATURE')
         self.column_labels_line = 'Transaction Date,Posting Date,Description,Foreign Currency Type,Transaction Amount(Foreign),Local Currency Type,Transaction Amount(Local)'  # noqa: E501
         self.date_format = '%d %b %Y'
 

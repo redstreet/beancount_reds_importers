@@ -2,6 +2,7 @@
 beancount_reds_importers."""
 
 import petl as etl
+import re
 from beancount_reds_importers.libreader import csvreader
 
 
@@ -12,7 +13,17 @@ class Importer(csvreader.Importer):
         if getattr(self, 'file', None) != file:
             self.file = file
             self.file_read_done = False
-            self.reader_ready = True
+            self.reader_ready = False
+
+            # TODO: this reads the entire file. Chop off after perhaps 2k or n lines
+            rdr = self.read_raw(file)
+            header = ''
+            for r in rdr:
+                line = ''.join(str(x) for x in r)
+                header += line
+            if re.match(self.header_identifier, header):
+                self.reader_ready = True
+
 
     def read_raw(self, file):
         return etl.fromxls(file.name)

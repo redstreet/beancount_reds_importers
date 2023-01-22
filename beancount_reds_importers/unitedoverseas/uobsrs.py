@@ -10,7 +10,7 @@ class Importer(xlsreader.Importer, banking.Importer):
     def custom_init(self):
         self.max_rounding_error = 0.04
         self.filename_pattern_def = 'SRS_TXN_History[0-9]*'
-        self.header_identifier = 'United Overseas Bank Limited.*Account Type:SRS Account'
+        self.header_identifier = self.config.get('custom_header', 'United Overseas Bank Limited.*Account Type:SRS Account')
         self.column_labels_line = 'Transaction Date,Transaction Description,Withdrawal,Deposit'
         self.date_format = '%Y%m%d'
         self.header_map = {
