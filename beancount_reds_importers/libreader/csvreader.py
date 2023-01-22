@@ -120,7 +120,8 @@ class Importer(reader.Reader, importer.ImporterProtocol):
         return etl.fromcsv(file.name)
 
     def skip_until_main_table(self, rdr, col_labels=None):
-        # TODO: allow additional fields to show up anywhere
+        """Skip csv lines until the header line is found."""
+        # TODO: convert this into an 'extract_table()' method that handles the tail as well
         if not col_labels:
             if hasattr(self, 'column_labels_line'):
                 col_labels = self.column_labels_line.split(',')
@@ -128,7 +129,10 @@ class Importer(reader.Reader, importer.ImporterProtocol):
                 return rdr
         skip = None
         for n, r in enumerate(rdr):
-            if list(r) == col_labels:
+            # We only check if each element in col_labels shows up in the line in the file, and not
+            # the other way around. This allows additional fields to show up anywhere, case the csv
+            # format changes
+            if all(i in list(r) for i in col_labels):
                 skip = n
         if skip is None:
             print("Error: header line not found:")
