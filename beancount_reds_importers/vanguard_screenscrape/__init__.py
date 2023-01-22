@@ -35,7 +35,7 @@ class Importer(investments.Importer, tsvreader.Importer):
             }
         self.skip_transaction_types = ['']
 
-    def prepare_raw_columns(self, rdr):
+    def prepare_table(self, rdr):
         def extract_numbers(x):
             replacements = {'– ': '-',
                             '$': '',

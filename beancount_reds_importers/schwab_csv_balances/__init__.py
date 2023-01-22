@@ -26,7 +26,7 @@ class Importer(investments.Importer, csv_multitable_reader.Importer):
             "Price":       'unit_price',
             }
 
-    def prepare_raw_columns(self, rdr):
+    def prepare_table(self, rdr):
         return rdr
 
     def convert_columns(self, rdr):

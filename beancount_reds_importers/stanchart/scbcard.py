@@ -28,7 +28,7 @@ class Importer(csvreader.Importer, banking.Importer):
 
     # TODO: internationalize the string to number conversion
     # TODO: move into utils, since this is probably a common operation
-    def prepare_raw_columns(self, rdr):
+    def prepare_table(self, rdr):
         # split Foreign Currency Amount into two columns
         def safesplit(a, minlength=2):
             retval = a.split(' ')
@@ -56,7 +56,7 @@ class Importer(csvreader.Importer, banking.Importer):
         rdr = rdr.addfield('memo', lambda x: '')
         return rdr
 
-    def prepare_raw_rows(self, rdr):
+    def prepare_raw_file(self, rdr):
         # Strip tabs and spaces around each field in the entire file
         rdr = rdr.convertall(lambda x: x.strip(' \t') if isinstance(x, str) else x)
 
@@ -69,7 +69,7 @@ class Importer(csvreader.Importer, banking.Importer):
         max_date = self.get_max_transaction_date()
         if max_date:
             rdr = self.read_raw(file)
-            rdr = self.prepare_raw_rows(rdr)
+            rdr = self.prepare_raw_file(rdr)
             _, currency, amount, _ = rdr.select(lambda r: r[0] == 'Current Balance')[1]
             units, debitcredit = amount.split()
             if debitcredit != 'CR':

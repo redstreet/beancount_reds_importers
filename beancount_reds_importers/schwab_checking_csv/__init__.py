@@ -33,7 +33,7 @@ class Importer(csvreader.Importer, banking.Importer):
         }
         self.skip_transaction_types = ['Journal']
 
-    def prepare_raw_columns(self, rdr):
+    def prepare_table(self, rdr):
         rdr = rdr.addfield('amount',
                            lambda x: "-" + x['Withdrawal (-)'] if x['Withdrawal (-)'] != '' else x['Deposit (+)'])
         rdr = rdr.addfield('memo', lambda x: '')

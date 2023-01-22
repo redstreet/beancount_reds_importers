@@ -32,13 +32,13 @@ class Importer(csvreader.Importer, banking.Importer):
         self.skip_transaction_types = []
 
     # TODO: move into utils, since this is probably a common operation
-    def prepare_raw_columns(self, rdr):
+    def prepare_table(self, rdr):
         rdr = rdr.addfield('amount',
                            lambda x: "-" + x['Withdrawal'] if x['Withdrawal'] != '' else x['Deposit'])
         rdr = rdr.addfield('memo', lambda x: '')
         return rdr
 
-    def prepare_raw_rows(self, rdr):
+    def prepare_raw_file(self, rdr):
         # Strip tabs and spaces around each field in the entire file
         rdr = rdr.convertall(lambda x: x.strip(' \t') if isinstance(x, str) else x)
 
@@ -51,7 +51,7 @@ class Importer(csvreader.Importer, banking.Importer):
         max_date = self.get_max_transaction_date()
         if max_date:
             rdr = self.read_raw(file)
-            rdr = self.prepare_raw_rows(rdr)
+            rdr = self.prepare_raw_file(rdr)
 
             col_labels = self.balance_column_labels_line.split(',')
             rdr = self.skip_until_main_table(rdr, col_labels)

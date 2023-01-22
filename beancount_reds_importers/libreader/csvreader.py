@@ -13,7 +13,7 @@ import sys
 # This csv reader uses petl to read a .csv into a table for maniupulation. The output of this reader is a list
 # of namedtuples corresponding roughly to ofx transactions. The following steps achieve this. When writing
 # your own importer, you only should need to:
-# - override prepare_raw_columns()
+# - override prepare_table()
 #   - provide the following mappings, which correspond to the input file format of a given institution:
 #       - header_map
 #       - transaction_type_map
@@ -23,7 +23,7 @@ import sys
 # The steps this importer follow are:
 # - read csv into petl table
 # - skip header and footer rows (configurable)
-# - prepare_raw_columns: an overridable method to help get the raw table in shape. As an example, the schwab
+# - prepare_table: an overridable method to help get the raw table in shape. As an example, the schwab
 #   importer does the following
 #      - rdr.cutout('') # remove the last column, which is empty
 #      - for rows with interest, the date column contains text such as: '11/16/2018 as of 11/15/2018'. We
@@ -77,10 +77,10 @@ class Importer(reader.Reader, importer.ImporterProtocol):
         self.read_file(file)
         return max(ot.date for ot in self.get_transactions()).date()
 
-    def prepare_raw_columns(self, rdr):
+    def prepare_table(self, rdr):
         return rdr
 
-    def prepare_raw_rows(self, rdr):
+    def prepare_raw_file(self, rdr):
         return rdr
 
     def prepare_processed_columns(self, rdr):
@@ -142,16 +142,21 @@ class Importer(reader.Reader, importer.ImporterProtocol):
 
     def read_file(self, file):
         if not self.file_read_done:
+
+            # read file
             rdr = self.read_raw(file)
-            rdr = self.prepare_raw_rows(rdr)
+            rdr = self.prepare_raw_file(rdr)
+
+            # extract main table
             rdr = rdr.skip(getattr(self, 'skip_head_rows', 0))                 # chop unwanted header rows
             rdr = rdr.head(len(rdr) - getattr(self, 'skip_tail_rows', 0) - 1)  # chop unwanted footer rows
             rdr = self.skip_until_main_table(rdr)
-
             if hasattr(self, 'skip_comments'):
                 rdr = rdr.skipcomments(self.skip_comments)
             rdr = rdr.rowslice(getattr(self, 'skip_data_rows', 0), None)
-            rdr = self.prepare_raw_columns(rdr)
+            rdr = self.prepare_table(rdr)
+
+            # process table
             rdr = rdr.rename(self.header_map)
             rdr = self.convert_columns(rdr)
             rdr = self.prepare_processed_columns(rdr)
@@ -202,5 +207,5 @@ class Importer(reader.Reader, importer.ImporterProtocol):
         # Read from scratch, as we don't want to throw away headers or footers, which is where our
         # label is likely to be found
         rdr = self.read_raw(file)
-        rdr = self.prepare_raw_rows(rdr)
+        rdr = self.prepare_raw_file(rdr)
         return rdr.select(lambda r: r[0] == label)[1]

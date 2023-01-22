@@ -25,7 +25,7 @@ class Importer(xlsreader.Importer, banking.Importer):
         self.skip_transaction_types = []
 
     # TODO: move these into utils, since this is probably a common operation
-    def prepare_raw_columns(self, rdr):
+    def prepare_table(self, rdr):
         # Remove carriage returns in description
         rdr = rdr.convert('Transaction Description', lambda x: x.replace('\n', ' '))
 
@@ -34,7 +34,7 @@ class Importer(xlsreader.Importer, banking.Importer):
         rdr = rdr.addfield('memo', lambda x: '')
         return rdr
 
-    def prepare_raw_rows(self, rdr):
+    def prepare_raw_file(self, rdr):
         # Strip tabs and spaces around each field in the entire file
         rdr = rdr.convertall(lambda x: x.strip(' \t') if isinstance(x, str) else x)
 

@@ -53,7 +53,7 @@ class Importer(csvreader.Importer, investments.Importer):
             }
         self.skip_transaction_types = ['Journal']
 
-    def prepare_raw_columns(self, rdr):
+    def prepare_table(self, rdr):
         if '' in rdr.fieldnames():
             rdr = rdr.cutout('')  # clean up last column
 
