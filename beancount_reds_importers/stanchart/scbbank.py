@@ -15,7 +15,7 @@ class Importer(csvreader.Importer, banking.Importer):
         self.filename_pattern_def = 'AccountTransactions[0-9]*'
         self.header_identifier = self.config.get('custom_header', 'Account transactions shown:')
         self.column_labels_line = 'Date,Transaction,Currency,Deposit,Withdrawal,Running Balance,SGD Equivalent Balance'
-        self.balance_column_labels_line = 'Account Name,Account Number,Currency,Current Balance,Available Balance,,'
+        self.balance_column_labels_line = 'Account Name,Account Number,Currency,Current Balance,Available Balance'
         self.date_format = '%d/%m/%Y'
         self.skip_tail_rows = 0
         self.skip_comments = '# '
@@ -42,8 +42,6 @@ class Importer(csvreader.Importer, banking.Importer):
         # Strip tabs and spaces around each field in the entire file
         rdr = rdr.convertall(lambda x: x.strip(' \t') if isinstance(x, str) else x)
 
-        # Delete empty rows
-        rdr = rdr.select(lambda x: any([i != '' for i in x]))
         return rdr
 
     def get_balance_statement(self, file=None):
@@ -52,9 +50,8 @@ class Importer(csvreader.Importer, banking.Importer):
         if max_date:
             rdr = self.read_raw(file)
             rdr = self.prepare_raw_file(rdr)
-
             col_labels = self.balance_column_labels_line.split(',')
-            rdr = self.skip_until_main_table(rdr, col_labels)
+            rdr = self.extract_table_with_header(rdr, col_labels)
 
             header_map = {k: k.replace(' ', '_') for k in col_labels}
             rdr = rdr.rename(header_map)

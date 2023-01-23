@@ -135,10 +135,21 @@ class Importer(reader.Reader, importer.ImporterProtocol):
             if all(i in list(r) for i in col_labels):
                 skip = n
         if skip is None:
-            print("Error: header line not found:")
-            print(self.column_labels_line)
+            print("Error: expected columns not found:")
+            print(col_labels)
             sys.exit(1)
         return rdr.skip(skip)
+
+    def extract_table_with_header(self, rdr, col_labels=None):
+        rdr = self.skip_until_main_table(rdr, col_labels)
+        nrows = len(rdr)
+        for (n, r) in enumerate(rdr):
+            if not r or all(i == '' for i in r):
+                # blank line, terminate
+                nrows = n - 1
+                break
+        rdr = rdr.head(nrows)
+        return rdr
 
     def read_file(self, file):
         if not self.file_read_done:
@@ -150,7 +161,7 @@ class Importer(reader.Reader, importer.ImporterProtocol):
             # extract main table
             rdr = rdr.skip(getattr(self, 'skip_head_rows', 0))                 # chop unwanted header rows
             rdr = rdr.head(len(rdr) - getattr(self, 'skip_tail_rows', 0) - 1)  # chop unwanted footer rows
-            rdr = self.skip_until_main_table(rdr)
+            rdr = self.extract_table_with_header(rdr)
             if hasattr(self, 'skip_comments'):
                 rdr = rdr.skipcomments(self.skip_comments)
             rdr = rdr.rowslice(getattr(self, 'skip_data_rows', 0), None)
