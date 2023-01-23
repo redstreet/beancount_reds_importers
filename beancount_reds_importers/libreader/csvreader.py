@@ -64,7 +64,9 @@ class Importer(reader.Reader, importer.ImporterProtocol):
     def initialize_reader(self, file):
         if getattr(self, 'file', None) != file:
             self.file = file
-            self.reader_ready = re.match(self.header_identifier, file.head())
+            account_number = self.config.get('account_number', '')
+            self.reader_ready = re.match(self.header_identifier, file.head()) and \
+                                account_number in file.head()
             if self.reader_ready:
                 self.file_read_done = False
             # else:

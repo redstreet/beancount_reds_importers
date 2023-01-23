@@ -21,6 +21,12 @@ class Importer(csvreader.Importer):
             for r in rdr:
                 line = ''.join(str(x) for x in r)
                 header += line
+
+            # TODO
+            # account_number = self.config.get('account_number', '')
+            # self.reader_ready = re.match(self.header_identifier, file.head()) and \
+            #                     account_number in file.head()
+
             if re.match(self.header_identifier, header):
                 self.reader_ready = True
 
