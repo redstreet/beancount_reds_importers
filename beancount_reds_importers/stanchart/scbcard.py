@@ -24,7 +24,9 @@ class Importer(csvreader.Importer, banking.Importer):
             "DESCRIPTION":    "payee",
         }
         self.transaction_type_map = {}
-        self.skip_transaction_types = []
+
+    def skip_transaction(self, row):
+        return '[UNPOSTED]' in row.payee
 
     # TODO: internationalize the string to number conversion
     # TODO: move into utils, since this is probably a common operation
@@ -47,6 +49,8 @@ class Importer(csvreader.Importer, banking.Importer):
 
         # parse SGD Amount, change DR into -ve, remove SGD, change to amount
         def parse_sgd_amount(s):
+            if len(s.split()) < 3:
+                return '', ''
             currency, amount, drcr = s.split()
             if drcr == 'DR':
                 amount = '-' + amount
