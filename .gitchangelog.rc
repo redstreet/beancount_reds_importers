@@ -83,14 +83,14 @@ ignore_regexps = [
 ##
 section_regexps = [
     ('New', [
-        r'^[fF]eat\s*\([Mm]ajor\):.*$',
+        r'^[fF]eat\([Mm]ajor\):.*$',
      ]),
     ('Improvements', [
         r'^[fF]eat:.*$',
-        r'^[fF]eat\s*(.*):.*$',
+        r'^[fF]eat(.*):.*$',
      ]),
     ('Fixes', [
-        r'^[fF]ix\s*(.*):\s*((dev|use?r|pkg|test|doc)\s*:\s*)?([^\n]*)$',
+        r'^[fF]ix\s*:\s*((dev|use?r|pkg|test|doc)\s*:\s*)?([^\n]*)$',
      ]),
 
     ('Other', None ## Match all lines
