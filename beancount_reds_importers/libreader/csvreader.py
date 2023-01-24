@@ -66,7 +66,7 @@ class Importer(reader.Reader, importer.ImporterProtocol):
             self.file = file
             account_number = self.config.get('account_number', '')
             self.reader_ready = re.match(self.header_identifier, file.head()) and \
-                                account_number in file.head()
+                account_number in file.head()
             if self.reader_ready:
                 self.file_read_done = False
             # else:
