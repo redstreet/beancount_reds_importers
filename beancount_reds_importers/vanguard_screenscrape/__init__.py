@@ -15,8 +15,6 @@ class Importer(investments.Importer, tsvreader.Importer):
         self.get_ticker_info = self.get_ticker_info_from_id
         self.date_format = '%m/%d/%Y'
         self.funds_db_txt = 'funds_by_ticker'
-        self.skip_head_rows = 0
-        self.skip_tail_rows = 0
         self.header_map = {
             "date":        'date',
             "settledate":   'tradeDate',

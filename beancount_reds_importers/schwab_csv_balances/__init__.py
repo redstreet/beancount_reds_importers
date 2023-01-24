@@ -16,8 +16,6 @@ class Importer(investments.Importer, csv_multitable_reader.Importer):
         self.header_identifier = 'Transactions  for account'
         self.get_ticker_info = self.get_ticker_info_from_id
         self.date_format = '%m/%d/%Y'
-        self.skip_head_rows = 1
-        self.skip_tail_rows = 1
         self.funds_db_txt = 'funds_by_ticker'
         self.header_map = {
             "Description": 'memo',

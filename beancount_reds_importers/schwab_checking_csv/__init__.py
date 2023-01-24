@@ -14,8 +14,6 @@ class Importer(csvreader.Importer, banking.Importer):
         self.filename_pattern_def = '.*_Checking_Transactions_'
         self.header_identifier = '"Transactions  for Checking account.*'
         self.date_format = '%m/%d/%Y'
-        self.skip_head_rows = 1
-        self.skip_tail_rows = 0
         self.skip_comments = '# '
         self.header_map = {
             "Date":           "date",
