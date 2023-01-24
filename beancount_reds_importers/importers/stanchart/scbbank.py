@@ -4,6 +4,7 @@ from beancount_reds_importers.libreader import csvreader
 from beancount_reds_importers.libtransactionbuilder import banking
 from collections import namedtuple
 import datetime
+import re
 from beancount.core.number import D
 
 

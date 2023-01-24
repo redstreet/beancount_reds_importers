@@ -1,5 +1,6 @@
 """UOB SRS importer."""
 
+import re
 from beancount_reds_importers.libreader import xlsreader
 from beancount_reds_importers.libtransactionbuilder import banking
 
