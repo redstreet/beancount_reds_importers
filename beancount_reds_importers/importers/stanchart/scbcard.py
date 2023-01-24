@@ -25,6 +25,11 @@ class Importer(csvreader.Importer, banking.Importer):
         }
         self.transaction_type_map = {}
 
+    def deep_identify(self, file):
+        account_number = self.config.get('account_number', '')
+        return re.match(self.header_identifier, file.head()) and \
+            account_number in file.head()
+
     def skip_transaction(self, row):
         return '[UNPOSTED]' in row.payee
 

@@ -64,14 +64,15 @@ class Importer(reader.Reader, importer.ImporterProtocol):
     def initialize_reader(self, file):
         if getattr(self, 'file', None) != file:
             self.file = file
-            account_number = self.config.get('account_number', '')
-            self.reader_ready = re.match(self.header_identifier, file.head()) and \
-                account_number in file.head()
+            self.reader_ready = self.deep_identify(file)
             if self.reader_ready:
                 self.file_read_done = False
             # else:
             #     print("header_identifier failed---------------:")
             #     print(self.header_identifier, file.head())
+
+    def deep_identify(self, file):
+        return re.match(self.header_identifier, file.head())
 
     def file_date(self, file):
         "Get the maximum date from the file."

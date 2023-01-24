@@ -24,6 +24,11 @@ class Importer(xlsreader.Importer, banking.Importer):
         self.transaction_type_map = {}
         self.skip_transaction_types = []
 
+    def deep_identify(self, file):
+        account_number = self.config.get('account_number', '')
+        return re.match(self.header_identifier, file.head()) and \
+            account_number in file.head()
+
     # TODO: move these into utils, since this is probably a common operation
     def prepare_table(self, rdr):
         # Remove carriage returns in description
