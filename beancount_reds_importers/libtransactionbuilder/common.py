@@ -63,7 +63,7 @@ def create_simple_posting_with_cost_or_price(entry, account,
             raise PriceCostBothZeroException
             # import pdb; pdb.set_trace()
 
-    price = Amount(price_number, price_currency) if price_number else None
+    price = Amount(D(price_number), price_currency) if price_number else None
     cost = Cost(cost_number, cost_currency, None, None) if cost_number else None
     cost = costspec if costspec else cost
     posting = data.Posting(account, units, cost, price, None, None)

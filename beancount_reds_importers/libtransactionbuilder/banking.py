@@ -123,8 +123,8 @@ class Importer(importer.ImporterProtocol):
 
             if self.fields_contain_data(ot, ['foreign_amount', 'foreign_currency']):
                 common.create_simple_posting_with_price(entry, config['main_account'],
-                                                        ot.foreign_amount, ot.foreign_currency,
-                                                        ot.amount, self.get_currency(ot))
+                                                        ot.amount, self.get_currency(ot),
+                                                        ot.foreign_amount, ot.foreign_currency)
             else:
                 data.create_simple_posting(entry, config['main_account'], ot.amount, self.get_currency(ot))
 
