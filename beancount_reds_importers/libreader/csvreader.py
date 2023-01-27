@@ -8,12 +8,11 @@ from beancount.ingest import importer
 from beancount.core.number import D
 import petl as etl
 from beancount_reds_importers.libreader import reader
-import sys
 
 # This csv reader uses petl to read a .csv into a table for maniupulation. The output of this reader is a list
 # of namedtuples corresponding roughly to ofx transactions. The following steps achieve this. When writing
 # your own importer, you only should need to:
-# - override prepare_table()
+# - override prepare_raw_columns()
 #   - provide the following mappings, which correspond to the input file format of a given institution:
 #       - header_map
 #       - transaction_type_map
@@ -23,7 +22,7 @@ import sys
 # The steps this importer follow are:
 # - read csv into petl table
 # - skip header and footer rows (configurable)
-# - prepare_table: an overridable method to help get the raw table in shape. As an example, the schwab
+# - prepare_raw_columns: an overridable method to help get the raw table in shape. As an example, the schwab
 #   importer does the following
 #      - rdr.cutout('') # remove the last column, which is empty
 #      - for rows with interest, the date column contains text such as: '11/16/2018 as of 11/15/2018'. We
@@ -59,34 +58,29 @@ import sys
 
 
 class Importer(reader.Reader, importer.ImporterProtocol):
-    FILE_EXTS = ['csv']
+    FILE_EXT = 'csv'
 
     def initialize_reader(self, file):
         if getattr(self, 'file', None) != file:
             self.file = file
-            self.reader_ready = self.deep_identify(file)
+            self.reader_ready = re.match(self.header_identifier, file.head(), flags=re.DOTALL)
             if self.reader_ready:
+                # TODO: move out elsewhere?
+                # self.currency = self.ofx_account.statement.currency.upper()
+                self.currency = self.config.get('currency', 'USD')
+                self.includes_balances = False
+                self.date_format = '%m/%d/%Y'  # TODO: move into class variable, into reader.Reader
                 self.file_read_done = False
             # else:
             #     print("header_identifier failed---------------:")
             #     print(self.header_identifier, file.head())
 
-    def deep_identify(self, file):
-        return re.match(self.header_identifier, file.head())
-
     def file_date(self, file):
         "Get the maximum date from the file."
-        self.initialize(file)  # self.date_format gets set via this
         self.read_file(file)
         return max(ot.date for ot in self.get_transactions()).date()
 
-    def prepare_table(self, rdr):
-        return rdr
-
-    def prepare_raw_file(self, rdr):
-        return rdr
-
-    def prepare_processed_table(self, rdr):
+    def prepare_raw_columns(self, rdr):
         return rdr
 
     def convert_columns(self, rdr):
@@ -122,58 +116,18 @@ class Importer(reader.Reader, importer.ImporterProtocol):
     def read_raw(self, file):
         return etl.fromcsv(file.name)
 
-    def skip_until_main_table(self, rdr, col_labels=None):
-        """Skip csv lines until the header line is found."""
-        # TODO: convert this into an 'extract_table()' method that handles the tail as well
-        if not col_labels:
-            if hasattr(self, 'column_labels_line'):
-                col_labels = self.column_labels_line.split(',')
-            else:
-                return rdr
-        skip = None
-        for n, r in enumerate(rdr):
-            # We only check if each element in col_labels shows up in the line in the file, and not
-            # the other way around. This allows additional fields to show up anywhere, case the csv
-            # format changes
-            if all(i in list(r) for i in col_labels):
-                skip = n
-        if skip is None:
-            print("Error: expected columns not found:")
-            print(col_labels)
-            sys.exit(1)
-        return rdr.skip(skip)
-
-    def extract_table_with_header(self, rdr, col_labels=None):
-        rdr = self.skip_until_main_table(rdr, col_labels)
-        nrows = len(rdr)
-        for (n, r) in enumerate(rdr):
-            if not r or all(i == '' for i in r):
-                # blank line, terminate
-                nrows = n - 1
-                break
-        rdr = rdr.head(nrows)
-        return rdr
-
     def read_file(self, file):
         if not self.file_read_done:
-
-            # read file
             rdr = self.read_raw(file)
-            rdr = self.prepare_raw_file(rdr)
-
-            # extract main table
             rdr = rdr.skip(getattr(self, 'skip_head_rows', 0))                 # chop unwanted header rows
             rdr = rdr.head(len(rdr) - getattr(self, 'skip_tail_rows', 0) - 1)  # chop unwanted footer rows
-            rdr = self.extract_table_with_header(rdr)
+
             if hasattr(self, 'skip_comments'):
                 rdr = rdr.skipcomments(self.skip_comments)
             rdr = rdr.rowslice(getattr(self, 'skip_data_rows', 0), None)
-            rdr = self.prepare_table(rdr)
-
-            # process table
+            rdr = self.prepare_raw_columns(rdr)
             rdr = rdr.rename(self.header_map)
             rdr = self.convert_columns(rdr)
-            rdr = self.prepare_processed_table(rdr)
             self.rdr = rdr
             self.ifile = file
             self.file_read_done = True
@@ -212,14 +166,3 @@ class Importer(reader.Reader, importer.ImporterProtocol):
             return False
 
         return date
-
-    def get_row_by_label(self, file, label):
-        """Return a row from file where the first cell (column) matches label. This is a common
-        operation in csv files, and is thus provided here as a utility. Eg:
-           "Account Statement:,123456,EUR"
-        """
-        # Read from scratch, as we don't want to throw away headers or footers, which is where our
-        # label is likely to be found
-        rdr = self.read_raw(file)
-        rdr = self.prepare_raw_file(rdr)
-        return rdr.select(lambda r: r[0] == label)[1]
