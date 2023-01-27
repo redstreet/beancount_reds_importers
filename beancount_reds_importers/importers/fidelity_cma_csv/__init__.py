@@ -1,11 +1,10 @@
-"""Fidelity checking csv importer for beancount."""
+"""Fidelity CMA/checking csv importer for beancount."""
 
 from beancount_reds_importers.libreader import csvreader
 from beancount_reds_importers.libtransactionbuilder import banking
 
-
 class Importer(banking.Importer, csvreader.Importer):
-    IMPORTER_NAME = 'Fidelity Checking'
+    IMPORTER_NAME = 'Fidelity Cash Management Account'
 
     def custom_init(self):
        self.max_rounding_error = 0.04
@@ -18,7 +17,6 @@ class Importer(banking.Importer, csvreader.Importer):
                "Run Date":             'date',
                "Action":               'description',
                "Amount ($)":           'amount',
-               # "Symbol":               'payee',
 
                "Settlement Date":      'settleDate',
                "Accrued Interest ($)": 'accrued_interest',
@@ -29,34 +27,6 @@ class Importer(banking.Importer, csvreader.Importer):
                "Symbol":               'security',
                "Price ($)":            'unit_price',
                }
-
-       # self.transaction_type_map = {
-       #        'DIRECT DEPOSIT':                   'dep',
-       #        'DIRECT DEBIT':                     'dep',
-       #        'Check Paid':                       'dep',
-       #        'INTEREST EARNED':                  'income',
-       #        'TRANSFERRED TO':                   'credit',
-       #        'TRANSFERRED FROM':                 'debit',
-       #        'MERGER MER FROM':                  'transfer',
-       #        'MERGER MER PAYOUT':                'transfer',
-       #    }
-       # self.skip_transaction_types = []
-
-    # def prepare_raw_columns(self, rdr):
-    #     def description_to_action(d):
-    #         for i in self.transaction_type_map:
-    #             if d.startswith(i):
-    #                 return i
-    #         print("Unknown transaction type: ", d)
-    #         return d
-    #
-    #     for field in ['Run Date', 'Action']:
-    #         rdr = rdr.convert(field, lambda x: x.lstrip())
-    #
-    #     # rdr = rdr.addfield('payee', lambda x: x['Action'])
-    #     # rdr = rdr.convert('payee', description_to_action)
-    #     return rdr
-
 
     def prepare_raw_columns(self,rdr):
 
@@ -109,8 +79,3 @@ class Importer(banking.Importer, csvreader.Importer):
             rdr = rdr.convert(field, lambda x: x.lstrip())
 
         return rdr
- 
- 
- 
- 
- 
