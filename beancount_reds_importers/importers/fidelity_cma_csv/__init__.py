@@ -11,7 +11,7 @@ class Importer(banking.Importer, csvreader.Importer):
         self.max_rounding_error = 0.04
         self.filename_pattern_def = '.*History'
         self.date_format = '%m/%d/%Y'
-        self.header_identifier = ".*Run Date,Action,Symbol,Security Description,Security Type,Quantity,Price \(\$\),Commission \(\$\),Fees \(\$\),Accrued Interest \(\$\),Amount \(\$\),Settlement Date"
+        self.header_identifier = ".*Run Date,Action,Symbol,Security Description,Security Type,Quantity,Price \\(\\$\\),Commission \\(\\$\\),Fees \\(\\$\\),Accrued Interest \\(\\$\\),Amount \\(\\$\\),Settlement Date"
         self.skip_head_rows = 5
         self.skip_tail_rows = 16
         self.header_map = {
