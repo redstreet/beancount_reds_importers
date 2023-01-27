@@ -3,17 +3,18 @@
 from beancount_reds_importers.libreader import csvreader
 from beancount_reds_importers.libtransactionbuilder import banking
 
+
 class Importer(banking.Importer, csvreader.Importer):
     IMPORTER_NAME = 'Fidelity Cash Management Account'
 
     def custom_init(self):
-       self.max_rounding_error = 0.04
-       self.filename_pattern_def = '.*History'
-       self.date_format = '%m/%d/%Y'
-       self.header_identifier = ".*Run Date,Action,Symbol,Security Description,Security Type,Quantity,Price \(\$\),Commission \(\$\),Fees \(\$\),Accrued Interest \(\$\),Amount \(\$\),Settlement Date"
-       self.skip_head_rows = 5
-       self.skip_tail_rows = 16
-       self.header_map = {
+        self.max_rounding_error = 0.04
+        self.filename_pattern_def = '.*History'
+        self.date_format = '%m/%d/%Y'
+        self.header_identifier = ".*Run Date,Action,Symbol,Security Description,Security Type,Quantity,Price \(\$\),Commission \(\$\),Fees \(\$\),Accrued Interest \(\$\),Amount \(\$\),Settlement Date"
+        self.skip_head_rows = 5
+        self.skip_tail_rows = 16
+        self.header_map = {
                "Run Date":             'date',
                "Action":               'description',
                "Amount ($)":           'amount',
@@ -28,13 +29,12 @@ class Importer(banking.Importer, csvreader.Importer):
                "Price ($)":            'unit_price',
                }
 
-    def prepare_raw_columns(self,rdr):
+    def prepare_raw_columns(self, rdr):
 
         for field in ['Action']:
             rdr = rdr.convert(field, lambda x: x.lstrip())
 
         def create_payee(d):
-            # payee_types = ['DIRECT DEPOSIT','DIRECT DEBIT','Check Paid','INTEREST EARNED','TRANSFERRED TO','TRANSFERRED FROM']
             if d.startswith('DIRECT DEPOSIT'):
                 return 'DIRECT DEPOSIT'
             elif d.startswith('DIRECT DEBIT'):
@@ -50,9 +50,8 @@ class Importer(banking.Importer, csvreader.Importer):
             else:
                 print("error no matching payee")
             return d
- 
+
         def create_memo(d):
-            # payee_types = ['DIRECT DEPOSIT','DIRECT DEBIT','Check Paid','INTEREST EARNED','TRANSFERRED TO','TRANSFERRED FROM']
             if d.startswith('DIRECT DEPOSIT'):
                 return d.replace('DIRECT DEPOSIT', "")
             elif d.startswith('DIRECT DEBIT'):
@@ -69,11 +68,11 @@ class Importer(banking.Importer, csvreader.Importer):
                 print("error no matching payee")
             return d
 
-        rdr = rdr.addfield('payee',lambda x: x['Action'])
-        rdr = rdr.convert('payee',create_payee)
+        rdr = rdr.addfield('payee', lambda x: x['Action'])
+        rdr = rdr.convert('payee', create_payee)
  
-        rdr = rdr.addfield('memo',lambda x: x['Action'])
-        rdr = rdr.convert('memo',create_memo)
+        rdr = rdr.addfield('memo', lambda x: x['Action'])
+        rdr = rdr.convert('memo', create_memo)
 
         for field in ['memo']:
             rdr = rdr.convert(field, lambda x: x.lstrip())
