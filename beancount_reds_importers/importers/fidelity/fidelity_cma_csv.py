@@ -32,6 +32,9 @@ class Importer(banking.Importer, csvreader.Importer):
                "Price ($)":            'unit_price',
                }
 
+    def deep_identify(self, file):
+        return re.match(self.header_identifier, file.head(), flags=re.DOTALL)
+
     def prepare_raw_columns(self, rdr):
 
         for field in ['Action']:
