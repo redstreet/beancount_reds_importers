@@ -1,0 +1,36 @@
+#!/usr/bin/env python3
+"""Import configuration."""
+
+import sys
+from os import path
+
+sys.path.insert(0, path.join(path.dirname(__file__)))
+
+from beancount_reds_importers import fidelity_cma_csv
+
+fund_data = [
+        ('FZFXX',     'helllo', 'Fideilty Zero',          ),
+        ('DNA',       'world', 'DNA Systems',             ),
+        ('G8354H126', '',          'Great Stock',         ),
+        ('FZIPX',     '',          'Fidelity Zero IPX',   ),
+        ('9128285B2', '',          'Fidelity 9128285B2',  ),
+        ('',          '',          'Unknown',             ),
+        ('SPAXX', '',          'Fidelity SPA',  ),
+]
+
+money_market = [ 'VMMXX', 'SPAXX' ]
+
+fund_info = {
+        'fund_data' : fund_data,
+        'money_market' : money_market,
+        }
+
+# Setting this variable provides a list of importer instances.
+CONFIG = [
+ 
+    fidelity_cma_csv.Importer({
+        'account_number' : 'X8YYYYYY',
+        'main_account'   : 'Assets:Banking:Fidelity:USD',
+        'fund_info'       : fund_info,
+    }),
+]

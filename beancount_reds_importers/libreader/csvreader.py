@@ -72,7 +72,7 @@ class Importer(reader.Reader, importer.ImporterProtocol):
             #     print(self.header_identifier, file.head())
 
     def deep_identify(self, file):
-        return re.match(self.header_identifier, file.head())
+        return re.match(self.header_identifier, file.head(), flags=re.DOTALL)
 
     def file_date(self, file):
         "Get the maximum date from the file."
