@@ -184,9 +184,6 @@ class Importer(reader.Reader, importer.ImporterProtocol):
                 continue
             yield ot
 
-    def get_balance_positions(self):
-        raise "Not supported"
-
     def get_available_cash(self):
         return None
 
