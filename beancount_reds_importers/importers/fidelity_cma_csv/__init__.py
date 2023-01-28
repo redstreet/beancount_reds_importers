@@ -11,7 +11,10 @@ class Importer(banking.Importer, csvreader.Importer):
         self.max_rounding_error = 0.04
         self.filename_pattern_def = '.*History'
         self.date_format = '%m/%d/%Y'
-        self.header_identifier = ".*Run Date,Action,Symbol,Security Description,Security Type,Quantity,Price \\(\\$\\),Commission \\(\\$\\),Fees \\(\\$\\),Accrued Interest \\(\\$\\),Amount \\(\\$\\),Settlement Date"
+        header_s0 = ".*Run Date,Action,Symbol,Security Description,Security Type,Quantity,Price \\(\\$\\),"
+        header_s1 = "Commission \\(\\$\\),Fees \\(\\$\\),Accrued Interest \\(\\$\\),Amount \\(\\$\\),Settlement Date"
+        header_sum = header_s0 + header_s1
+        self.header_identifier = header_sum
         self.skip_head_rows = 5
         self.skip_tail_rows = 16
         self.header_map = {
@@ -34,47 +37,10 @@ class Importer(banking.Importer, csvreader.Importer):
         for field in ['Action']:
             rdr = rdr.convert(field, lambda x: x.lstrip())
 
-        def create_payee(d):
-            if d.startswith('DIRECT DEPOSIT'):
-                return 'DIRECT DEPOSIT'
-            elif d.startswith('DIRECT DEBIT'):
-                return 'DIRECT DEBIT'
-            elif d.startswith('Check Paid'):
-                return 'Check Paid'
-            elif d.startswith('INTEREST EARNED'):
-                return 'INTEREST EARNED'
-            elif d.startswith('TRANSFERRED TO'):
-                return 'TRANSFERRED TO'
-            elif d.startswith('TRANSFERRED FROM'):
-                return 'TRANSFERRED FROM'
-            else:
-                print("error no matching payee")
-            return d
+        rdr = rdr.capture('Action', '(?:\\s)(?:\\w*)(.*)', ['memo'], include_original=True)
+        rdr = rdr.capture('Action', '(\\S+(?:\\s+\\S+)?)', ['payee'], include_original=True)
 
-        def create_memo(d):
-            if d.startswith('DIRECT DEPOSIT'):
-                return d.replace('DIRECT DEPOSIT', "")
-            elif d.startswith('DIRECT DEBIT'):
-                return d.replace('DIRECT DEBIT', "")
-            elif d.startswith('Check Paid'):
-                return d.replace('Check Paid', "")
-            elif d.startswith('INTEREST EARNED'):
-                return d.replace('INTEREST EARNED', "")
-            elif d.startswith('TRANSFERRED TO'):
-                return d.replace('TRANSFERRED TO', "")
-            elif d.startswith('TRANSFERRED FROM'):
-                return d.replace('TRANSFERRED FROM', "")
-            else:
-                print("error no matching payee")
-            return d
-
-        rdr = rdr.addfield('payee', lambda x: x['Action'])
-        rdr = rdr.convert('payee', create_payee)
- 
-        rdr = rdr.addfield('memo', lambda x: x['Action'])
-        rdr = rdr.convert('memo', create_memo)
-
-        for field in ['memo']:
+        for field in ['memo', 'payee']:
             rdr = rdr.convert(field, lambda x: x.lstrip())
 
         return rdr
