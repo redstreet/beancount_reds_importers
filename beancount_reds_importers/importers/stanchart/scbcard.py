@@ -4,7 +4,6 @@ from beancount_reds_importers.libreader import csvreader
 from beancount_reds_importers.libtransactionbuilder import banking
 from collections import namedtuple
 import datetime
-import petl as etl
 import re
 from beancount.core.number import D
 
@@ -35,6 +34,7 @@ class Importer(csvreader.Importer, banking.Importer):
         return '[UNPOSTED]' in row.payee
 
     def prepare_table(self, rdr):
+        # parse foreign_currency amount: "YEN 74,000"
         if self.config.get('convert_currencies', False):
             # Currency conversions won't work as expected since Beancount v2
             # doesn't support adding @@ (total price conversions) via code.
@@ -46,14 +46,14 @@ class Importer(csvreader.Importer, banking.Importer):
                               fill=' ', include_original=True)
         rdr = rdr.cutout('Foreign Currency Amount')
 
-        # parse SGD Amount: "SGD 32.01 CR"
+        # parse SGD Amount: "SGD 141.02 CR" into a single amount column
         rdr = rdr.capture('SGD Amount', '(.*) (.*) (.*)', ['currency', 'amount', 'crdr'])
 
-        # change DR into -ve
+        # change DR into -ve. TODO: move this into csvreader or csvreader.utils
         crdrdict = {'DR': '-', 'CR': ''}
         rdr = rdr.convert('amount', lambda i, row: crdrdict[row.crdr] + i, pass_row=True)
 
-        rdr = rdr.addfield('memo', lambda x: '')
+        rdr = rdr.addfield('memo', lambda x: '')  # TODO: make this non-mandatory in csvreader
         return rdr
 
     def prepare_raw_file(self, rdr):
