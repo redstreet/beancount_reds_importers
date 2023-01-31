@@ -119,10 +119,10 @@ class Importer(importer.ImporterProtocol):
     def get_ticker_info_from_id(self, security_id):
         try:
             # isin might look like "US293409829" while the ofx use only a substring like "29340982"
-            # first try a full match, fall back to substring
             ticker = None
-            ticker, ticker_long_name = [v for k, v in self.funds_db.items() if security_id == k][0]
-            if ticker is None:
+            try:  # first try a full match, fall back to substring
+                ticker, ticker_long_name = [v for k, v in self.funds_db.items() if security_id == k][0]
+            except IndexError:
                 ticker, ticker_long_name = [v for k, v in self.funds_db.items() if security_id in k][0]
         except IndexError:
             print(f"Error: fund info not found for {security_id}", file=sys.stderr)
@@ -132,32 +132,21 @@ class Importer(importer.ImporterProtocol):
                 for k in self.funds_db:
                     if s in k:
                         securities_missing.remove(s)
-            # securities_missing = [s for s in securities if s not in self.funds_db]
 
             # try to extract security info from ofx
-            ofx_securities = dict()
+            ofx_securities = {}
             try:
                 for o in self.ofx.security_list:
-                    # It seems that because of the way investment transactions are reported
-                    # in ofx the securities returned by self.get_security_list() are a list
-                    # of cusip codes.  In the section of the ofx that lists all securities
-                    # and is found in self.ofx.security_list these codes are generally
-                    # referred to as UNIQUEID (though the presence of another key called
-                    # UNIQUEIDTYPE suggests that UNIQUEID is not always a cusip).
-                    # because of this the key for the ofx_securities dict is uniqueid which
-                    # corresponds to the items in the securities_missing list.  The values
-                    # of this dict are the best guess at what an entry for fund_info.py should
-                    # be: a tuple of (ticker, cusip, name).  Note in the case of bonds the
-                    # ticker will match the cusip (at least in examples I have) and not be
-                    # literally usable as a beancount symbol
+                    # Not all institutions provide securities info, nor is the format standardized.
+                    # We do this on a best effort basis and guess the format based on Fidelity's,
+                    # where self.get_security_list() returns cusips via uniqueid
                     ofx_securities[o.uniqueid] = (o.ticker, o.uniqueid, o.name)
-            except AttributeError:
-                # ofx doesn't have a security list
+            except AttributeError:  # ofx doesn't have a security list
                 pass
 
             print("List of securities without fund info:", file=sys.stderr)
             for m in securities_missing:
-                print("%s: %s" % (m, ofx_securities.get(m, "???")), file=sys.stderr)
+                print("%s: %s" % (m, ofx_securities.get(m, "Unknown")), file=sys.stderr)
             # print(f"List of securities without fund info: {securities_missing}", file=sys.stderr)
             # import pdb; pdb.set_trace()
             sys.exit(1)
