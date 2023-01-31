@@ -22,7 +22,9 @@ in to three parts:
 This design helps move most of the heavy-lifting common code into (1) and (2) above.
 Writing new importers is made easier since one only has to write code to address the
 institution-specific formatting and quirks for each bank/brokerage. See working examples
-of an [ofx based](https://github.com/redstreet/beancount_reds_importers/blob/main/beancount_reds_importers/citi/__init__.py) and [csv](https://github.com/redstreet/beancount_reds_importers/blob/main/beancount_reds_importers/schwab_csv/__init__.py) based importers.
+of an [ofx based](https://github.com/redstreet/beancount_reds_importers/blob/main/beancount_reds_importers/importers/citi/__init__.py)
+and [csv](https://github.com/redstreet/beancount_reds_importers/blob/main/beancount_reds_importers/importers/schwab/schwab_csv_brokerage.py)
+based importers.
 
 ### Importers
 
