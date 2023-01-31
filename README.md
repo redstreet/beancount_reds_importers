@@ -122,6 +122,11 @@ I know to be correct from my personal file. However, I'm unable to share them si
 these are personal. Testing against real world files is best, so I recommend you do this
 with your own input files.
 
+## Contact
+Feel free to post questions/concerns in the [Beancount groups](https://groups.google.com/forum/#!forum/beancount)
+or on [The Five Minute Ledger Update](https://reds-rants.netlify.app/personal-finance/the-five-minute-ledger-update/)
+site. For bugs, open an issue here on Github.
+
 ## Contributions
 Contributions welcome. New importers for institutions and test input files appreciated.
 Sharing importers helps the community.
