@@ -34,6 +34,8 @@ class Importer(csvreader.Importer, banking.Importer):
         return '[UNPOSTED]' in row.payee
 
     def prepare_table(self, rdr):
+        rdr = rdr.select(lambda r: 'UNPOSTED' not in r['DESCRIPTION'])
+
         # parse foreign_currency amount: "YEN 74,000"
         if self.config.get('convert_currencies', False):
             # Currency conversions won't work as expected since Beancount v2
