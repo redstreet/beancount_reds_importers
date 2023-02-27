@@ -94,5 +94,5 @@ class Importer(csvreader.Importer):
         # TODO
         raise "Not supported"
 
-    def get_available_cash(self):
+    def get_available_cash(self, settlement_fund_balance=0):
         return None

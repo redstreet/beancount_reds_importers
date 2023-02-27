@@ -27,3 +27,6 @@ class Importer(investments.Importer, ofxreader.Importer):
         if transaction.memo.startswith("FEES"):
             return self.config['fees']
         return None
+
+    def get_available_cash(self, settlement_fund_balance=0):
+        return getattr(self.ofx_account.statement, 'available_cash', None)

@@ -41,5 +41,5 @@ class Reader():
     def get_balance_positions(self):
         return []
 
-    def get_available_cash(self):
+    def get_available_cash(self, settlement_fund_balance=0):
         return None

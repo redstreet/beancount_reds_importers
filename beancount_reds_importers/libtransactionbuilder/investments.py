@@ -375,15 +375,14 @@ class Importer(importer.ImporterProtocol):
                 new_entries.append(price_entry)
 
         # ----------------- available cash
-        available_cash = self.get_available_cash()
+        available_cash = self.get_available_cash(settlement_fund_balance)
         if available_cash is not None:
-            balance = available_cash - settlement_fund_balance
             metadata = data.new_metadata(file.name, next(counter))
             metadata.update(self.build_metadata(file, metatype='balance_cash'))
             try:
                 bal_date = date if date else self.file_date(file).date()  # unavailable file_date raises AttributeError
                 balance_entry = data.Balance(metadata, bal_date, self.config['cash_account'],
-                                             amount.Amount(balance, self.currency),
+                                             amount.Amount(available_cash, self.currency),
                                              None, None)
                 new_entries.append(balance_entry)
             except AttributeError:

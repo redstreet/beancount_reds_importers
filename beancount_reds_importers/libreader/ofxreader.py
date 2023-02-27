@@ -60,8 +60,13 @@ class Importer(reader.Reader, importer.ImporterProtocol):
             return []
         yield from self.ofx_account.statement.positions
 
-    def get_available_cash(self):
-        return getattr(self.ofx_account.statement, 'available_cash', None)
+    def get_available_cash(self, settlement_fund_balance=0):
+        available_cash = getattr(self.ofx_account.statement, 'available_cash', None)
+        if available_cash is not None:
+            # Some institutions compute available_cash this way. For others, override this method
+            # in the importer
+            return available_cash - settlement_fund_balance
+        return None
 
     def get_max_transaction_date(self):
         try:
