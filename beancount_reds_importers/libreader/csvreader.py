@@ -86,9 +86,12 @@ class Importer(reader.Reader, importer.ImporterProtocol):
     def prepare_raw_file(self, rdr):
         return rdr
 
-    def prepare_processed_table(self, rdr):
+    def fix_column_names(self, rdr):
         header_map = {k: k.replace(' ', '_') for k in rdr.header()}
         rdr = rdr.rename(header_map)
+        return rdr
+
+    def prepare_processed_table(self, rdr):
         return rdr
 
     def convert_columns(self, rdr):
@@ -175,6 +178,7 @@ class Importer(reader.Reader, importer.ImporterProtocol):
             # process table
             rdr = rdr.rename(self.header_map)
             rdr = self.convert_columns(rdr)
+            rdr = self.fix_column_names(rdr)
             rdr = self.prepare_processed_table(rdr)
             self.rdr = rdr
             self.ifile = file
