@@ -127,7 +127,7 @@ class Importer(reader.Reader, importer.ImporterProtocol):
         # TODO: convert this into an 'extract_table()' method that handles the tail as well
         if not col_labels:
             if hasattr(self, 'column_labels_line'):
-                col_labels = self.column_labels_line.split(',')
+                col_labels = self.column_labels_line.replace('"', '').split(',')
             else:
                 return rdr
         skip = None
