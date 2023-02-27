@@ -87,6 +87,8 @@ class Importer(reader.Reader, importer.ImporterProtocol):
         return rdr
 
     def prepare_processed_table(self, rdr):
+        header_map = {k: k.replace(' ', '_') for k in rdr.header()}
+        rdr = rdr.rename(header_map)
         return rdr
 
     def convert_columns(self, rdr):
@@ -103,7 +105,7 @@ class Importer(reader.Reader, importer.ImporterProtocol):
         # fixup currencies
         def remove_non_numeric(x):
             return re.sub("[^0-9\.-]", "", str(x).strip())  # noqa: W605
-        currencies = ['unit_price', 'fees', 'total', 'amount', 'balance']
+        currencies = getattr(self, 'currency_fields', []) + ['unit_price', 'fees', 'total', 'amount', 'balance']
         for i in currencies:
             if i in rdr.header():
                 rdr = rdr.convert(i, remove_non_numeric)
@@ -112,7 +114,7 @@ class Importer(reader.Reader, importer.ImporterProtocol):
         # fixup dates
         def convert_date(d):
             return datetime.datetime.strptime(d, self.date_format)
-        dates = ['date', 'tradeDate', 'settleDate']
+        dates = getattr(self, 'date_fields', []) + ['date', 'tradeDate', 'settleDate']
         for i in dates:
             if i in rdr.header():
                 rdr = rdr.convert(i, convert_date)
