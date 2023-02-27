@@ -31,6 +31,20 @@ class Reader():
         return '{}'.format(ntpath.basename(file.name))
 
     def file_account(self, _):
+        # Ugly hack to handle:
+        # https://github.com/redstreet/beancount_reds_importers/issues/41
+        # https://github.com/beancount/smart_importer/issues/122
+        # https://github.com/beancount/smart_importer/issues/30
+        import inspect
+        curframe = inspect.currentframe()
+        calframe = inspect.getouterframes(curframe, 2)
+
+        # smart_importer call
+        if any('predictor' in i.filename for i in calframe):
+            if 'smart_importer_hack' in self.config:
+                return self.config['smart_importer_hack']
+
+        # bean-file call
         if 'filing_account' in self.config:
             return self.config['filing_account']
         return self.config['main_account'].replace(':{ticker}', '').replace(':{currency}', '')
