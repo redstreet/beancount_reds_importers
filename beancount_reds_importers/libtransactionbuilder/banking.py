@@ -99,7 +99,6 @@ class Importer(importer.ImporterProtocol):
         self.initialize(file)
         counter = itertools.count()
         new_entries = []
-        config = self.config
 
         self.read_file(file)
         for ot in self.get_transactions():
