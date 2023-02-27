@@ -66,11 +66,11 @@ class Importer(importer.ImporterProtocol):
 
     def extract_balance(self, file, counter):
         entries = []
-        metadata = data.new_metadata(file.name, counter)
-        metadata.update(self.build_metadata(file, metatype='balance'))
 
         for bal in self.get_balance_statement(file=file):
             if bal:
+                metadata = data.new_metadata(file.name, counter)
+                metadata.update(self.build_metadata(file, metatype='balance'))
                 balance_entry = data.Balance(metadata, bal.date, self.config['main_account'],
                                              amount.Amount(bal.amount, self.get_currency(bal)),
                                              None, None)
