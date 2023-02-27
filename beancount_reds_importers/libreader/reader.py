@@ -31,6 +31,8 @@ class Reader():
         return '{}'.format(ntpath.basename(file.name))
 
     def file_account(self, _):
+        if 'filing_account' in self.config:
+            return self.config['filing_account']
         return self.config['main_account'].replace(':{ticker}', '').replace(':{currency}', '')
 
     def get_balance_statement(self, file=None):
