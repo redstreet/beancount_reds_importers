@@ -87,7 +87,7 @@ class Importer(reader.Reader, importer.ImporterProtocol):
         return rdr
 
     def fix_column_names(self, rdr):
-        header_map = {k: k.replace(' ', '_') for k in rdr.header()}
+        header_map = {k: re.sub("[-/ ]", "_", k) for k in rdr.header()}
         rdr = rdr.rename(header_map)
         return rdr
 
