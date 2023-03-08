@@ -57,7 +57,7 @@ class Importer(xlsreader.Importer, banking.Importer):
         return rdr
 
     def prepare_processed_table(self, rdr):
-        return rdr.convert('amount', lambda x: -1 * x)
+        return rdr.convert('amount', lambda x: -1 * D(x))
 
     def prepare_raw_file(self, rdr):
         # Strip tabs and spaces around each field in the entire file

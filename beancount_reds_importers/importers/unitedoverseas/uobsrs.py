@@ -3,6 +3,7 @@
 import re
 from beancount_reds_importers.libreader import xlsreader
 from beancount_reds_importers.libtransactionbuilder import banking
+from beancount.core.number import D
 
 
 class Importer(xlsreader.Importer, banking.Importer):
@@ -31,7 +32,7 @@ class Importer(xlsreader.Importer, banking.Importer):
         rdr = rdr.convert('Transaction Description', lambda x: x.replace('\n', ' '))
 
         rdr = rdr.addfield('amount',
-                           lambda x: -1 * x['Withdrawal'] if x['Withdrawal'] != '' else x['Deposit'])
+                           lambda x: -1 * D(x['Withdrawal']) if x['Withdrawal'] != '' else D(x['Deposit']))
         rdr = rdr.addfield('memo', lambda x: '')
         return rdr
 
