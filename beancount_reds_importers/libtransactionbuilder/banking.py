@@ -62,9 +62,13 @@ class Importer(importer.ImporterProtocol):
     def fields_contain_data(ot, fields):
         return all(hasattr(ot, f) and getattr(ot, f) for f in fields)
 
-    def main_account(self, ot):
+    def get_main_account(self, ot):
         """Can be overridden by importer"""
         return self.config['main_account']
+
+    def get_target_account(self, ot):
+        """Can be overridden by importer"""
+        return self.config.get('target_account')
 
     # --------------------------------------------------------------------------------
 
@@ -124,7 +128,7 @@ class Importer(importer.ImporterProtocol):
                                      self.get_narration(ot), self.get_payee(ot),
                                      data.EMPTY_SET, data.EMPTY_SET, [])
 
-            main_account = self.main_account(ot)
+            main_account = self.get_main_account(ot)
 
             if self.fields_contain_data(ot, ['foreign_amount', 'foreign_currency']):
                 common.create_simple_posting_with_price(entry, main_account,
@@ -133,9 +137,10 @@ class Importer(importer.ImporterProtocol):
             else:
                 data.create_simple_posting(entry, main_account, ot.amount, self.get_currency(ot))
 
-            # TODO: Commented out so smart_importer can fill this in
-            # target_acct = self.get_target_acct(ot)
-            # data.create_simple_posting(entry, target_acct, None, None)
+            # smart_importer can fill this in if the importer doesn't override self.get_target_acct()
+            target_acct = self.get_target_account(ot)
+            if target_acct:
+                data.create_simple_posting(entry, target_acct, None, None)
 
             new_entries.append(entry)
 
