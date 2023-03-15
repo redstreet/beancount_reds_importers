@@ -11,6 +11,7 @@ class Importer(csvreader.Importer, investments.Importer):
         self.max_rounding_error = 0.04
         self.filename_pattern_def = '.*_Transactions_'
         self.header_identifier = '"Transactions  for account.*'
+        self.column_labels_line = '"Date","Action","Symbol","Description","Quantity","Price","Fees & Comm","Amount"'
         self.get_ticker_info = self.get_ticker_info_from_id
         self.date_format = '%m/%d/%Y'
         self.funds_db_txt = 'funds_by_ticker'
@@ -49,7 +50,9 @@ class Importer(csvreader.Importer, investments.Importer):
             'Stock Split':                  'transfer',
             'Cash In Lieu':                 'transfer',  # TODO: not handled correctly
             }
-        self.skip_transaction_types = ['Journal']
+
+    def skip_transaction(self, ot):
+        return ot.type in ['', 'Journal']
 
     def prepare_table(self, rdr):
         if '' in rdr.fieldnames():
