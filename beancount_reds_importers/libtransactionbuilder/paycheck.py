@@ -16,14 +16,19 @@ from beancount_reds_importers.libtransactionbuilder import banking
 #
 #         # top level keys (eg: 'Earnings') correspond to sections of the paycheck.
 #
-#         # Inner keys correspond to text found in the paycheck being imported. Values are postings to
-#         # generate, and can be a string or a list. Each string generates a single posting. A list therefore
-#         # generates multiple postings. The example shows where this is useful:
+#         # Inner keys correspond to text found in the row of the paycheck being imported. Values
+#         are accounts in postings to generate, and can be a string or a list. Each string
+#         generates a single posting. A list therefore generates multiple postings. The example
+#         shows where this is useful:
 #
 #         'Employer Paid Benefits': {
 #             "401(k) Employer Match": ["Income:Benefits:Employer-401k",
 #                                       "Assets:Zero-Sum-Accounts:Transfers:Paycheck:Y401k:Match"],
 #         },
+#
+#         Note that , the 'amount' column in any row is extracted. If that column doesn't exist,
+#         'amount_in_pay_group_currency' (currently hardcoded) is extracted. If neither of those
+#         exist, no extraction is done.
 #
 #         'Earnings' : {
 #         "Salary Pay"                :"Income:Salary:Regular",
