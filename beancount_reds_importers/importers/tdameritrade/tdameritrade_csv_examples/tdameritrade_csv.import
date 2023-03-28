@@ -1,0 +1,43 @@
+#!/usr/bin/env python3
+"""Import configuration."""
+
+import sys
+from os import path
+
+sys.path.insert(0, path.join(path.dirname(__file__)))
+
+from beancount_reds_importers import tdameritrade_csv
+
+fund_data = [
+    ('BP',   '055622104', 'BP p.l.c. ADR'),
+    ('LUV', '844741108', 'Southwest Airlines Co.'),
+    ('COST',  '22160K105', 'Costco Wholesale Corp.'),
+    ('VLO',  '91913Y100', 'Valero Energy Corp.'),
+    ('HCP',  '418100103', 'HashiCorp, Inc.'),
+    ('NVDA',  '67066G104', 'NVIDIA Corp.'),
+    ('ON',  '682189105', 'ON Semiconductor Corp.'),
+]
+
+money_market = ['VMFXX']
+
+fund_info = {
+    'fund_data': fund_data,
+    'money_market': money_market,
+}
+
+CONFIG = [
+    tdameritrade_csv.Importer({
+        'main_account'   : 'Assets:Ameritrade:{ticker}',
+        'cash_account'   : 'Assets:Ameritrade:{currency}',
+        'account_number' : 'XXXXXXXXX',
+        'transfer'       : 'Assets:Zero-Sum-Accounts:Transfers:Bank-Account',
+        'dividends'      : 'Income:Dividends:Ameritrade:{ticker}',
+        'interest'       : 'Income:Interest:Ameritrade:{ticker}',
+        'cg'             : 'Income:Capital-Gains:Ameritrade:{ticker}',
+        'capgainsd_lt'   : 'Income:Capital-Gains-Distributions:Long:Ameritrade:{ticker}',
+        'capgainsd_st'   : 'Income:Capital-Gains-Distributions:Short:Ameritrade:{ticker}',
+        'fees'           : 'Expenses:Brokerage-Fees:Ameritrade',
+        'rounding_error' : 'Equity:Rounding-Errors:Imports',
+        'fund_info'       : fund_info,
+    }),
+]
