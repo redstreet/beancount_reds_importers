@@ -117,10 +117,15 @@ pip3 install git+https://github.com/redstreet/beancount_reds_importers
    for automating and managing identifier info
 
 ## Testing
-I run tests across hundreds of actual ofx and csv files, against reference outputs that
-I know to be correct from my personal file. However, I'm unable to share them since
-these are personal. Testing against real world files is best, so I recommend you do this
-with your own input files.
+
+Some importers are tested with
+[regression_pytest.py](https://github.com/beancount/beancount/blob/v2/beancount/ingest/regression_pytest.py).
+Run `pytest --generate` then `pytest`.
+
+More broadly I run tests across hundreds of actual ofx and csv files, against
+reference outputs that I know to be correct from my personal file. However, I'm
+unable to share them since these are personal. Testing against real world files
+is best, so I recommend you do this with your own input files.
 
 ## Contact
 Feel free to post questions/concerns in the [Beancount groups](https://groups.google.com/forum/#!forum/beancount)
