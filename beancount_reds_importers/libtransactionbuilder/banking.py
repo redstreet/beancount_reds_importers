@@ -124,9 +124,16 @@ class Importer(importer.ImporterProtocol):
             # Build transaction entry
             # Banking transactions might include foreign currency transactions. TODO: figure out
             # how ofx handles this and use the same interface for csv and other files
-            entry = data.Transaction(metadata, ot.date.date(), self.FLAG,
-                                     self.get_narration(ot), self.get_payee(ot),
-                                     data.EMPTY_SET, data.EMPTY_SET, [])
+            entry = data.Transaction(
+                    meta=metadata,
+                    date=ot.date.date(),
+                    flag=self.FLAG,
+                    # payee and narration are switched. See the preceding note
+                    payee=self.get_narration(ot),
+                    narration=self.get_payee(ot),
+                    tags=data.EMPTY_SET,
+                    links=data.EMPTY_SET,
+                    postings=[])
 
             main_account = self.get_main_account(ot)
 
