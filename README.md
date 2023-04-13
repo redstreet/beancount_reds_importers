@@ -34,12 +34,16 @@ File format readers included are:
 - `.xlsx` (single and multitable support)
 
 Transaction builders included are:
-- banking (for banks and credit cards, which benefit from a postings predictor like
-  [smart_importer](https://github.com/beancount/smart_importer)
-- investments/brokerages (to handle the very many distinct cases of investment related
-  transactions)
-- paychecks (to handle paychecks, which typically contain very many mostly
-  pre-determined postings in a single entry)
+- Banking (for banks and credit cards, which benefit from a postings predictor like
+  [smart_importer](https://github.com/beancount/smart_importer).  Note that,
+  depending on the institution, the `payee` and `narration` fields in generated
+  transactions may appear to be switched. This is described by
+  [libtransactionbuilder/banking.py](https://github.com/redstreet/beancount_reds_importers/blob/main/beancount_reds_importers/libtransactionbuilder/banking.py).
+  and the fields can be swapped in a `custom_init`.
+- Investments/brokerages (to handle the very many distinct cases of investment related
+  transactions).
+- Paychecks (to handle paychecks, which typically contain very many mostly
+  pre-determined postings in a single entry).
 
 [Input in `.ofx` format (over `.csv`) is preferred](https://reds-rants.netlify.app/personal-finance/a-word-about-input-formats-use-ofx-when-you-can/),
 when provided by the institution, as it minimizes data and coding errors, eliminates
