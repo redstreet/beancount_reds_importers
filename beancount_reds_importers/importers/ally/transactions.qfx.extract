@@ -1,0 +1,8 @@
+
+2019-01-09 * "Transfer to savings account"
+  Assets:Banks:Checking  -55.00 USD
+
+2019-01-09 * "Check 23400"
+  Assets:Banks:Checking  -1000 USD
+
+2019-01-10 balance Assets:Banks:Checking                           150.65 USD
