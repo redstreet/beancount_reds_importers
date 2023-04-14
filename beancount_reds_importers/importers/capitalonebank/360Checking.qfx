@@ -1,0 +1,75 @@
+<?OFX OFXHEADER="200" VERSION="202" SECURITY="NONE" OLDFILEUID="NONE" NEWFILEUID="NONE"?>
+<OFX>
+  <SIGNONMSGSRSV1>
+    <SONRS>
+      <STATUS>
+        <CODE>0</CODE>
+        <SEVERITY>INFO</SEVERITY>
+      </STATUS>
+      <DTSERVER>20230310048208.398</DTSERVER>
+      <LANGUAGE>ENG</LANGUAGE>
+      <FI>
+        <ORG>Capital One Bank</ORG>
+        <FID>1001</FID>
+      </FI>
+      <INTU.BID>1236</INTU.BID>
+    </SONRS>
+  </SIGNONMSGSRSV1>
+  <BANKMSGSRSV1>
+    <STMTTRNRS>
+      <TRNUID>0</TRNUID>
+      <STATUS>
+        <CODE>0</CODE>
+        <SEVERITY>INFO</SEVERITY>
+      </STATUS>
+      <STMTRS>
+        <CURDEF>USD</CURDEF>
+        <BANKACCTFROM>
+          <BANKID>031176110</BANKID>
+          <ACCTID>9876</ACCTID>
+          <ACCTTYPE>CHECKING</ACCTTYPE>
+        </BANKACCTFROM>
+        <BANKTRANLIST>
+          <DTSTART>20230109050000.000</DTSTART>
+          <DTEND>20230309040000.000</DTEND>
+
+          <STMTTRN>
+            <TRNTYPE>CREDIT</TRNTYPE>
+            <DTPOSTED>20230228050000.000</DTPOSTED>
+            <TRNAMT>0.01</TRNAMT>
+            <FITID>202302283828</FITID>
+            <MEMO>Monthly Interest Paid</MEMO>
+          </STMTTRN>
+
+          <STMTTRN>
+            <TRNTYPE>CREDIT</TRNTYPE>
+            <DTPOSTED>20230119050000.000</DTPOSTED>
+            <TRNAMT>888.99</TRNAMT>
+            <FITID>202301191113</FITID>
+            <MEMO>Deposit from BEAN COUNTERS PAYROLL</MEMO>
+          </STMTTRN>
+
+          <STMTTRN>
+            <TRNTYPE>DEBIT</TRNTYPE>
+            <DTPOSTED>20230117050000.000</DTPOSTED>
+            <TRNAMT>-100</TRNAMT>
+            <FITID>202301171112</FITID>
+            <MEMO>Withdrawal from AMERICAN EXPRESS ACH PMT</MEMO>
+          </STMTTRN>
+          <STMTTRN>
+            <TRNTYPE>CREDIT</TRNTYPE>
+            <DTPOSTED>20230112050000.000</DTPOSTED>
+            <TRNAMT>444.55</TRNAMT>
+            <FITID>202301121111</FITID>
+            <MEMO>Deposit from BEAN COUNTERS PAYROLL</MEMO>
+          </STMTTRN>
+
+        </BANKTRANLIST>
+        <LEDGERBAL>
+          <BALAMT>4321.98</BALAMT>
+          <DTASOF>20230310048208.39</DTASOF>
+        </LEDGERBAL>
+      </STMTRS>
+    </STMTTRNRS>
+  </BANKMSGSRSV1>
+</OFX>

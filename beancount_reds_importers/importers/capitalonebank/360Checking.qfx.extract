@@ -1,0 +1,14 @@
+
+2023-01-12 * "Deposit from BEAN COUNTERS PAYROLL" ""
+  Assets:Banks:CapitalOne  444.55 USD
+
+2023-01-17 * "Withdrawal from AMERICAN EXPRESS ACH PMT" ""
+  Assets:Banks:CapitalOne  -100 USD
+
+2023-01-19 * "Deposit from BEAN COUNTERS PAYROLL" ""
+  Assets:Banks:CapitalOne  888.99 USD
+
+2023-02-28 * "Monthly Interest Paid" ""
+  Assets:Banks:CapitalOne  0.01 USD
+
+2023-03-01 balance Assets:Banks:CapitalOne                         4321.98 USD
