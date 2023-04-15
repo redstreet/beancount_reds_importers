@@ -35,11 +35,7 @@ File format readers included are:
 
 Transaction builders included are:
 - Banking (for banks and credit cards, which benefit from a postings predictor like
-  [smart_importer](https://github.com/beancount/smart_importer).  Note that,
-  depending on the institution, the `payee` and `narration` fields in generated
-  transactions may appear to be switched. This is described by
-  [libtransactionbuilder/banking.py](https://github.com/redstreet/beancount_reds_importers/blob/main/beancount_reds_importers/libtransactionbuilder/banking.py).
-  and the fields can be swapped in a `custom_init`.
+  [smart_importer](https://github.com/beancount/smart_importer)).
 - Investments/brokerages (to handle the very many distinct cases of investment related
   transactions).
 - Paychecks (to handle paychecks, which typically contain very many mostly
@@ -120,16 +116,23 @@ pip3 install git+https://github.com/redstreet/beancount_reds_importers
    [this article](https://reds-rants.netlify.app/personal-finance/tickers-and-identifiers/)
    for automating and managing identifier info
 
+#### Note
+
+Depending on the institution, the `payee` and `narration` fields in generated
+transactions may appear to be switched. This is described by
+[libtransactionbuilder/banking.py](https://github.com/redstreet/beancount_reds_importers/blob/main/beancount_reds_importers/libtransactionbuilder/banking.py),
+and the fields can be swapped in a `custom_init`.
+
 ## Testing
 
 Some importers are tested with
 [regression_pytest.py](https://github.com/beancount/beancount/blob/v2/beancount/ingest/regression_pytest.py).
 Run `pytest --generate` then `pytest`.
 
-More broadly I run tests across hundreds of actual ofx and csv files, against
-reference outputs that I know to be correct from my personal file. However, I'm
-unable to share them since these are personal. Testing against real world files
-is best, so I recommend you do this with your own input files.
+More broadly I run tests across hundreds of actual ofx and csv files, against reference
+outputs that I know to be correct from my personal file. However, I'm unable to share
+them since these are personal. Testing against real world files is best, so I recommend
+you do this with your own input files.
 
 ## Contact
 Feel free to post questions/concerns in the [Beancount groups](https://groups.google.com/forum/#!forum/beancount)
