@@ -41,6 +41,7 @@ class Importer(csvreader.Importer, investments.Importer):
             'MoneyLink Transfer':           'transfer',
             'Pr Yr Div Reinvest':           'dividends',
             'Reinvest Dividend':            'dividends',
+            'Qualified Dividend':           'dividends',
             'Reinvest Shares':              'buystock',
             'Sell':                         'sellstock',
             'Short Term Cap Gain Reinvest': 'capgainsd_st',
