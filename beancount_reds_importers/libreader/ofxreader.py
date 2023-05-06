@@ -37,8 +37,13 @@ class Importer(reader.Reader, importer.ImporterProtocol):
         return file_account == config_account
 
     def file_date(self, file):
-        "Get the maximum date from the file."
-        return self.ofx_account.statement.end_date
+        """Get the ending date of the statement."""
+        if not getattr(self, 'ofx_account', None):
+            self.initialize(file)
+        try:
+            return self.ofx_account.statement.end_date
+        except AttributeError:
+            return None
 
     def read_file(self, file):
         pass
