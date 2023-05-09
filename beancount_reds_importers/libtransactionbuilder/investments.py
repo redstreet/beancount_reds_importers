@@ -233,10 +233,11 @@ class Importer(importer.ImporterProtocol):
                                                             costspec=CostSpec(None, None, None, None, None, None))
             data.create_simple_posting(entry, self.config['cg'].format(ticker=ticker), None, None)
         else:  # buy stock/fund
-            # annoyingly, vanguard reinvests have unit_price set to zero. so manually compute it
+            unit_price = getattr(ot, 'unit_price', 0)
+            # annoyingly, vanguard reinvests have ot.unit_price set to zero. so manually compute it
             if (hasattr(ot, 'security') and ot.security) and ot.units and not ot.unit_price:
-                ot.unit_price = round(abs(ot.total) / ot.units, 4)
-            common.create_simple_posting_with_cost(entry, main_acct, units, ticker, ot.unit_price,
+                unit_price = round(abs(ot.total) / ot.units, 4)
+            common.create_simple_posting_with_cost(entry, main_acct, units, ticker, unit_price,
                                                    self.currency, self.price_cost_both_zero_handler)
 
         # "Other" account posting
