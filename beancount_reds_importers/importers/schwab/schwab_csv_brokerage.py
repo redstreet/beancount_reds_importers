@@ -42,6 +42,7 @@ class Importer(csvreader.Importer, investments.Importer):
             'Pr Yr Div Reinvest':           'dividends',
             'Reinvest Dividend':            'dividends',
             'Qualified Dividend':           'dividends',
+            'Cash Dividend':                'dividends',
             'Reinvest Shares':              'buystock',
             'Sell':                         'sellstock',
             'Short Term Cap Gain Reinvest': 'capgainsd_st',
