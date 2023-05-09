@@ -30,15 +30,15 @@ class Importer(csvreader.Importer, investments.Importer):
             }
         self.transaction_type_map = {
             'Bank Interest':                'income',
-            'Bank Transfer':                'transfer',
+            'Bank Transfer':                'cash',
             'Buy':                          'buystock',
             'Reinvestment Adj':             'buystock',
             'Cash Dividend':                'dividends',
             'Div Adjustment':               'dividends',
             'Long Term Cap Gain Reinvest':  'capgainsd_lt',
-            'Misc Credits':                 'transfer',
-            'MoneyLink Deposit':            'transfer',
-            'MoneyLink Transfer':           'transfer',
+            'Misc Credits':                 'cash',
+            'MoneyLink Deposit':            'cash',
+            'MoneyLink Transfer':           'cash',
             'Pr Yr Div Reinvest':           'dividends',
             'Reinvest Dividend':            'dividends',
             'Qualified Dividend':           'dividends',
@@ -46,11 +46,11 @@ class Importer(csvreader.Importer, investments.Importer):
             'Reinvest Shares':              'buystock',
             'Sell':                         'sellstock',
             'Short Term Cap Gain Reinvest': 'capgainsd_st',
-            'Wire Funds Received':          'transfer',
-            'Wire Received':                'transfer',
-            'Funds Received':               'transfer',
-            'Stock Split':                  'transfer',
-            'Cash In Lieu':                 'transfer',  # TODO: not handled correctly
+            'Wire Funds Received':          'cash',
+            'Wire Received':                'cash',
+            'Funds Received':               'cash',
+            'Stock Split':                  'cash',
+            'Cash In Lieu':                 'cash',
             }
 
     def skip_transaction(self, ot):

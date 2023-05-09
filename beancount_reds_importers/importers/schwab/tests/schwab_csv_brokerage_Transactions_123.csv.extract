@@ -1,11 +1,11 @@
 
-2022-12-15 * "transfer" "transfer"
-  Assets:Investments:Schwab:USD                     0 USD
-  Assets:Zero-Sum-Accounts:Transfers:Bank-Account  -0 USD
+2022-12-15 * "cash" "cash"
+  Assets:Investments:Schwab:USD                     980.65 USD
+  Assets:Zero-Sum-Accounts:Transfers:Bank-Account  -980.65 USD
 
-2023-01-09 * "transfer" "transfer"
-  Assets:Investments:Schwab:USD                     0 USD
-  Assets:Zero-Sum-Accounts:Transfers:Bank-Account  -0 USD
+2023-01-09 * "cash" "cash"
+  Assets:Investments:Schwab:USD                     25.00 USD
+  Assets:Zero-Sum-Accounts:Transfers:Bank-Account  -25.00 USD
 
 2023-01-17 * "dividends" "[SWVXX] SCHWAB VALUE ADVANTAGE MONEY INV"
   Assets:Investments:Schwab:USD                       0.98 USD
