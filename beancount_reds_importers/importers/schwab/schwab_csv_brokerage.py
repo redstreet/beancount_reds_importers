@@ -15,9 +15,8 @@ class Importer(csvreader.Importer, investments.Importer):
         self.get_ticker_info = self.get_ticker_info_from_id
         self.date_format = '%m/%d/%Y'
         self.funds_db_txt = 'funds_by_ticker'
-        self.get_payee = lambda ot: ot.type
+        self.get_payee = lambda ot: ot.Action
         self.header_map = {
-            "Action":      'type',
             "Date":        'date',
             "Description": 'memo',
             "Symbol":      'security',
@@ -67,4 +66,5 @@ class Importer(csvreader.Importer, investments.Importer):
         rdr = rdr.convert('Date', cleanup_date)
         rdr = rdr.addfield('tradeDate', lambda x: x['Date'])
         rdr = rdr.addfield('total', lambda x: x['Amount'])
+        rdr = rdr.addfield('type', lambda x: x['Action'])
         return rdr
