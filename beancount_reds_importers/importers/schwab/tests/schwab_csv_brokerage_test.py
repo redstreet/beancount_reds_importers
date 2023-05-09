@@ -39,7 +39,6 @@ def build_config():
         'fees'           : f'Expenses:Fees-and-Charges:Brokerage-Fees:{taxability}:{leaf}',
         'rounding_error' : 'Equity:Rounding-Errors:Imports',
         'fund_info'      : fund_info,
-        "filename_pattern": "schwab_csv_brokerage.csv",
         'currency'       : currency,
     }
     return config
