@@ -1,0 +1,40 @@
+
+2022-12-15 * "MoneyLink Transfer" "cash"
+  Assets:Investments:Schwab:USD                     980.65 USD
+  Assets:Zero-Sum-Accounts:Transfers:Bank-Account  -980.65 USD
+
+2023-01-09 * "MoneyLink Deposit" "cash"
+  Assets:Investments:Schwab:USD                     25.00 USD
+  Assets:Zero-Sum-Accounts:Transfers:Bank-Account  -25.00 USD
+
+2023-01-17 * "Cash Dividend" "[SWVXX] SCHWAB VALUE ADVANTAGE MONEY INV"
+  Assets:Investments:Schwab:USD                       0.98 USD
+  Income:Investments:Taxable:Dividends:Schwab:SWVXX  -0.98 USD
+
+2023-02-01 * "Qualified Dividend" "[GIS] GENERAL MILLS INC"
+  Assets:Investments:Schwab:USD                     0.54 USD
+  Income:Investments:Taxable:Dividends:Schwab:GIS  -0.54 USD
+
+2023-04-06 * "Reinvest Dividend" "[BND] Vanguard Total Bond Market Index Fund"
+  Assets:Investments:Schwab:USD                     1.84 USD
+  Income:Investments:Taxable:Dividends:Schwab:BND  -1.84 USD
+
+2023-04-10 * "Reinvest Shares" "[BND] Vanguard Total Bond Market Index Fund"
+  Assets:Investments:Schwab:BND  0.0249 BND {73.8993 USD}
+  Assets:Investments:Schwab:USD   -1.84 USD
+
+2023-04-17 * "Bank Interest" "income"
+  Assets:Investments:Schwab:USD                    0.03 USD
+  Income:Investments:Taxable:Interest:Schwab:USD  -0.03 USD
+
+2023-04-18 * "Sell" "[BND] Vanguard Total Bond Market Index Fund"
+  todo: "TODO: this entry is incomplete until lots are selected (bean-doctor context <filename> <lineno>)"
+  Assets:Investments:Schwab:BND                              -10.065 BND {} @ 73.4049 USD
+  Income:Investments:Taxable:Capital-Gains:Schwab:BND
+  Assets:Investments:Schwab:USD                               738.81 USD
+  Equity:Rounding-Errors:Imports                           0.0103185 USD
+  Expenses:Fees-and-Charges:Brokerage-Fees:Taxable:Schwab       0.01 USD
+
+2023-04-27 * "Buy" "[BND] Vanguard Total Bond Market Index Fund"
+  Assets:Investments:Schwab:BND        45 BND {73.7789 USD}
+  Assets:Investments:Schwab:USD  -3320.05 USD
