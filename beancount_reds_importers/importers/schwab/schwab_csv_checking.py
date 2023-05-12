@@ -2,7 +2,6 @@
 
 from beancount_reds_importers.libreader import csvreader
 from beancount_reds_importers.libtransactionbuilder import banking
-from collections import namedtuple
 import datetime
 
 
@@ -13,6 +12,7 @@ class Importer(csvreader.Importer, banking.Importer):
         self.max_rounding_error = 0.04
         self.filename_pattern_def = '.*_Checking_Transactions_'
         self.header_identifier = '"Transactions  for Checking account.*'
+        self.column_labels_line = '"Date","Type","Check #","Description","Withdrawal (-)","Deposit (+)","RunningBalance"'
         self.date_format = '%m/%d/%Y'
         self.skip_comments = '# '
         self.header_map = {
@@ -32,6 +32,8 @@ class Importer(csvreader.Importer, banking.Importer):
         self.skip_transaction_types = ['Journal']
 
     def prepare_table(self, rdr):
+        # There are two sub-tables: pending and posted transactions. Skip pending transactions
+        rdr = self.skip_until_row_contains(rdr, "Posted Transactions")
         rdr = rdr.addfield('amount',
                            lambda x: "-" + x['Withdrawal (-)'] if x['Withdrawal (-)'] != '' else x['Deposit (+)'])
         rdr = rdr.addfield('memo', lambda x: '')
@@ -42,8 +44,5 @@ class Importer(csvreader.Importer, banking.Importer):
 
         max_date = self.get_max_transaction_date()
         if max_date:
-            for row in [self.rdr.namedtuples()[0], self.rdr.namedtuples()[len(self.rdr) - 2]]:
-                date = row.date.date() + datetime.timedelta(days=1)
-                # See comment in get_max_transaction_date() for explanation of the above line
-                Balance = namedtuple('Balance', ['date', 'amount'])
-                yield Balance(date, row.balance)
+            date = max_date + datetime.timedelta(days=1)
+            yield banking.Balance(date, self.rdr.namedtuples()[0].balance, self.currency)

@@ -2,7 +2,6 @@
 
 from beancount_reds_importers.libreader import csvreader
 from beancount_reds_importers.libtransactionbuilder import banking
-from collections import namedtuple
 import datetime
 import re
 from beancount.core.number import D
@@ -66,11 +65,10 @@ class Importer(csvreader.Importer, banking.Importer):
                 rdr = rdr.cutout('')
 
             date = max_date + datetime.timedelta(days=1)
-            Balance = namedtuple('Balance', ['date', 'amount', 'currency'])
 
             row = rdr.namedtuples()[0]
             amount = row.Current_Balance
             units, debitcredit = amount.split()
             if debitcredit != 'CR':
                 units = '-' + units
-            yield Balance(date, D(units), row.Currency)
+            yield banking.Balance(date, D(units), row.Currency)

@@ -1,10 +1,14 @@
 """Generic banking importer for beancount."""
 
 import itertools
+from collections import namedtuple
 from beancount.core import data
 from beancount.core import amount
 from beancount.ingest import importer
 from beancount_reds_importers.libtransactionbuilder import common
+
+
+Balance = namedtuple('Balance', ['date', 'amount', 'currency'])
 
 
 class Importer(importer.ImporterProtocol):

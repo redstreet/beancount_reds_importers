@@ -159,6 +159,16 @@ class Importer(reader.Reader, importer.ImporterProtocol):
         rdr = rdr.head(nrows)
         return rdr
 
+    def skip_until_row_contains(self, rdr, value):
+        start = None
+        for n, r in enumerate(rdr):
+            if value in r[0]:
+                start = n
+        if start is None:
+            print(f'Error: table is not as expected. "{value}" row not found.')
+            sys.exit(1)
+        return rdr.rowslice(start, len(rdr))
+
     def read_file(self, file):
         if not self.file_read_done:
 
