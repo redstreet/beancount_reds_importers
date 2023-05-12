@@ -2,7 +2,6 @@
 
 from beancount_reds_importers.libreader import xlsreader
 from beancount_reds_importers.libtransactionbuilder import banking
-from collections import namedtuple
 import datetime
 import re
 from beancount.core.number import D
@@ -55,9 +54,8 @@ class Importer(xlsreader.Importer, banking.Importer):
         if max_date:
             row = self.rdr.namedtuples()[0]
             date = max_date + datetime.timedelta(days=1)
-            Balance = namedtuple('Balance', ['date', 'amount', 'currency'])
 
             # Get currency from input file
             currency = self.get_row_by_label(file, 'Account Number:')[2]
 
-            yield Balance(date, D(str(row.balance)), currency)
+            yield banking.Balance(date, D(str(row.balance)), currency)
