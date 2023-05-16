@@ -32,8 +32,16 @@ class Importer(csvreader.Importer, banking.Importer):
         self.skip_transaction_types = ['Journal']
 
     def prepare_table(self, rdr):
-        # There are two sub-tables: pending and posted transactions. Skip pending transactions
-        rdr = self.skip_until_row_contains(rdr, "Posted Transactions")
+        if self.config.get('include_pending', False):
+            rows_to_remove = ['Pending Transactions', 'Posted Transactions', 'Total Pending Check']
+            rdr = rdr.select(lambda x: not any(x[0].startswith(i) for i in rows_to_remove))
+            # TODO: this doesn't work with generating balance assertions: pending transactions
+            # don't include balance assertion data. So what we need to do is generate a balance
+            # assertion at the end of posted transactions. This has not yet been done.
+        else:
+            # There are two sub-tables: pending and posted transactions. Skip pending transactions
+            rdr = self.skip_until_row_contains(rdr, "Posted Transactions")
+
         rdr = rdr.addfield('amount',
                            lambda x: "-" + x['Withdrawal (-)'] if x['Withdrawal (-)'] != '' else x['Deposit (+)'])
         rdr = rdr.addfield('memo', lambda x: '')
