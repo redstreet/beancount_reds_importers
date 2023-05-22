@@ -17,7 +17,7 @@ class Importer(reader.Reader, importer.ImporterProtocol):
             self.ofx_account = None
             self.reader_ready = False
             try:
-                self.ofx = ofxparse.OfxParser.parse(open(file.name))
+                self.ofx = self.read_file(file)
             except ofxparse.OfxParserException:
                 return
             for acc in self.ofx.accounts:
@@ -46,7 +46,8 @@ class Importer(reader.Reader, importer.ImporterProtocol):
             return None
 
     def read_file(self, file):
-        pass
+        with open(file.name) as fh:
+            return ofxparse.OfxParser.parse(fh)
 
     def get_transactions(self):
         yield from self.ofx_account.statement.transactions
