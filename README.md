@@ -129,6 +129,10 @@ Some importers are tested with
 [regression_pytest.py](https://github.com/beancount/beancount/blob/v2/beancount/ingest/regression_pytest.py).
 Run `pytest --generate` then `pytest`.
 
+Anonymized data to increase regression test coverage is most welcome. Please submit a
+PR if you can. See [here](importers/schwab/tests/schwab_csv_checking) for an example to follow.
+
+
 More broadly I run tests across hundreds of actual ofx and csv files, against reference
 outputs that I know to be correct from my personal file. However, I'm unable to share
 them since these are personal. Testing against real world files is best, so I recommend
