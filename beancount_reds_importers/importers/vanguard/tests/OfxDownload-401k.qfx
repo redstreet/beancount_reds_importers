@@ -1,0 +1,212 @@
+OFXHEADER:100
+DATA:OFXSGML
+VERSION:102
+SECURITY:NONE
+ENCODING:USASCII
+CHARSET:1252
+COMPRESSION:NONE
+OLDFILEUID:NONE
+NEWFILEUID:NONE
+
+<OFX>
+  <SIGNONMSGSRSV1>
+    <SONRS>
+      <STATUS>
+        <CODE>0</CODE>
+        <SEVERITY>INFO</SEVERITY>
+        <MESSAGE>Successful Sign On</MESSAGE>
+      </STATUS>
+      <DTSERVER>20230526150323[-5:EST]</DTSERVER>
+      <LANGUAGE>ENG</LANGUAGE>
+      <DTPROFUP>20140605083000</DTPROFUP>
+      <FI>
+        <ORG>Vanguard</ORG>
+        <FID>15103</FID>
+      </FI>
+      <SESSCOOKIE>ABCDEF0123456789.abcd1234</SESSCOOKIE>
+      <INTU.BID>15103</INTU.BID>
+      <INTU.USERID>BEANCOUNTER</INTU.USERID>
+    </SONRS>
+  </SIGNONMSGSRSV1>
+
+  <INVSTMTMSGSRSV1>
+    <INVSTMTTRNRS>
+      <TRNUID>0</TRNUID>
+      <STATUS>
+        <CODE>0</CODE>
+        <SEVERITY>INFO</SEVERITY>
+      </STATUS>
+      <INVSTMTRS>
+        <DTASOF>20230526160000.000[-5:EST]</DTASOF>
+        <CURDEF>USD</CURDEF>
+        <INVACCTFROM>
+          <BROKERID>vanguard.com</BROKERID>
+          <ACCTID>444555</ACCTID>
+        </INVACCTFROM>
+        <INVTRANLIST>
+          <DTSTART>20230101160000.000[-5:EST]</DTSTART>
+          <DTEND>20230526150323.000[-5:EST]</DTEND>
+
+          <BUYMF>
+            <INVBUY>
+              <INVTRAN>
+                <FITID>5906642204228653372810364AAA</FITID>
+                <DTTRADE>20230106160000.000[-5:EST]</DTTRADE>
+                <DTSETTLE>20230106160000.000[-5:EST]</DTSETTLE>
+                <MEMO>Price as of date based on closing price</MEMO>
+              </INVTRAN>
+              <SECID>
+                <UNIQUEID>VGI007743</UNIQUEID>
+                <UNIQUEIDTYPE>CUSIP</UNIQUEIDTYPE>
+              </SECID>
+              <UNITS>10.16089</UNITS>
+              <UNITPRICE>111.75</UNITPRICE>
+              <TOTAL>-1135.48</TOTAL>
+              <SUBACCTSEC>CASH</SUBACCTSEC>
+              <SUBACCTFUND>OTHER</SUBACCTFUND>
+              <INV401KSOURCE>PRETAX</INV401KSOURCE>
+            </INVBUY>
+            <BUYTYPE>BUY</BUYTYPE>
+          </BUYMF>
+
+          <BUYMF>
+            <INVBUY>
+              <INVTRAN>
+                <FITID>6410030147434374319950352BBB</FITID>
+                <DTTRADE>20230120160000.000[-5:EST]</DTTRADE>
+                <DTSETTLE>20230120160000.000[-5:EST]</DTSETTLE>
+                <MEMO>Price as of date based on closing price</MEMO>
+              </INVTRAN>
+              <SECID>
+                <UNIQUEID>VGI007743</UNIQUEID>
+                <UNIQUEIDTYPE>CUSIP</UNIQUEIDTYPE>
+              </SECID>
+              <UNITS>5.58049</UNITS>
+              <UNITPRICE>115.03</UNITPRICE>
+              <TOTAL>-641.92</TOTAL>
+              <SUBACCTSEC>CASH</SUBACCTSEC>
+              <SUBACCTFUND>OTHER</SUBACCTFUND>
+              <INV401KSOURCE>AFTERTAX</INV401KSOURCE>
+            </INVBUY>
+            <BUYTYPE>BUY</BUYTYPE>
+          </BUYMF>
+
+          <TRANSFER>
+            <INVTRAN>
+              <FITID>8364548282917106589730063CCC</FITID>
+              <DTTRADE>20230120160000.000[-5:EST]</DTTRADE>
+              <DTSETTLE>20230120160000.000[-5:EST]</DTSETTLE>
+              <MEMO>Price as of date based on closing price</MEMO>
+            </INVTRAN>
+            <SECID>
+              <UNIQUEID>VGI007743</UNIQUEID>
+              <UNIQUEIDTYPE>CUSIP</UNIQUEIDTYPE>
+            </SECID>
+            <SUBACCTSEC>CASH</SUBACCTSEC>
+            <UNITS>-5.58049</UNITS>
+            <TFERACTION>OUT</TFERACTION>
+            <POSTYPE>LONG</POSTYPE>
+            <UNITPRICE>115.03</UNITPRICE>
+            <INV401KSOURCE>AFTERTAX</INV401KSOURCE>
+          </TRANSFER>
+          <TRANSFER>
+            <INVTRAN>
+              <FITID>2254123215835146058555205DDD</FITID>
+              <DTTRADE>20230120160000.000[-5:EST]</DTTRADE>
+              <DTSETTLE>20230120160000.000[-5:EST]</DTSETTLE>
+              <MEMO>Price as of date based on closing price</MEMO>
+            </INVTRAN>
+            <SECID>
+              <UNIQUEID>VGI007743</UNIQUEID>
+              <UNIQUEIDTYPE>CUSIP</UNIQUEIDTYPE>
+            </SECID>
+            <SUBACCTSEC>CASH</SUBACCTSEC>
+            <UNITS>5.58049</UNITS>
+            <TFERACTION>IN</TFERACTION>
+            <POSTYPE>LONG</POSTYPE>
+            <UNITPRICE>115.03</UNITPRICE>
+            <INV401KSOURCE>AFTERTAX</INV401KSOURCE>
+          </TRANSFER>
+
+          <TRANSFER>
+            <INVTRAN>
+              <FITID>9398129822025741566423194EEE</FITID>
+              <DTTRADE>20230307160000.000[-5:EST]</DTTRADE>
+              <DTSETTLE>20230307160000.000[-5:EST]</DTSETTLE>
+              <MEMO>Investment Expense</MEMO>
+            </INVTRAN>
+            <SECID>
+              <UNIQUEID>VGI007743</UNIQUEID>
+              <UNIQUEIDTYPE>CUSIP</UNIQUEIDTYPE>
+            </SECID>
+            <SUBACCTSEC>CASH</SUBACCTSEC>
+            <UNITS>-0.000349</UNITS>
+            <TFERACTION>OUT</TFERACTION>
+            <POSTYPE>LONG</POSTYPE>
+            <UNITPRICE>113.86</UNITPRICE>
+            <INV401KSOURCE>PRETAX</INV401KSOURCE>
+          </TRANSFER>
+
+        </INVTRANLIST>
+
+        <INVPOSLIST>
+          <POSMF>
+            <INVPOS>
+              <SECID>
+                <UNIQUEID>VGI007743</UNIQUEID>
+                <UNIQUEIDTYPE>CUSIP</UNIQUEIDTYPE>
+              </SECID>
+              <HELDINACCT>OTHER</HELDINACCT>
+              <POSTYPE>LONG</POSTYPE>
+              <UNITS>113.718</UNITS>
+              <UNITPRICE>117.71</UNITPRICE>
+              <MKTVAL>13385.75</MKTVAL>
+              <DTPRICEASOF>20230526160000.000[-5:EST]</DTPRICEASOF>
+              <MEMO>Price as of date based on closing price</MEMO>
+              <INV401KSOURCE>OTHERNONVEST</INV401KSOURCE>
+            </INVPOS>
+            <REINVDIV>Y</REINVDIV>
+            <REINVCG>Y</REINVCG>
+          </POSMF>
+        </INVPOSLIST>
+
+        <INV401K>
+          <EMPLOYERNAME>BEANS 401(K) SAVINGS PLAN</EMPLOYERNAME>
+          <CURRENTVESTPCT>100.0</CURRENTVESTPCT>
+        </INV401K>
+
+        <INV401KBAL>
+          <CASHBAL>0.0</CASHBAL>
+          <PRETAX>0.0</PRETAX>
+          <AFTERTAX>0.0</AFTERTAX>
+          <MATCH>0.0</MATCH>
+          <PROFITSHARING>0.0</PROFITSHARING>
+          <ROLLOVER>0.0</ROLLOVER>
+          <OTHERVEST>0.0</OTHERVEST>
+          <OTHERNONVEST>0.0</OTHERNONVEST>
+          <TOTAL>0.0</TOTAL>
+        </INV401KBAL>
+
+      </INVSTMTRS>
+    </INVSTMTTRNRS>
+  </INVSTMTMSGSRSV1>
+
+  <SECLISTMSGSRSV1>
+    <SECLIST>
+      <MFINFO>
+        <SECINFO>
+          <SECID>
+            <UNIQUEID>VGI007743</UNIQUEID>
+            <UNIQUEIDTYPE>CUSIP</UNIQUEIDTYPE>
+          </SECID>
+          <SECNAME>Vanguard Target Retirement 2050 Trust</SECNAME>
+          <FIID>7743</FIID>
+          <UNITPRICE>117.71</UNITPRICE>
+          <DTASOF>20230526160000.000[-5:EST]</DTASOF>
+          <MEMO>Price as of date based on closing price</MEMO>
+        </SECINFO>
+      </MFINFO>
+    </SECLIST>
+  </SECLISTMSGSRSV1>
+
+</OFX>
