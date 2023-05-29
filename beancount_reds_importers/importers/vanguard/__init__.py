@@ -7,11 +7,18 @@ from beancount_reds_importers.libtransactionbuilder import investments
 
 class Importer(investments.Importer, ofxreader.Importer):
     IMPORTER_NAME = 'Vanguard'
+    # Any memo in the source OFX that's in this set is not carried forward.
+    # Vanguard sets memos that aren't very useful and would create noise in the
+    # generated ledger transactions.
+    SKIP_MEMOS = {
+        "Price as of date based on closing price",
+    }
 
     def custom_init(self):
         self.max_rounding_error = 0.11
         self.filename_pattern_def = '.*OfxDownload'
         self.get_ticker_info = self.get_ticker_info_from_id
+        self.get_payee = self._get_payee
 
         # See https://github.com/redstreet/beancount_reds_importers/issues/15: occasionally, Vanguard qfx
         # files contain a transaction with untiprice set to zero. Probably an internal bug at their end. We
@@ -31,3 +38,9 @@ class Importer(investments.Importer, ofxreader.Importer):
         elif 'ST CAP GAIN' in transaction.memo:
             return self.config['capgainsd_st']
         return None
+
+    def _get_payee(self, ot):
+        parts = [ot.type.title()]
+        if ot.memo not in self.SKIP_MEMOS:
+            parts.append(ot.memo)
+        return ' - '.join(parts)
