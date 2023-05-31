@@ -183,10 +183,10 @@ class Importer(importer.ImporterProtocol):
     def skip_transaction(self, ot):
         return False
 
-    def get_tags(self, ot):
+    def get_tags(self, ot=None):
         """Can be overridden by importer"""
         return data.EMPTY_SET
-    
+
     # extract() and supporting methods
     # --------------------------------------------------------------------------------
 

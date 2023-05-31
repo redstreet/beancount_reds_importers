@@ -116,7 +116,7 @@ class Importer(banking.Importer):
         metadata = data.new_metadata(file.name, 0)
         metadata.update(self.build_metadata(file, metatype='transaction'))
         entry = data.Transaction(metadata, self.paycheck_date(file), self.FLAG,
-                                 None, config['desc'], data.EMPTY_SET, data.EMPTY_SET, [])
+                                 None, config['desc'], self.get_tags(), data.EMPTY_SET, [])
 
         entry = self.build_postings(entry)
         return [entry]

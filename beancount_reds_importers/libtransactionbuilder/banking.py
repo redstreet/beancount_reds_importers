@@ -73,8 +73,8 @@ class Importer(importer.ImporterProtocol):
     def get_target_account(self, ot):
         """Can be overridden by importer"""
         return self.config.get('target_account')
-    
-    def get_tags(self, ot):
+
+    def get_tags(self, ot=None):
         """Can be overridden by importer"""
         return data.EMPTY_SET
 
