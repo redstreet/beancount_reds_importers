@@ -58,22 +58,24 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
         #     'fund_info'       : fund_info, }
 
     def initialize(self, file):
-        if not self.initialized:
-            self.custom_init()
-            self.initialize_reader(file)
-            if self.reader_ready:
-                # TODO: get self.currency to be defined by the reader (ofx, csv, etc.), overridable by config
-                d = {'currency': self.currency, 'ticker': '{ticker}'}
-                self.config = {k: v.format(**d) if isinstance(v, str) else v for k, v in self.config.items()}
-                self.money_market_funds = self.config['fund_info']['money_market']
-                self.fund_data = self.config['fund_info']['fund_data']  # [(ticker, id, long_name), ...]
-                self.funds_by_id = {i: (ticker, desc) for ticker, i, desc in self.fund_data}
-                self.funds_by_ticker = {ticker: (ticker, desc) for ticker, _, desc in self.fund_data}
+        if self.initialized:
+            return
 
-                # Most ofx/csv files refer to funds by id (cusip/isin etc.) Some use tickers instead
-                self.funds_db = getattr(self, getattr(self, 'funds_db_txt', 'funds_by_id'))
-                self.build_account_map()  # TODO: avoid for identify()
-            self.initialized = True
+        self.custom_init()
+        self.initialize_reader(file)
+        if self.reader_ready:
+            # TODO: get self.currency to be defined by the reader (ofx, csv, etc.), overridable by config
+            d = {'currency': self.currency, 'ticker': '{ticker}'}
+            self.config = {k: v.format(**d) if isinstance(v, str) else v for k, v in self.config.items()}
+            self.money_market_funds = self.config['fund_info']['money_market']
+            self.fund_data = self.config['fund_info']['fund_data']  # [(ticker, id, long_name), ...]
+            self.funds_by_id = {i: (ticker, desc) for ticker, i, desc in self.fund_data}
+            self.funds_by_ticker = {ticker: (ticker, desc) for ticker, _, desc in self.fund_data}
+
+            # Most ofx/csv files refer to funds by id (cusip/isin etc.) Some use tickers instead
+            self.funds_db = getattr(self, getattr(self, 'funds_db_txt', 'funds_by_id'))
+            self.build_account_map()  # TODO: avoid for identify()
+        self.initialized = True
 
     def build_account_map(self):
         # map transaction types to target posting accounts
