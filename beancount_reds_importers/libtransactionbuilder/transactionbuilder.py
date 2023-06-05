@@ -3,6 +3,7 @@ paycheck inherit this."""
 
 from beancount.core import data
 
+
 class TransactionBuilder():
     def skip_transaction(self, ot):
         """For custom importers to override"""
@@ -11,4 +12,3 @@ class TransactionBuilder():
     def get_tags(self, ot=None):
         """For custom importers to override"""
         return data.EMPTY_SET
-
