@@ -183,6 +183,10 @@ class Importer(importer.ImporterProtocol):
     def skip_transaction(self, ot):
         return False
 
+    def get_tags(self, ot=None):
+        """Can be overridden by importer"""
+        return data.EMPTY_SET
+
     # extract() and supporting methods
     # --------------------------------------------------------------------------------
 
@@ -218,7 +222,7 @@ class Importer(importer.ImporterProtocol):
         # Build transaction entry
         entry = data.Transaction(metadata, ot.tradeDate.date(), self.FLAG,
                                  self.get_payee(ot), narration,
-                                 data.EMPTY_SET, data.EMPTY_SET, [])
+                                 self.get_tags(ot), data.EMPTY_SET, [])
 
         # Main posting(s):
         main_acct = self.main_acct(ticker)
@@ -294,7 +298,7 @@ class Importer(importer.ImporterProtocol):
         # Build transaction entry
         entry = data.Transaction(metadata, date, self.FLAG,
                                  self.get_payee(ot), narration,
-                                 data.EMPTY_SET, data.EMPTY_SET, [])
+                                 self.get_tags(ot), data.EMPTY_SET, [])
         target_acct = self.get_target_acct(ot, ticker)
         if target_acct:
             target_acct = target_acct.format(ticker=ticker)

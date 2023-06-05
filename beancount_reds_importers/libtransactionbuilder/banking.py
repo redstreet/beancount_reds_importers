@@ -74,6 +74,10 @@ class Importer(importer.ImporterProtocol):
         """Can be overridden by importer"""
         return self.config.get('target_account')
 
+    def get_tags(self, ot=None):
+        """Can be overridden by importer"""
+        return data.EMPTY_SET
+
     # --------------------------------------------------------------------------------
 
     def extract_balance(self, file, counter):
@@ -135,7 +139,7 @@ class Importer(importer.ImporterProtocol):
                     # payee and narration are switched. See the preceding note
                     payee=self.get_narration(ot),
                     narration=self.get_payee(ot),
-                    tags=data.EMPTY_SET,
+                    tags=self.get_tags(ot),
                     links=data.EMPTY_SET,
                     postings=[])
 
