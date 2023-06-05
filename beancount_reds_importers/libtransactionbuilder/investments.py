@@ -8,10 +8,10 @@ from beancount.core import data
 from beancount.core import amount
 from beancount.ingest import importer
 from beancount.core.position import CostSpec
-from beancount_reds_importers.libtransactionbuilder import common
+from beancount_reds_importers.libtransactionbuilder import common, transactionbuilder
 
 
-class Importer(importer.ImporterProtocol):
+class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder):
     def __init__(self, config):
         self.config = config
         self.initialized = False
@@ -182,10 +182,6 @@ class Importer(importer.ImporterProtocol):
     # for custom importers to override
     def skip_transaction(self, ot):
         return False
-
-    def get_tags(self, ot=None):
-        """Can be overridden by importer"""
-        return data.EMPTY_SET
 
     # extract() and supporting methods
     # --------------------------------------------------------------------------------

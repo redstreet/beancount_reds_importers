@@ -5,13 +5,13 @@ from collections import namedtuple
 from beancount.core import data
 from beancount.core import amount
 from beancount.ingest import importer
-from beancount_reds_importers.libtransactionbuilder import common
+from beancount_reds_importers.libtransactionbuilder import common, transactionbuilder
 
 
 Balance = namedtuple('Balance', ['date', 'amount', 'currency'])
 
 
-class Importer(importer.ImporterProtocol):
+class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder):
     def __init__(self, config):
         self.config = config
         self.initialized = False
@@ -73,10 +73,6 @@ class Importer(importer.ImporterProtocol):
     def get_target_account(self, ot):
         """Can be overridden by importer"""
         return self.config.get('target_account')
-
-    def get_tags(self, ot=None):
-        """Can be overridden by importer"""
-        return data.EMPTY_SET
 
     # --------------------------------------------------------------------------------
 
