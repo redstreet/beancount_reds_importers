@@ -179,10 +179,6 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
     def main_acct(self, ticker):
         return self.config['main_account'].format(ticker=ticker)
 
-    # for custom importers to override
-    def skip_transaction(self, ot):
-        return False
-
     # extract() and supporting methods
     # --------------------------------------------------------------------------------
 

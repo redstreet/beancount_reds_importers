@@ -99,10 +99,6 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
         except AttributeError:
             return self.currency
 
-    # for custom importers to override
-    def skip_transaction(self, ot):
-        return False
-
     def extract(self, file, existing_entries=None):
         self.initialize(file)
         counter = itertools.count()
