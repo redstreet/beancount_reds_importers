@@ -6,6 +6,9 @@ import ofxparse
 from collections import namedtuple
 from beancount.ingest import importer
 from beancount_reds_importers.libreader import reader
+from bs4.builder import XMLParsedAsHTMLWarning
+import warnings
+warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
 
 
 class Importer(reader.Reader, importer.ImporterProtocol):

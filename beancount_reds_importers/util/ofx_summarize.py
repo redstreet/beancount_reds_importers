@@ -6,6 +6,9 @@ import os
 import sys
 from collections import defaultdict
 from ofxparse import OfxParser
+from bs4.builder import XMLParsedAsHTMLWarning
+import warnings
+warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
 
 
 def analyze(filename, ttype='dividends', pdb_explore=False):
