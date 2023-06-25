@@ -7,13 +7,13 @@ from beancount_reds_importers.importers import vanguard
     vanguard.Importer(
         {
             "account_number": "444555",
-            "main_account": "Assets:Vanguard:401k:{ticker}",
+            "main_account": "Assets:Vanguard:401k:{source401k}:{ticker}",
             "cash_account": "Assets:Vanguard:401k:Cash",
-            "dividends": "Income:Dividends:Vanguard:401k:{ticker}",
-            "interest": "Income:Interest:Vanguard:401k:{ticker}",
-            "cg": "Income:CapitalGains:401k:{ticker}",
-            "capgainsd_lt": "Income:CapitalGains:Long:Vanguard:401k:{ticker}",
-            "capgainsd_st": "Income:CapitalGains:Short:Vanguard:401k:{ticker}",
+            "dividends": "Income:Dividends:Vanguard:401k:{source401k}:{ticker}",
+            "interest": "Income:Interest:Vanguard:401k:{source401k}:{ticker}",
+            "cg": "Income:CapitalGains:401k:{source401k}:{ticker}",
+            "capgainsd_lt": "Income:CapitalGains:Long:Vanguard:401k:{source401k}:{ticker}",
+            "capgainsd_st": "Income:CapitalGains:Short:Vanguard:401k:{source401k}:{ticker}",
             "fees": "Expenses:Fees:Vanguard:401k",
             "rounding_error": "Equity:Rounding-Errors:Imports",
             "fund_info": {
@@ -27,5 +27,5 @@ from beancount_reds_importers.importers import vanguard
     )
 )
 @regtest.with_testdir(path.dirname(__file__))
-class TestVanguard(regtest.ImporterTestBase):
+class TestVanguard401k(regtest.ImporterTestBase):
     pass
