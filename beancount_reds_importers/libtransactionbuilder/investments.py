@@ -22,7 +22,7 @@ def format_raw_account(raw_acct, ot, ticker):
     Fills variables like {ticker}.  ot may be None if it is not available.
     """
     kwargs = {'ticker': ticker, 'source401k': ''}
-    if ot is not None and hasattr(ot, 'inv401ksource'):
+    if hasattr(ot, 'inv401ksource'):
         kwargs['source401k'] = ot.inv401ksource.title()
     acct = raw_acct.format(**kwargs)
     # Empty sub-accounts happen if 'source401k' is
@@ -35,23 +35,23 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
         """Initializes the importer.
 
         REQUIRED_CONFIG = {
-            'account_number'   : 'account number',
-            'main_account'     : 'Destination account of import',
-            'cash_account'     : 'Cash account (usually same as the main account + a :{currency} appended)',
-            'transfer'         : 'Account to which contributions and outgoing is transferred',
-            #                     transfer account is optional. If left off no target posting will be created.
-            #                     This allows for additional tools to handle this like smart importer.
-            'dividends'        : 'Account to book dividends',
-            'cg'               : 'Account to book capital gains/losses',
-            'capgainsd_lt'     : 'Account to book long term capital gains distributions to'
-            'capgainsd_st'     : 'Account to book short term capital gains distributions to'
-            'fees'             : 'Account to book fees to',
-            'rounding_error'   : 'Account to book rounding errors to',
-            'fund_info '       : 'dictionary of fund info (by_id, money_market)',
+            'account_number': 'account number',
+            'main_account'  : 'Destination account of import',
+            'cash_account'  : 'Cash account (usually same as the main account + a :{currency} appended)',
+            'transfer'      : 'Account to which contributions and outgoing is transferred',
+                               # transfer account is optional. If left off no target posting will be created.
+                               # This allows for additional tools to handle this like smart importer.
+            'dividends'     : 'Account to book dividends',
+            'cg'            : 'Account to book capital gains/losses',
+            'capgainsd_lt'  : 'Account to book long term capital gains distributions to'
+            'capgainsd_st'  : 'Account to book short term capital gains distributions to'
+            'fees'          : 'Account to book fees to',
+            'rounding_error': 'Account to book rounding errors to',
+            'fund_info '    : 'dictionary of fund info (by_id, money_market)',
         }
 
-        In the config processing sets several variables that are used to format
-        the account strings given in this config. The variables are:
+        Certian variables in the config are resolved by this transaction builder.
+        Those variables are:
 
           {ticker}: replaced with the ticker symbol. Use this to obtain account
             names that end with the commodity (commodity leaf accounts).
@@ -76,7 +76,7 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
             'capgainsd_st'   : 'Income:Capital-Gains-Distributions:Short:XTrade:{ticker}',
             'fees'           : 'Expenses:Brokerage-Fees:XTrade',
             'rounding_error' : 'Equity:Rounding-Errors:Imports',
-            'fund_info'       : fund_info,
+            'fund_info'      : fund_info,
         }
 
         For a 401(k) account you could set:
