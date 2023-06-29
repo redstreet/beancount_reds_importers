@@ -19,9 +19,7 @@ class Importer(investments.Importer, ofxreader.Importer):
         self.max_rounding_error = 0.11
         self.filename_pattern_def = '.*OfxDownload'
         self.get_ticker_info = self.get_ticker_info_from_id
-
-        # For users to comment out in their local file if they so prefer
-        # self.get_payee = self._get_payee
+        self.get_payee = self.cleanup_memo
 
         # See https://github.com/redstreet/beancount_reds_importers/issues/15: occasionally, Vanguard qfx
         # files contain a transaction with untiprice set to zero. Probably an internal bug at their end. We
@@ -42,8 +40,19 @@ class Importer(investments.Importer, ofxreader.Importer):
             return self.config['capgainsd_st']
         return None
 
-    def _get_payee(self, ot):
-        parts = [ot.type]
-        if ot.memo not in self.SKIP_MEMOS:
-            parts.append(ot.memo)
-        return ' - '.join(parts)
+    def cleanup_memo(self, ot):
+        # some vanguard files have memos repeated like this:
+        # 'DIVIDEND REINVESTMENTDIVIDEND REINVESTMENT'
+        retval = ot.memo
+        if ot.memo[:int(len(ot.memo)/2)] == ot.memo[int(len(ot.memo)/2):]:
+            retval = ot.memo[:int(len(ot.memo)/2)]
+        return retval
+
+        # For users to comment out in their local file if they so prefer
+        # parts = [ot.type]
+        # if ot.memo not in self.SKIP_MEMOS:
+        #     parts.append(ot.memo)
+        # return ' - '.join(parts)
+
+    def skip_transaction(self, ot):
+        return ot.memo.startswith("JOURNAL SEC BETWEEN ACCT")
