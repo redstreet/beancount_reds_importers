@@ -359,7 +359,12 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
             data.create_simple_posting(entry, config['cash_account'], ot.total, self.currency)
             data.create_simple_posting(entry, target_acct, -1 * ot.total, self.currency)
         else:
-            data.create_simple_posting(entry, main_acct, units, ticker)
+            if getattr(ot, "unit_price"):
+                common.create_simple_posting_with_price(
+                    entry, main_acct, units, ticker, ot.unit_price, self.currency
+                )
+            else:
+                data.create_simple_posting(entry, main_acct, units, ticker)
             if target_acct:
                 data.create_simple_posting(entry, target_acct, -1 * units, ticker)
         return entry

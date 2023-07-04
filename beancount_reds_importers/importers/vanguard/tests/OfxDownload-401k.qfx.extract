@@ -10,13 +10,13 @@
   Equity:Rounding-Errors:Imports       -0.0037647 USD
 
 2023-01-20 * "Price as of date based on closing price" "[V7743] Vanguard Target Retirement 2050 Trust"
-  Assets:Vanguard:401k:Aftertax:V7743  -5.58049 V7743
+  Assets:Vanguard:401k:Aftertax:V7743  -5.58049 V7743 @ 115.03 USD
 
 2023-01-20 * "Price as of date based on closing price" "[V7743] Vanguard Target Retirement 2050 Trust"
-  Assets:Vanguard:401k:Aftertax:V7743  5.58049 V7743
+  Assets:Vanguard:401k:Aftertax:V7743  5.58049 V7743 @ 115.03 USD
 
 2023-03-07 * "Investment Expense" "[V7743] Vanguard Target Retirement 2050 Trust"
-  Assets:Vanguard:401k:Pretax:V7743  -0.000349 V7743
+  Assets:Vanguard:401k:Pretax:V7743  -0.000349 V7743 @ 113.86 USD
 
 2023-03-08 balance Assets:Vanguard:401k:V7743                      113.718 V7743
 
