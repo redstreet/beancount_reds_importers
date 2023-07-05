@@ -1,0 +1,25 @@
+2023-05-02 * "NETS Debit-Consumer xxxxxxYYYY"
+  Assets:Banks:UOB:UNIPLUS  -27.9 SGD
+
+2023-05-08 * "Cash Withdrawal-ATM NFC Mobile WDL"
+  Assets:Banks:UOB:UNIPLUS  -60.0 SGD
+
+2023-05-31 * "Interest Credit"
+  Assets:Banks:UOB:UNIPLUS  0.13 SGD
+
+2023-06-05 * "Cheque Deposit"
+  Assets:Banks:UOB:UNIPLUS  545.05 SGD
+
+2023-06-05 * "Cash Withdrawal-ATM NFC Mobile WDL"
+  Assets:Banks:UOB:UNIPLUS  -80.0 SGD
+
+2023-06-14 * "Cash Withdrawal-ATM NFC Mobile WDL"
+  Assets:Banks:UOB:UNIPLUS  -300.0 SGD
+
+2023-06-16 * "Cash Withdrawal-ATM NFC Mobile WDL"
+  Assets:Banks:UOB:UNIPLUS  -800.0 SGD
+
+2023-06-30 * "Interest Credit"
+  Assets:Banks:UOB:UNIPLUS  0.12 SGD
+
+2023-07-01 balance Assets:Banks:UOB:UNIPLUS                        0.0 SGD
