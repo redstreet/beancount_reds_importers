@@ -4,6 +4,7 @@ beancount_reds_importers."""
 import petl as etl
 import re
 from beancount_reds_importers.libreader import csvreader
+from os import devnull
 
 
 class Importer(csvreader.Importer):
@@ -31,4 +32,5 @@ class Importer(csvreader.Importer):
                 self.reader_ready = True
 
     def read_raw(self, file):
-        return etl.fromxls(file.name)
+        # set logfile to ignore WARNING *** file size (92598) not 512 + multiple of sector size (512)
+        return etl.fromxls(file.name, logfile=open(devnull, 'w'))
