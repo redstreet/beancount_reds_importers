@@ -30,7 +30,7 @@ class Reader():
     def file_name(self, file):
         return '{}'.format(ntpath.basename(file.name))
 
-    def file_account(self, _):
+    def file_account(self, file):
         # Ugly hack to handle an interaction with smart_importer. See:
         # https://github.com/redstreet/beancount_reds_importers/issues/41
         # https://github.com/beancount/smart_importer/issues/122
@@ -43,6 +43,7 @@ class Reader():
                 return self.config['smart_importer_hack']
 
         # Otherwise handle a typical bean-file call
+        self.initialize(file)
         if 'filing_account' in self.config:
             return self.config['filing_account']
         return self.config['main_account']

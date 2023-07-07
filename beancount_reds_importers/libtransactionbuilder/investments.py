@@ -11,25 +11,6 @@ from beancount.core.position import CostSpec
 from beancount_reds_importers.libtransactionbuilder import common, transactionbuilder
 
 
-def remove_empty_subaccounts(acct):
-    """Translates 'Assets:Foo::Bar' to 'Assets:Foo:Bar'."""
-    return ':'.join(x for x in acct.split(':') if x)
-
-
-def format_raw_account(raw_acct, ot, ticker):
-    """Format raw_acct with the account name variables described in Importer.
-
-    Fills variables like {ticker}.  ot may be None if it is not available.
-    """
-    kwargs = {'ticker': ticker, 'source401k': ''}
-    if hasattr(ot, 'inv401ksource'):
-        kwargs['source401k'] = ot.inv401ksource.title()
-    acct = raw_acct.format(**kwargs)
-    # Empty sub-accounts happen if 'source401k' is
-    # in the templated string but isn't known during formatting.
-    return remove_empty_subaccounts(acct)
-
-
 class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder):
     def __init__(self, config):
         """Initializes the importer.
@@ -83,6 +64,7 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
 
             'main_account'   : 'Assets:Vanguard:401k:{source401k}:{ticker}',
         """
+
         self.config = config
         self.initialized = False
         self.reader_ready = False
@@ -99,23 +81,12 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
         self.custom_init()
         self.initialize_reader(file)
         if self.reader_ready:
-
-            # TODO: get self.currency to be defined by the reader (ofx, csv, etc.), overridable by config
-            d = {
-                'currency': self.currency,
-                # Leave the other values as-is:
-                'ticker': '{ticker}',
-                'source401k': '{source401k}',
-            }
-            self.config = {k: v.format(**d) if isinstance(v, str) else v for k, v in self.config.items()}
-
-            # Prevent the replacement fields from appearing in the output of
-            # the file_account method
-            if 'filing_account' not in self.config:
-                kwargs = dict((f, '') for f in ['currency', 'ticker', 'source401k'])
-                acct = self.config['main_account'].format(**kwargs)
-                self.config['filing_account'] = remove_empty_subaccounts(acct)
-
+            config_subst_vars = {'currency': self.currency,
+                                 # Leave the other values as is
+                                 'ticker': '{ticker}',
+                                 'source401k': '{source401k}',
+                                 }
+            self.set_config_variables(config_subst_vars)
             self.money_market_funds = self.config['fund_info']['money_market']
             self.fund_data = self.config['fund_info']['fund_data']  # [(ticker, id, long_name), ...]
             self.funds_by_id = {i: (ticker, desc) for ticker, i, desc in self.fund_data}
@@ -228,13 +199,26 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
                 tickers.add(ot.security)
         return tickers
 
+    def format_raw_account(self, raw_acct, ot, ticker):
+        """Format raw_acct with the account name variables described in Importer.
+
+        Fills variables like {ticker}.  ot may be None if it is not available.
+        """
+        kwargs = {'ticker': ticker, 'source401k': ''}
+        if hasattr(ot, 'inv401ksource'):
+            kwargs['source401k'] = ot.inv401ksource.title()
+        acct = raw_acct.format(**kwargs)
+        # Empty sub-accounts happen if 'source401k' is
+        # in the templated string but isn't known during formatting.
+        return self.remove_empty_subaccounts(acct)
+
     def format_account(self, config_var, ot, ticker):
         """ot may be None if not available."""
         template = self.config.get(config_var)
         if not template:
             raise KeyError(f'Config variable {config_var} not set in '
                            f'importer configuration. Config: {self.config}')
-        return format_raw_account(template, ot, ticker)
+        return self.format_raw_account(template, ot, ticker)
 
     # extract() and supporting methods
     # --------------------------------------------------------------------------------
@@ -267,7 +251,7 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
             ticker_val = ticker
         else:
             ticker_val = self.currency
-        target_acct = format_raw_account(raw_target_acct, ot, ticker_val)
+        target_acct = self.format_raw_account(raw_target_acct, ot, ticker_val)
 
         # Build transaction entry
         entry = data.Transaction(metadata, ot.tradeDate.date(), self.FLAG,
@@ -352,7 +336,7 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
                                  self.get_tags(ot), data.EMPTY_SET, [])
         target_acct = self.get_target_acct(ot, ticker)
         if target_acct:
-            target_acct = format_raw_account(target_acct, ot, ticker)
+            target_acct = self.format_raw_account(target_acct, ot, ticker)
 
         # Build postings
         if ot.type in ['income', 'dividends', 'capgainsd_st', 'capgainsd_lt']:  # cash
