@@ -80,6 +80,7 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
 
         self.custom_init()
         self.initialize_reader(file)
+
         if self.reader_ready:
             config_subst_vars = {'currency': self.currency,
                                  # Leave the other values as is
@@ -94,7 +95,7 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
 
             # Most ofx/csv files refer to funds by id (cusip/isin etc.) Some use tickers instead
             self.funds_db = getattr(self, getattr(self, 'funds_db_txt', 'funds_by_id'))
-            self.build_account_map()  # TODO: avoid for identify()
+            self.build_account_map()
 
         self.initialized = True
 
@@ -199,26 +200,22 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
                 tickers.add(ot.security)
         return tickers
 
-    def format_raw_account(self, raw_acct, ot, ticker):
-        """Format raw_acct with the account name variables described in Importer.
-
-        Fills variables like {ticker}.  ot may be None if it is not available.
+    def subst_acct_vars(self, raw_acct, ot, ticker):
+        """Resolve variables within an account like {ticker}.
         """
-        kwargs = {'ticker': ticker, 'source401k': ''}
-        if hasattr(ot, 'inv401ksource'):
-            kwargs['source401k'] = ot.inv401ksource.title()
+        ot = ot if ot else {}
+        # inv401ksource is an ofx field that is 'PRETAX', 'AFTERTAX', etc.
+        kwargs = {'ticker': ticker, 'source401k': getattr(ot, 'inv401ksource', '').title()}
         acct = raw_acct.format(**kwargs)
-        # Empty sub-accounts happen if 'source401k' is
-        # in the templated string but isn't known during formatting.
-        return self.remove_empty_subaccounts(acct)
+        return self.remove_empty_subaccounts(acct)  # if 'inv401ksource' was unavailable
 
-    def format_account(self, config_var, ot, ticker):
-        """ot may be None if not available."""
-        template = self.config.get(config_var)
+    def get_acct(self, acct, ot, ticker):
+        """Get an account from self.config, resolve variables, and return
+        """
+        template = self.config.get(acct)
         if not template:
-            raise KeyError(f'Config variable {config_var} not set in '
-                           f'importer configuration. Config: {self.config}')
-        return self.format_raw_account(template, ot, ticker)
+            raise KeyError(f'{acct} not set in importer configuration. Config: {self.config}')
+        return self.subst_acct_vars(template, ot, ticker)
 
     # extract() and supporting methods
     # --------------------------------------------------------------------------------
@@ -251,7 +248,7 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
             ticker_val = ticker
         else:
             ticker_val = self.currency
-        target_acct = self.format_raw_account(raw_target_acct, ot, ticker_val)
+        target_acct = self.subst_acct_vars(raw_target_acct, ot, ticker_val)
 
         # Build transaction entry
         entry = data.Transaction(metadata, ot.tradeDate.date(), self.FLAG,
@@ -259,7 +256,7 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
                                  self.get_tags(ot), data.EMPTY_SET, [])
 
         # Main posting(s):
-        main_acct = self.format_account('main_account', ot, ticker)
+        main_acct = self.get_acct('main_account', ot, ticker)
 
         if is_money_market:  # Use price conversions instead of holding these at cost
             common.create_simple_posting_with_price(entry, main_acct,
@@ -269,7 +266,7 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
                                                             units, ticker, price_number=ot.unit_price,
                                                             price_currency=self.currency,
                                                             costspec=CostSpec(None, None, None, None, None, None))
-            cg_acct = self.format_account('cg', ot, ticker)
+            cg_acct = self.get_acct('cg', ot, ticker)
             data.create_simple_posting(entry, cg_acct, None, None)
         else:  # buy stock/fund
             unit_price = getattr(ot, 'unit_price', 0)
@@ -324,7 +321,7 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
                        'capgainsd_st', 'transfer'] and (hasattr(ot, 'security') and ot.security):
             ticker, ticker_long_name = self.get_ticker_info(ot.security)
             narration = self.security_narration(ot)
-            main_acct = self.format_account('main_account', ot, ticker)
+            main_acct = self.get_acct('main_account', ot, ticker)
         else:  # cash transaction
             narration = ot.type
             ticker = self.currency
@@ -336,7 +333,7 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
                                  self.get_tags(ot), data.EMPTY_SET, [])
         target_acct = self.get_target_acct(ot, ticker)
         if target_acct:
-            target_acct = self.format_raw_account(target_acct, ot, ticker)
+            target_acct = self.subst_acct_vars(target_acct, ot, ticker)
 
         # Build postings
         if ot.type in ['income', 'dividends', 'capgainsd_st', 'capgainsd_lt']:  # cash
@@ -399,7 +396,7 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
             # if there are no transactions, use the date in the source file for the balance. This gives us the
             # bonus of an updated, recent balance assertion
             bal_date = date if date else pos.date.date()
-            main_acct = self.format_account('main_account', None, ticker)
+            main_acct = self.get_acct('main_account', None, ticker)
             balance_entry = data.Balance(metadata, bal_date, main_acct,
                                          amount.Amount(pos.units, ticker),
                                          None, None)
