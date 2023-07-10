@@ -104,7 +104,13 @@ def download(config_file, sites, site_types, dry_run, verbose):  # noqa: C901
     async def download_site(i, site):
         tid = f'[{i+1}/{numsites} {site}]'
         pverbose(f'{tid}: Begin')
-        options = config[site]
+        try:
+            options = config[site]
+        except KeyError:
+            errors.append(site)
+            displays.append([site, f"Couldn't find {site} in {config_file}"])
+            return
+
         # We support cmd and display, and type to filter
         if 'display' in options:
             displays.append([site, f"{options['display']}"])
