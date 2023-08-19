@@ -6,7 +6,7 @@ from beancount_reds_importers.libtransactionbuilder import investments
 
 
 class Importer(investments.Importer, tsvreader.Importer):
-    IMPORTER_NAME = 'Vanguard screensrape tsv'
+    IMPORTER_NAME = 'Vanguard screenscrape tsv'
 
     def custom_init(self):
         self.max_rounding_error = 0.04
