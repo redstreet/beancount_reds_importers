@@ -108,6 +108,7 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
             "sellstock":    self.config['cash_account'],
             "buyother":     self.config['cash_account'],
             "sellother":    self.config['cash_account'],
+            "buydebt":      self.config['cash_account'],
             "reinvest":     self.config['dividends'],
             "dividends":    self.config['dividends'],
             "capgainsd_lt": self.config['capgainsd_lt'],
@@ -366,7 +367,7 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
         for ot in self.get_transactions():
             if self.skip_transaction(ot):
                 continue
-            if ot.type in ['buymf', 'sellmf', 'buystock', 'sellstock', 'buyother', 'sellother', 'reinvest']:
+            if ot.type in ['buymf', 'sellmf', 'buystock', 'buydebt', 'sellstock', 'buyother', 'sellother', 'reinvest']:
                 entry = self.generate_trade_entry(ot, file, counter)
             elif ot.type in ['other', 'credit', 'debit', 'transfer', 'dep', 'income',
                              'dividends', 'capgainsd_st', 'capgainsd_lt', 'cash', 'payment', 'check']:
