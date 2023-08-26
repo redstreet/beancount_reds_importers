@@ -130,7 +130,8 @@ Some importers are tested with
 Run `pytest --generate` then `pytest`.
 
 Anonymized data to increase regression test coverage is most welcome. Please submit a
-PR if you can. See [here](importers/schwab/tests/schwab_csv_checking) for an example to follow.
+PR if you can. See [here](beancount_reds_importers/importers/schwab/tests/schwab_csv_checking)
+for an example to follow.
 
 
 More broadly I run tests across hundreds of actual ofx and csv files, against reference
