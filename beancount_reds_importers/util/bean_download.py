@@ -17,6 +17,9 @@ def cli():
     Multi-threaded."""
     pass
 
+# from needs_update import accounts_needing_updates
+# cli.add_command(accounts_needing_updates)
+
 
 def readConfigFile(configfile):
     config = configparser.ConfigParser()
