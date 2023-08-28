@@ -9,6 +9,7 @@ import configparser
 import os
 import tabulate
 import tqdm
+import beancount_reds_importers.util.needs_update as needs_update
 
 
 @click.group(cls=ClickAliasedGroup)
@@ -17,8 +18,8 @@ def cli():
     Multi-threaded."""
     pass
 
-# from needs_update import accounts_needing_updates
-# cli.add_command(accounts_needing_updates)
+
+cli.add_command(needs_update.accounts_needing_updates)
 
 
 def readConfigFile(configfile):
