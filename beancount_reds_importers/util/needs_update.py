@@ -24,9 +24,9 @@ def get_config(entries):
                    for entry in _extension_entries}
 
     config = {k: ast.literal_eval(v) for k, v in config_meta.items() if 'needs-updates' in k}
-    config = config['needs-updates']
+    config = config.get('needs-updates', {})
     included_account_pats = config.get('included_account_pats', ['^Assets:', '^Liabilities:'])
-    excluded_account_pats = config.get('excluded_account_pats', [])
+    excluded_account_pats = config.get('excluded_account_pats', ['$-^'])  # exclude nothing by default
     excluded_re = re.compile('|'.join(excluded_account_pats))
     included_re = re.compile('|'.join(included_account_pats))
 
@@ -115,6 +115,23 @@ def accounts_needing_updates(beancount_file, recency, sort_by_date):
 
     The BEANCOUNT_FILE environment variable can optionally be set instead of specifying the file on
     the command line.
+
+    The (optional) configuration for this utility is to be supplied as a custom directive like the 
+    following example in your beancount file:
+ 
+    \b
+     2010-01-01 custom "reds-importers" "needs-updates" "{
+       'included_account_pats' : ['^Assets:Banks', '^Assets:Investments', '^Liabilities:Credit-Cards'],
+       'excluded_account_pats' : ['.*Inactive', '.*Closed']
+     }}"
+
+    Default values for the configuration are:
+
+    \b
+     2010-01-01 custom "reds-importers" "needs-updates" "{
+       'included_account_pats' : ['^Assets:', '^Liabilities:'],
+       'excluded_account_pats' : []
+     }}"
     """
 
     entries, _, _ = loader.load_file(beancount_file)
