@@ -1,5 +1,163 @@
 # Changelog
 
+## 0.7.0 (2023-08-28)
+
+### New Features
+
+- bean-download needs-update to determine accounts needing an update based on the latest
+  balance assertion in the journal. [Red S]
+
+### New Importers
+
+- Fidelity cma csv importer (#47) [kantskernel]
+  * adding support for importering Fidelity Cash Management Acct (checking). CSV.
+  * cleaned up importer and merged required csvreader change with the version from main
+
+- add Schwab CSV Positions importer. [Red S]
+
+### Breaking Changes
+- reorganized directories. Changes import lines. [Red S]
+
+  Change your import lines from:
+
+  1. For most importers
+  from beancount_reds_importers import fidelity
+  to:
+  from beancount_reds_importers.importers import fidelity
+
+  2. For institutions with alternative importers:
+  from beancount_reds_importers.importers.schwab import schwab_csv_balances, schwab_csv_brokerage
+
+  BREAKING CHANGE: users will need to change import lines
+
+### Improvements
+
+- Improve Vanguard support. [Matt Brown]
+
+  Remove noisy Vanguard memos. Show Vanguard transaction type as payee.
+- Add 401k support to investments. [Matt Brown]
+
+  Support 401(k) source sub-accounts in account config values.
+
+  Add some human-readable error handling if a config variable is missing.
+- add get_tags to transactionbuilders (#68) [Sarah E Busch]
+
+  * feat: add get_tags to banking.py
+
+  * feat: add get_tags to investments.py
+
+  * feat: add get_tags to paycheck.py
+- schwab_csv_brokerage: more descriptive payee/memo. [Red S]
+- tests: tests for schwab_csv_brokerage #59. [Red S]
+
+  With these tests, #59 is reproduced. Fix pending.
+- overridable target account in banking importer. [Red S]
+- get_available_cash now takes as input settlement_fund_balance. [Red S]
+
+  different institutions seem to compute this in different ways.
+  overridable method now includes settlement_fund_balance for use if
+  needed in importers
+- use filing_account to file. [Red S]
+- overridable main_account in banking. [Red S]
+- overridable currency and date fields in csvreader. [Red S]
+- remove double quotes from column headers. [Red S]
+- SCB/UOB: add 'convert_currencies' as an option; fix conversions. [Red S]
+- check for account number in csv files. [Red S]
+
+  added untested, commented out code for xls
+- perform table extraction in csvreader; scbbank now uses it. [Red S]
+
+  Start at a given header, and extract a table until either the end of the
+  file or until a blank line occurs.
+
+  Useful high level extractor.
+- scb/uob: enable custom header; xls/xlsx: respect header. [Red S]
+- relax header finding condition in csv. [Red S]
+- united overseas bank (uob) importers: card, srs. [Red S]
+- standard chartered importers (bank, card) [Red S]
+- united overseas bank csv importer. [Red S]
+- xls reader (previous one was xlsx reader) [Red S]
+- enable price conversions in banking transaction builder. See #38. [Red S]
+- default currency to CURRENCY_NOT_CONFIGURED. [Red S]
+- csvreader now can search for the header. [Red S]
+
+  Eliminates the need to skip a set number of head/tail lines.
+- attempt to get currency from input file instead of config. [Red S]
+- Improve 401k and Vanguard support [Matt Brown]
+
+### Fixes
+
+- intergrate needs_update into bean-download cli. [Red S]
+- file_account was returning '{ticker}'. refactored config vars. [Red S]
+
+  TODO: refactor setting config vars better. format_raw_account() is
+  closely related.
+- uobbank importer: add unit tests, fix several issues #70. [Red S]
+
+  - decimal places
+    - still needs a full solution. The problem is, petel uses xlwt/xlrd to
+      read excel, which use excel datatypes, which we don't want, as we
+      want just the string, which we can then pass on to decimal.decimal
+    - not sure exactly how decimals are stored in excel
+
+  - don't end up with long floats
+- ignore xls spurious warning #70. [Red S]
+
+  - ignore WARNING *** file size (92598) not 512 + multiple of sector size (512)
+- vanguard importer: clean up repeated memo. [Red S]
+- filter out XMLParsedAsHTMLWarning from ofxparse. #40. [Red S]
+
+  https://github.com/jseutter/ofxparse/issues/170
+  https://github.com/jseutter/ofxparse/pull/108
+- schwab_csv_checking: add tests, and fixes #63. [Red S]
+
+  - fixed skipping "pending transactions" rows
+  - move Balance namedtuple from importers to banking.py
+- #52 unit price immutable. [Red S]
+- schwab_csv_brokerage transfers #59. [Red S]
+- counter -> next(counter) #62. [Red S]
+- add 'Qualified Dividend' type to Schwab CSV Brokerage #60. [Red S]
+- allow file_date() to be called without initialization #61. [Red S]
+- minor fixes to schwab_csv_brokerage. [Red S]
+- unitedoverseas xls doesn't convert amounts in strings. [Red S]
+- remove special chars from column names. [Red S]
+- ugly hack to handle #41 until that is resolved upstream. [Red S]
+- banking: don't call self.build_metadata unless there is metadata. [Red S]
+- scbcard: ignore unposted. [Red S]
+- securities not found handling IndexError exception not caught. [Red S]
+- Merge pull request #77 from mariolopjr/main. [Red S]
+
+  Add buydebt which corresponds to CD for Fidelity
+- add buydebt which corresponds to CD for fidelity. [Mario Lopez]
+
+- #48 clean up get_balance_positions() [Red S]
+- default currency to CURRENCY_NOT_CONFIGURED. [Red S]
+- uobbank withdrawal/deposit. [Red S]
+- typo in vanguard_screenscrape.py. [Wiebe Stolp]
+
+### Other
+
+- bean_download: catch config not in file gracefully. [Red S]
+- style: Short-circuit in investments initialize to reduce indentation. [Matt Brown]
+- test: Add Vanguard 401(k) test (#65) [Matt Brown]
+- Add test for capitalonebank, which also demonstrates #57 (#58) [Matt Brown]
+- Importer.extract: Explicitly name args to Transaction (#55) [Matt Brown]
+
+  This shows that payee and narration are switched, as documented.
+  https://github.com/beancount/beancount/blob/v2/beancount/core/data.py is
+  the reference. This confused my use of smart_importer completion from an
+  existing ledger and took me some time to figure out.
+
+  I think the arguments should be swithed but I can see this would be
+  difficult to do while maintaining backwards compatibility.
+- Add a simple regression test for the ally importer. (#56) [Matt Brown]
+
+  This uses a copy of transactions.qfx from example/.
+- chore: directory structure. [Red S]
+
+  ---------
+
+
 ## 0.6.0 (2023-01-22)
 
 ### New Importers
