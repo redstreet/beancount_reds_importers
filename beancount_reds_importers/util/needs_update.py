@@ -14,7 +14,7 @@ import ast
 tbl_options = {'tablefmt': 'simple'}
 
 
-def get_config(entries):
+def get_config(entries, args):
     """Get beancount config for the given plugin that can then be used on the command line"""
     global excluded_re, included_re
     _extension_entries = [e for e in entries
@@ -25,6 +25,9 @@ def get_config(entries):
 
     config = {k: ast.literal_eval(v) for k, v in config_meta.items() if 'needs-updates' in k}
     config = config.get('needs-updates', {})
+    if args['all_accounts']:
+        config['included_account_pats'] = []
+        config['excluded_account_pats'] = ['$-^']
     included_account_pats = config.get('included_account_pats', ['^Assets:', '^Liabilities:'])
     excluded_account_pats = config.get('excluded_account_pats', ['$-^'])  # exclude nothing by default
     excluded_re = re.compile('|'.join(excluded_account_pats))
@@ -95,7 +98,8 @@ def pretty_print_table(not_updated_accounts, sort_by_date):
 @click.argument('beancount-file', type=click.Path(exists=True), envvar='BEANCOUNT_FILE')
 @click.option('--recency', help='How many days back to look for balance assertions', default=15)
 @click.option('--sort-by-date', help='Sort output by date (instead of account name)', is_flag=True)
-def accounts_needing_updates(beancount_file, recency, sort_by_date):
+@click.option('--all-accounts', help='Show all account (ignore include/exclude in config)', is_flag=True)
+def accounts_needing_updates(beancount_file, recency, sort_by_date, all_accounts):
     """
     Show a list of accounts needing updates, and the date of the last update (which is defined as
     the date of the last balance assertion on the account).
@@ -135,7 +139,7 @@ def accounts_needing_updates(beancount_file, recency, sort_by_date):
     """
 
     entries, _, _ = loader.load_file(beancount_file)
-    get_config(entries)
+    get_config(entries, locals())
     closes = [a.account for a in entries if isinstance(a, Close)]
     balance_entries = [a for a in entries if isinstance(a, Balance) and
                        is_interesting_account(a.account, closes)]
