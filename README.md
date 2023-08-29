@@ -56,11 +56,14 @@ These commands are installed as a part of the pip installation:
 - `ofx-summarize`: Quick and dirty way to summarize a .ofx file, and peek inside it
 - `bean-download`: [Download account statements automatically](https://reds-rants.netlify.app/personal-finance/direct-downloads/)
   (for supporting institutions), from your configuration of accounts. Multi-threaded.
+  - `bean-download needs-update` is a configurable utility that shows you the last time
+    each account was updated, based on the latest balance assertion in your journal.
 
 The commands include shell auto-completion (tab-to-complete) via
 [click](https://click.palletsprojects.com/en/8.1.x/shell-completion/). `bean-download`, in
 particular, can complete the account or account groups you want to download, which can
-be handy. To enable it, do:
+be handy. To enable it in zsh, do
+([see here for other shells](https://click.palletsprojects.com/en/8.1.x/shell-completion/)):
 
 ```
 mkdir -p ~/.zcomplete

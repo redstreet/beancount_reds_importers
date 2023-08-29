@@ -116,9 +116,9 @@ def accounts_needing_updates(beancount_file, recency, sort_by_date):
     The BEANCOUNT_FILE environment variable can optionally be set instead of specifying the file on
     the command line.
 
-    The (optional) configuration for this utility is to be supplied as a custom directive like the 
+    The (optional) configuration for this utility is to be supplied as a custom directive like the
     following example in your beancount file:
- 
+
     \b
      2010-01-01 custom "reds-importers" "needs-updates" "{
        'included_account_pats' : ['^Assets:Banks', '^Assets:Investments', '^Liabilities:Credit-Cards'],
