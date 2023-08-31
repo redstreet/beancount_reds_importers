@@ -57,7 +57,9 @@ These commands are installed as a part of the pip installation:
 - `bean-download`: [Download account statements automatically](https://reds-rants.netlify.app/personal-finance/direct-downloads/)
   (for supporting institutions), from your configuration of accounts. Multi-threaded.
   - `bean-download needs-update` is a configurable utility that shows you the last time
-    each account was updated, based on the latest balance assertion in your journal.
+    each account was updated, based on the latest balance assertion in your journal. See
+    [this article](https://reds-rants.netlify.app/personal-finance/how-up-to-date-are-my-accounts/)
+    for more.
 
 The commands include shell auto-completion (tab-to-complete) via
 [click](https://click.palletsprojects.com/en/8.1.x/shell-completion/). `bean-download`, in
