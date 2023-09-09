@@ -207,6 +207,13 @@ class Importer(reader.Reader, importer.ImporterProtocol):
     def skip_transaction(self, row):
         return getattr(row, 'type', 'NO_TYPE') in self.skip_transaction_types
 
+    def get_balance_assertion_date(self):
+        """
+        We add an additional day to get_max_transaction_date(), since Beancount balance
+        assertions are defined to occur on the beginning of the assertion date.
+        """
+        return self.get_max_transaction_date() + datetime.timedelta(days=1)
+
     def get_max_transaction_date(self):
         try:
             # date = self.ofx_account.statement.end_date.date() # this is the date of ofx download

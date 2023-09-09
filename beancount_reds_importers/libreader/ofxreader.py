@@ -58,9 +58,8 @@ class Importer(reader.Reader, importer.ImporterProtocol):
     def get_balance_statement(self, file=None):
         if not hasattr(self.ofx_account.statement, 'balance'):
             return []
-        date = self.get_max_transaction_date()
+        date = self.get_balance_assertion_date()
         if date:
-            date += datetime.timedelta(days=1)  # See comment in get_max_transaction_date() for explanation
             Balance = namedtuple('Balance', ['date', 'amount'])
             yield Balance(date, self.ofx_account.statement.balance)
 
@@ -77,13 +76,41 @@ class Importer(reader.Reader, importer.ImporterProtocol):
             return available_cash - settlement_fund_balance
         return None
 
+    def get_balance_assertion_date(self):
+        """ We find the statement's end date from the OFX file. However, banks and credit cards
+        typically have pending transactions that are not included in downloads. When we download
+        the next statement, new transactions may appear prior to the balance assertion date that we
+        generate for this statement. To attempt to avoid this, we set the balance assertion date to
+        either two days before the statement's end date or the last transaction's date, whichever
+        is later.
+
+        Finally, we add an additional day, since Beancount balance assertions are defined to occur
+        on the beginning of the assertion date.
+        """
+
+        end_date = self.ofx_account.statement.end_date
+        # convert end_date from utc to local timezone
+        end_date = end_date.replace(tzinfo=datetime.timezone.utc).astimezone().date()
+        end_date -= datetime.timedelta(days=getattr(self, 'balance_assertion_date_fudge', 2))
+
+        max_transaction_date = self.get_max_transaction_date()
+        max_transaction_date = max_transaction_date if max_transaction_date else datetime.date.min
+        return_date = max(end_date, max_transaction_date)
+
+        # As defined by Beancount
+        return_date += datetime.timedelta(days=1)
+        return return_date
+
     def get_max_transaction_date(self):
+        """
+        Here, we find the last transaction's date. If we use the ofx download date (if our source is ofx), we
+        could end up with a gap in time between the last transaction's date and balance assertion.
+        Pending (but not yet downloaded) transactions in this gap will get downloaded the next time we
+        do a download in the future, and cause the balance assertions to be invalid. This is
+        a problem particularly with credit card accounts and bank accounts.
+
+        """
         try:
-            # date = self.ofx_account.statement.end_date.date() # this is the date of ofx download
-            # we find the last transaction's date. If we use the ofx download date (if our source is ofx), we
-            # could end up with a gap in time between the last transaction's date and balance assertion.
-            # Pending (but not yet downloaded) transactions in this gap will get downloaded the next time we
-            # do a download in the future, and cause the balance assertions to be invalid.
 
             date = max(ot.tradeDate if hasattr(ot, 'tradeDate') else ot.date
                        for ot in self.get_transactions()).date()

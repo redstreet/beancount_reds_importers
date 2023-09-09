@@ -1,7 +1,6 @@
 """Generic investment importer module for beancount. Needs a reader module (eg: ofx, csv, etc.) from
 beancount_reads_importers to work."""
 
-import datetime
 import itertools
 import sys
 from beancount.core import data
@@ -381,12 +380,7 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
 
     def extract_balances_and_prices(self, file, counter):
         new_entries = []
-        date = self.get_max_transaction_date()
-        if date:
-            # balance assertions are evaluated at the beginning of the date, so move it to the following day
-            date += datetime.timedelta(days=1)
-        else:
-            print("Warning: no transactions, using statement date for balance assertions.")
+        date = self.get_balance_assertion_date()
 
         settlement_fund_balance = 0
         for pos in self.get_balance_positions():
