@@ -121,7 +121,26 @@ pip3 install git+https://github.com/redstreet/beancount_reds_importers
    [this article](https://reds-rants.netlify.app/personal-finance/tickers-and-identifiers/)
    for automating and managing identifier info
 
-#### Note
+### Configuring balance assertion dates
+Choices for the date of the generated balance assertion can be specified as a key in
+the importer config, `balance_assertion_date_type`, which can be set to:
+- `smart`:            smart date (default; see below)
+- `ofx_date`:         date specified in ofx file
+- `last_transaction`: max transaction date
+- `today`:            today's date
+
+If you want something else, simply override this method in individual importer
+
+`smart` dates: Banks and credit cards typically have pending transactions that are not
+included in downloads. When we download the next statement, new transactions may appear
+prior to the balance assertion date that we generate for this statement. To attempt to
+avoid this, we set the balance assertion date to either two days (fudge factor to
+account for pending transactions) before the statement's end date or the last
+transaction's date, whichever is later. To choose a different fudge factor, simply set
+`balance_assertion_date_fudge` in your config.
+
+
+### Note
 
 Depending on the institution, the `payee` and `narration` fields in generated
 transactions may appear to be switched. This is described by
