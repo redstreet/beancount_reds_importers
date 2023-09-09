@@ -37,6 +37,7 @@ def build_config():
         'capgainsd_lt'   : f'Income:{root}:{taxability}:Capital-Gains-Distributions:Long:{leaf}:{{ticker}}',
         'capgainsd_st'   : f'Income:{root}:{taxability}:Capital-Gains-Distributions:Short:{leaf}:{{ticker}}',
         'fees'           : f'Expenses:Fees-and-Charges:Brokerage-Fees:{taxability}:{leaf}',
+        'expenses'       : f'Expenses:Expenses:Investment-Expenses:{taxability}:{leaf}',
         'rounding_error' : 'Equity:Rounding-Errors:Imports',
         'fund_info'      : fund_info,
         'currency'       : currency,
