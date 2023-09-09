@@ -62,9 +62,6 @@ class Importer(banking.Importer):
     def file_date(self, input_file):
         return self.paycheck_date(input_file)
 
-    def get_max_transaction_date(self):
-        return self.date.date()
-
     def build_postings(self, entry):
         template = self.config['paycheck_template']
         currency = self.config['currency']

@@ -2,7 +2,6 @@
 
 from beancount_reds_importers.libreader import csvreader
 from beancount_reds_importers.libtransactionbuilder import banking
-import datetime
 
 
 class Importer(csvreader.Importer, banking.Importer):
@@ -50,7 +49,6 @@ class Importer(csvreader.Importer, banking.Importer):
     def get_balance_statement(self, file=None):
         """Return the balance on the first and last dates"""
 
-        max_date = self.get_max_transaction_date()
-        if max_date:
-            date = max_date + datetime.timedelta(days=1)
+        date = self.get_balance_assertion_date()
+        if date:
             yield banking.Balance(date, self.rdr.namedtuples()[0].balance, self.currency)

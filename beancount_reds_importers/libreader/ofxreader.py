@@ -76,30 +76,50 @@ class Importer(reader.Reader, importer.ImporterProtocol):
             return available_cash - settlement_fund_balance
         return None
 
-    def get_balance_assertion_date(self):
+    def get_ofx_end_date(self):
+        end_date = self.ofx_account.statement.end_date
+        # convert end_date from utc to local timezone
+        end_date = end_date.replace(tzinfo=datetime.timezone.utc).astimezone().date()
+        return end_date
+
+    def get_smart_date(self):
         """ We find the statement's end date from the OFX file. However, banks and credit cards
         typically have pending transactions that are not included in downloads. When we download
         the next statement, new transactions may appear prior to the balance assertion date that we
         generate for this statement. To attempt to avoid this, we set the balance assertion date to
         either two days before the statement's end date or the last transaction's date, whichever
         is later.
+        """
+        end_date = self.get_ofx_end_date()
+        end_date -= datetime.timedelta(days=self.config.get('balance_assertion_date_fudge', 2))
+
+        max_transaction_date = self.get_max_transaction_date()
+        max_transaction_date = max_transaction_date if max_transaction_date else datetime.date.min
+        return_date = max(end_date, max_transaction_date)
+        return return_date
+
+    def get_balance_assertion_date(self):
+        """ Choices for the date of the generated balance assertion can be specified in
+        self.config['balance_assertion_date_type'], which can be:
+        - 'smart':            smart date (default)
+        - 'ofx_date':         date specified in ofx file
+        - 'last_transaction': max transaction date
+        - 'today':            today's date
+
+        If you want something else, simply override this method in individual importer
 
         Finally, we add an additional day, since Beancount balance assertions are defined to occur
         on the beginning of the assertion date.
         """
 
-        end_date = self.ofx_account.statement.end_date
-        # convert end_date from utc to local timezone
-        end_date = end_date.replace(tzinfo=datetime.timezone.utc).astimezone().date()
-        end_date -= datetime.timedelta(days=getattr(self, 'balance_assertion_date_fudge', 2))
+        date_type_map = {'smart': self.get_smart_date,
+                         'ofx_date': self.get_ofx_end_date,
+                         'last_transaction': self.get_max_transaction_date,
+                         'today': datetime.date.today}
+        date_type = self.config.get('balance_assertion_date_type', 'smart')
+        return_date = date_type_map[date_type]()
 
-        max_transaction_date = self.get_max_transaction_date()
-        max_transaction_date = max_transaction_date if max_transaction_date else datetime.date.min
-        return_date = max(end_date, max_transaction_date)
-
-        # As defined by Beancount
-        return_date += datetime.timedelta(days=1)
-        return return_date
+        return return_date + datetime.timedelta(days=1)  # Next day, as defined by Beancount
 
     def get_max_transaction_date(self):
         """

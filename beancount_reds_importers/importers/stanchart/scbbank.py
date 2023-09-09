@@ -2,7 +2,6 @@
 
 from beancount_reds_importers.libreader import csvreader
 from beancount_reds_importers.libtransactionbuilder import banking
-import datetime
 import re
 from beancount.core.number import D
 
@@ -51,8 +50,8 @@ class Importer(csvreader.Importer, banking.Importer):
 
     def get_balance_statement(self, file=None):
         """Return the balance on the first and last dates"""
-        max_date = self.get_max_transaction_date()
-        if max_date:
+        date = self.get_balance_assertion_date
+        if date:
             rdr = self.read_raw(file)
             rdr = self.prepare_raw_file(rdr)
             col_labels = self.balance_column_labels_line.split(',')
@@ -63,8 +62,6 @@ class Importer(csvreader.Importer, banking.Importer):
 
             while '' in rdr.header():
                 rdr = rdr.cutout('')
-
-            date = max_date + datetime.timedelta(days=1)
 
             row = rdr.namedtuples()[0]
             amount = row.Current_Balance
