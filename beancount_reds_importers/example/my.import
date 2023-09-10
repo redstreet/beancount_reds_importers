@@ -28,6 +28,7 @@ CONFIG = [
         'capgainsd_lt'   : 'Income:Capital-Gains-Distributions:Long:TradIRA:{ticker}',
         'capgainsd_st'   : 'Income:Capital-Gains-Distributions:Short:TradIRA:{ticker}',
         'fees'           : 'Expenses:Brokerage-Fees:TradIRA',
+        'invexpense'     : 'Expenses:Brokerage-Expenses:TradIRA',
         'rounding_error' : 'Equity:Rounding-Errors:Imports',
         'fund_info'      : fund_info,
 
@@ -48,6 +49,7 @@ CONFIG = [
         'capgainsd_lt'   : 'Income:Capital-Gains-Distributions:Long:RothIRA:{ticker}',
         'capgainsd_st'   : 'Income:Capital-Gains-Distributions:Short:RothIRA:{ticker}',
         'fees'           : 'Expenses:Brokerage-Fees:RothIRA',
+        'invexpense'     : 'Expenses:Brokerage-Expenses:TradIRA',
         'rounding_error' : 'Equity:Rounding-Errors:Imports',
         'fund_info'       : fund_info,
     }),
@@ -63,6 +65,7 @@ CONFIG = [
         'capgainsd_lt'   : 'Income:Capital-Gains-Distributions:Long:Schwab:{ticker}',
         'capgainsd_st'   : 'Income:Capital-Gains-Distributions:Short:Schwab:{ticker}',
         'fees'           : 'Expenses:Brokerage-Fees:Schwab',
+        'invexpense'     : 'Expenses:Brokerage-Expenses:TradIRA',
         'rounding_error' : 'Equity:Rounding-Errors:Imports',
         'fund_info'       : fund_info,
     }),

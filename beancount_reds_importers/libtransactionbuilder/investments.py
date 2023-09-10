@@ -26,7 +26,7 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
             'capgainsd_lt'  : 'Account to book long term capital gains distributions to'
             'capgainsd_st'  : 'Account to book short term capital gains distributions to'
             'fees'          : 'Account to book fees to',
-            'expenses'      : 'Account to book expenses (like foreign taxes) to',
+            'invexpense'    : 'Account to book expenses (like foreign taxes) to',
             'rounding_error': 'Account to book rounding errors to',
             'fund_info '    : 'dictionary of fund info (by_id, money_market)',
         }
@@ -56,7 +56,7 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
             'capgainsd_lt'   : 'Income:Capital-Gains-Distributions:Long:XTrade:{ticker}',
             'capgainsd_st'   : 'Income:Capital-Gains-Distributions:Short:XTrade:{ticker}',
             'fees'           : 'Expenses:Brokerage-Fees:XTrade',
-            'expenses'       : 'Expenses:Investment-Expenses:XTrade',
+            'invexpense'     : 'Expenses:Investment-Expenses:XTrade',
             'rounding_error' : 'Equity:Rounding-Errors:Imports',
             'fund_info'      : fund_info,
         }
@@ -115,7 +115,7 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
             "capgainsd_lt": self.config['capgainsd_lt'],
             "capgainsd_st": self.config['capgainsd_st'],
             "income":       self.config['interest'],
-            "invexpense":   self.config['expenses'],
+            "invexpense":   self.config['invexpense'],
         }
 
         if 'transfer' in self.config:
