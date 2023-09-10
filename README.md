@@ -173,5 +173,13 @@ or on [The Five Minute Ledger Update](https://reds-rants.netlify.app/personal-fi
 site. For bugs, open an issue here on Github.
 
 ## Contributions
-Contributions welcome. New importers for institutions and test input files appreciated.
-Sharing importers helps the community.
+
+Features, fixes, and improvements welcome. New importers for institutions with test
+input files appreciated. Sharing importers helps the community! Remember:
+- Feel free to send send pull requests. Please include unit tests
+- For larger changes or changes that might need discussion, please reach out and discuss
+  first to save time (open an issue) 
+- Please squash your commits (reasonably)
+- Use [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) for commit messages
+
+Thank you for contributing!

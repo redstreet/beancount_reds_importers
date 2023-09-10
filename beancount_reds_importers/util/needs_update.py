@@ -96,7 +96,7 @@ def pretty_print_table(not_updated_accounts, sort_by_date):
 
 @click.command("needs-update", context_settings={'show_default': True})
 @click.argument('beancount-file', type=click.Path(exists=True), envvar='BEANCOUNT_FILE')
-@click.option('--recency', help='How many days back to look for balance assertions', default=15)
+@click.option('--recency', help='How many days ago should the last balance assertion be to be considered old', default=15)
 @click.option('--sort-by-date', help='Sort output by date (instead of account name)', is_flag=True)
 @click.option('--all-accounts', help='Show all account (ignore include/exclude in config)', is_flag=True)
 def accounts_needing_updates(beancount_file, recency, sort_by_date, all_accounts):
