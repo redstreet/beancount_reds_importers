@@ -7,7 +7,7 @@ from beancount_reds_importers.importers import etrade
 
 fund_data = [
  ('TSM', '874039100', 'Taiwan Semiconductor Mfg LTD'),
- ('V', '92826C839', 'Visa Inc'),
+ ('VISA', '92826C839', 'Visa Inc'),
 ]
 
 # list of money_market accounts. These will not be held at cost, and instead will use price conversions

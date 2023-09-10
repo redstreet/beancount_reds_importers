@@ -1,6 +1,6 @@
 
-2023-07-12 * "VISA INC COM CL A @  242.21" "[V] Visa Inc"
-  Assets:Investments:Etrade:V         5.55 V {242.21 USD}
+2023-07-12 * "VISA INC COM CL A @  242.21" "[VISA] Visa Inc"
+  Assets:Investments:Etrade:VISA      5.55 VISA {242.21 USD}
   Assets:Investments:Etrade:USD   -1344.27 USD
   Equity:Rounding-Errors:Imports    0.0045 USD
 
@@ -17,8 +17,8 @@
   Expenses:Expenses:Investment-Expenses:Taxable:Etrade   21.89 USD
 
 2023-09-07 balance Assets:Investments:Etrade:TSM                   55.55 TSM
-2023-09-07 balance Assets:Investments:Etrade:V                     500 V
+2023-09-07 balance Assets:Investments:Etrade:VISA                  500 VISA
 2023-09-07 balance Assets:Investments:Etrade:USD                   555.55 USD
 
 2023-09-08 price TSM                                 89.64 USD
-2023-09-08 price V                                  247.29 USD
+2023-09-08 price VISA                               247.29 USD
