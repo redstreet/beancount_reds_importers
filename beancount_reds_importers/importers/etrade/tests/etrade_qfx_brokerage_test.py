@@ -2,13 +2,12 @@
 
 from os import path
 from beancount.ingest import regression_pytest as regtest
-from beancount_reds_importers.importers.schwab import schwab_csv_brokerage
+from beancount_reds_importers.importers import etrade
 
 
 fund_data = [
- ('SWVXX', '123', 'SCHWAB VALUE ADVANTAGE MONEY INV'),
- ('GIS',   '456', 'GENERAL MILLS INC'),
- ('BND',   '789', 'Vanguard Total Bond Market Index Fund'),
+ ('TSM', '874039100', 'Taiwan Semiconductor Mfg LTD'),
+ ('VISA', '92826C839', 'Visa Inc'),
 ]
 
 # list of money_market accounts. These will not be held at cost, and instead will use price conversions
@@ -21,13 +20,13 @@ fund_info = {
 
 
 def build_config():
-    acct = "Assets:Investments:Schwab"
+    acct = "Assets:Investments:Etrade"
     root = 'Investments'
     taxability = 'Taxable'
-    leaf = 'Schwab'
+    leaf = 'Etrade'
     currency = 'USD'
     config = {
-        'account_number' : 9876,
+        'account_number' : '555555555',
         'main_account'   : acct + ':{ticker}',
         'cash_account'   : f'{acct}:{{currency}}',
         'transfer'       : 'Assets:Zero-Sum-Accounts:Transfers:Bank-Account',
@@ -46,10 +45,10 @@ def build_config():
 
 
 @regtest.with_importer(
-    schwab_csv_brokerage.Importer(
+    etrade.Importer(
         build_config()
     )
 )
 @regtest.with_testdir(path.dirname(__file__))
-class TestSchwabCSV(regtest.ImporterTestBase):
+class TestEtradeQFX(regtest.ImporterTestBase):
     pass

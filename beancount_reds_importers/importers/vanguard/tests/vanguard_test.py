@@ -15,6 +15,7 @@ from beancount_reds_importers.importers import vanguard
             "capgainsd_lt": "Income:CapitalGains:Long:Vanguard:401k:{source401k}:{ticker}",
             "capgainsd_st": "Income:CapitalGains:Short:Vanguard:401k:{source401k}:{ticker}",
             "fees": "Expenses:Fees:Vanguard:401k",
+            "invexpense": "Expenses:Expenses:Vanguard:401k",
             "rounding_error": "Equity:Rounding-Errors:Imports",
             "fund_info": {
                 "fund_data": [

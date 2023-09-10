@@ -1,0 +1,24 @@
+
+2023-07-12 * "VISA INC COM CL A @  242.21" "[VISA] Visa Inc"
+  Assets:Investments:Etrade:VISA      5.55 VISA {242.21 USD}
+  Assets:Investments:Etrade:USD   -1344.27 USD
+  Equity:Rounding-Errors:Imports    0.0045 USD
+
+2023-07-14 * "TAIWAN SEMICONDUCTOR MFG COLTD-SPONSORED ADR REPSTG 5 COM" "[TSM] Taiwan Semiconductor Mfg LTD"
+  Assets:Investments:Etrade:TSM  0.76817 TSM {107.1895 USD}
+  Assets:Investments:Etrade:USD   -82.34 USD
+
+2023-07-14 * "DIV - TAIWAN SEMICONDUCTOR MFG COLTD-SPONSORED ADR REPSTG 5 COM" "[TSM] Taiwan Semiconductor Mfg LTD"
+  Assets:Investments:Etrade:USD                     104.23 USD
+  Income:Investments:Taxable:Dividends:Etrade:TSM  -104.23 USD
+
+2023-07-14 * "DIV - TAIWAN SEMI Foreign Stk W/HLTD-SPONSORED ADR REPSTG 5 COM" "invexpense"
+  Assets:Investments:Etrade:USD                         -21.89 USD
+  Expenses:Expenses:Investment-Expenses:Taxable:Etrade   21.89 USD
+
+2023-09-07 balance Assets:Investments:Etrade:TSM                   55.55 TSM
+2023-09-07 balance Assets:Investments:Etrade:VISA                  500 VISA
+2023-09-07 balance Assets:Investments:Etrade:USD                   555.55 USD
+
+2023-09-08 price TSM                                 89.64 USD
+2023-09-08 price VISA                               247.29 USD
