@@ -31,7 +31,7 @@ based importers.
 File format readers included are:
 - `.ofx`
 - `.csv` (single and multitable support)
-- `.xlsx` (single and multitable support)
+- `.xlsx` (single and multitable support) (`pip3 install xlrd` if you plan to use this)
 
 Transaction builders included are:
 - Banking (for banks and credit cards, which benefit from a postings predictor like
@@ -148,6 +148,10 @@ transactions may appear to be switched. This is described by
 and the fields can be swapped in a `custom_init`.
 
 ## Testing
+First:
+```
+pip3 install xlrd
+```
 
 Some importers are tested with
 [regression_pytest.py](https://github.com/beancount/beancount/blob/v2/beancount/ingest/regression_pytest.py).

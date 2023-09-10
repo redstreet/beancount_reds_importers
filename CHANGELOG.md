@@ -95,7 +95,7 @@
 - uobbank importer: add unit tests, fix several issues #70. [Red S]
 
   - decimal places
-    - still needs a full solution. The problem is, petel uses xlwt/xlrd to
+    - still needs a full solution. The problem is, petl uses xlwt/xlrd to
       read excel, which use excel datatypes, which we don't want, as we
       want just the string, which we can then pass on to decimal.decimal
     - not sure exactly how decimals are stored in excel
