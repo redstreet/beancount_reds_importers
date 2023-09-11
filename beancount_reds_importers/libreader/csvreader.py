@@ -229,7 +229,7 @@ class Importer(reader.Reader, importer.ImporterProtocol):
         except Exception as err:
             print("ERROR: no end_date. SKIPPING input.")
             traceback.print_tb(err.__traceback__)
-            return False
+            return None
 
         return date
 
