@@ -192,13 +192,22 @@ class Importer(reader.Reader, importer.ImporterProtocol):
             rdr = self.prepare_table(rdr)
 
             # process table
-            rdr = rdr.rename(self.header_map)
-            rdr = self.convert_columns(rdr)
-            rdr = self.fix_column_names(rdr)
-            rdr = self.prepare_processed_table(rdr)
+            rdr = self.process_table(rdr)
             self.rdr = rdr
             self.ifile = file
             self.file_read_done = True
+
+    def process_table(self, rdr):
+        # Filter out any header mappings that don't exist in this table, since petl doesn't do this for us
+        #  and will complain if we try to rename a header that doesn't exist
+        existing_headers = {key: value for key, value in self.header_map.items() if key in rdr.header()}
+        rdr = rdr.rename(existing_headers)
+        
+        rdr = self.convert_columns(rdr)
+        rdr = self.fix_column_names(rdr)
+        rdr = self.prepare_processed_table(rdr)
+        return rdr
+
 
     def get_transactions(self):
         for ot in self.rdr.namedtuples():

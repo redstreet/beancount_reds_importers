@@ -1,5 +1,3 @@
-# flake8: noqa
-
 from os import path
 from beancount.ingest import regression_pytest as regtest
 from beancount_reds_importers.importers.schwab import schwab_csv_balances
