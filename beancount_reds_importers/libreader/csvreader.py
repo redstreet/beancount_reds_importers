@@ -108,10 +108,16 @@ class Importer(reader.Reader, importer.ImporterProtocol):
         # fixup currencies
         def remove_non_numeric(x):
             return re.sub("[^0-9\.-]", "", str(x).strip())  # noqa: W605
+        def add_decimal(x):
+            if '.' not in x:
+                return x+".00"
+            return x
         currencies = getattr(self, 'currency_fields', []) + ['unit_price', 'fees', 'total', 'amount', 'balance']
         for i in currencies:
             if i in rdr.header():
                 rdr = rdr.convert(i, remove_non_numeric)
+                if self.config.get('add_currency_precision', False):
+                    rdr = rdr.convert(i, add_decimal)
                 rdr = rdr.convert(i, D)
 
         # fixup dates
