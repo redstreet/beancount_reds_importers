@@ -3,7 +3,7 @@
 import petl as etl
 import sys
 import re
-import datetime
+from datetime import datetime
 
 from beancount.core.number import D
 
@@ -45,7 +45,15 @@ class Importer(investments.Importer, csv_multitable_reader.Importer):
         return super().deep_identify(file) and account_number in file.head()
     
     def file_date(self, file):
-        return datetime.datetime.now()
+        date = None
+        # Use the date in the file name. If that doesn't exist, fall back to the maximum date we found in the transactions
+        match = re.search(r'\d{8}', file.name)
+        if match:
+            date_str = match.group()
+            date = datetime.strptime(date_str, "%m%d%Y").date()
+        else:
+            date = self.maxdate
+        return date
     
     def prepare_tables(self):
         ticker_by_desc = {desc: ticker for ticker, _, desc in self.fund_data}
@@ -62,11 +70,11 @@ class Importer(investments.Importer, csv_multitable_reader.Importer):
                 section = 'Transactions'
                 table = table.addfield('security', lambda x: ticker_by_desc.get(x['Investment Name'], x['Investment Name']))
                 # We have to do our own finding of the max date because the table data hasn't been cleaned up yet
-                maxdate = max(datetime.datetime.strptime(d[0], self.date_format) for d in table.cut('Trade Date').rename('Trade Date', 'date').namedtuples()).date().strftime(self.date_format)
+                self.maxdate = max(datetime.strptime(d[0], self.date_format) for d in table.cut('Trade Date').rename('Trade Date', 'date').namedtuples()).date().strftime(self.date_format)
             alltables[section] = table
         self.alltables = alltables
 
-        self.alltables['Balance Positions'] = self.alltables['Balance Positions'].addfield('date', maxdate)
+        self.alltables['Balance Positions'] = self.alltables['Balance Positions'].addfield('date', self.maxdate)
 
     def is_section_title(self, row):
         if len(row) == 0:
