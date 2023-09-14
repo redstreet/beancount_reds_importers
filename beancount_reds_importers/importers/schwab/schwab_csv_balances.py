@@ -13,7 +13,7 @@ class Importer(investments.Importer, csv_multitable_reader.Importer):
     def custom_init(self):
         self.max_rounding_error = 0.04
         self.filename_pattern_def = '.*_Balances_'
-        self.header_identifier = 'Balances  for account'
+        self.header_identifier = '"Balances  for account.*'
         self.get_ticker_info = self.get_ticker_info_from_id
         self.date_format = '%m/%d/%Y'
         self.funds_db_txt = 'funds_by_ticker'
