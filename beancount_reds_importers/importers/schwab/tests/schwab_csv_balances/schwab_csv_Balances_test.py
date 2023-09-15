@@ -13,7 +13,7 @@ fund_data = [
 ]
 
 # list of money_market accounts. These will not be held at cost, and instead will use price conversions
-money_market = ['VMMX','VMMX2','HOOLI']
+money_market = ['VMMX', 'VMMX2', 'HOOLI']
 
 fund_info = {
         'fund_data': fund_data,
@@ -28,21 +28,21 @@ def build_config():
     leaf = 'Schwab'
     currency = 'USD'
     config = {
-        'account_number' : 9876,
-        'main_account'   : acct + ':{ticker}',
-        'cash_account'   : f'{acct}:{{currency}}',
-        'transfer'       : 'Assets:Zero-Sum-Accounts:Transfers:Bank-Account',
-        'dividends'      : f'Income:{root}:{taxability}:Dividends:{leaf}:{{ticker}}',
-        'interest'       : f'Income:{root}:{taxability}:Interest:{leaf}:{{ticker}}',
-        'cg'             : f'Income:{root}:{taxability}:Capital-Gains:{leaf}:{{ticker}}',
-        'capgainsd_lt'   : f'Income:{root}:{taxability}:Capital-Gains-Distributions:Long:{leaf}:{{ticker}}',
-        'capgainsd_st'   : f'Income:{root}:{taxability}:Capital-Gains-Distributions:Short:{leaf}:{{ticker}}',
-        'fees'           : f'Expenses:Fees-and-Charges:Brokerage-Fees:{taxability}:{leaf}',
-        'invexpense'     : f'Expenses:Expenses:Investment-Expenses:{taxability}:{leaf}',
-        'rounding_error' : 'Equity:Rounding-Errors:Imports',
-        'fund_info'      : fund_info,
-        'currency'       : currency,
-        'section_headers': ['Stocks', 'Bonds', 'Money Market']
+        'account_number':   9876,
+        'main_account':     acct + ':{ticker}',
+        'cash_account':     f'{acct}:{{currency}}',
+        'transfer': '       Assets:Zero-Sum-Accounts:Transfers:Bank-Account',
+        'dividends':        f'Income:{root}:{taxability}:Dividends:{leaf}:{{ticker}}',
+        'interest':         f'Income:{root}:{taxability}:Interest:{leaf}:{{ticker}}',
+        'cg':               f'Income:{root}:{taxability}:Capital-Gains:{leaf}:{{ticker}}',
+        'capgainsd_lt':     f'Income:{root}:{taxability}:Capital-Gains-Distributions:Long:{leaf}:{{ticker}}',
+        'capgainsd_st':     f'Income:{root}:{taxability}:Capital-Gains-Distributions:Short:{leaf}:{{ticker}}',
+        'fees':             f'Expenses:Fees-and-Charges:Brokerage-Fees:{taxability}:{leaf}',
+        'invexpense':       f'Expenses:Expenses:Investment-Expenses:{taxability}:{leaf}',
+        'rounding_error':   'Equity:Rounding-Errors:Imports',
+        'fund_info':        fund_info,
+        'currency':         currency,
+        'section_headers':  ['Stocks', 'Bonds', 'Money Market']
     }
     return config
 

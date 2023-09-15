@@ -48,7 +48,7 @@ class Importer(investments.Importer, csv_multitable_reader.Importer):
 
     def get_max_transaction_date(self):
         return self.date.date()
-    
+
     def prepare_processed_table(self, rdr):
         rdr = rdr.cut('memo', 'security', 'units', 'unit_price')
         rdr = rdr.selectne('memo', '--')  # we don't need total rows

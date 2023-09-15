@@ -1,14 +1,11 @@
 """ Vanguard 529 csv importer."""
 
-import petl as etl
-import sys
 import re
 from datetime import datetime
 
-from beancount.core.number import D
-
 from beancount_reds_importers.libreader import csv_multitable_reader
 from beancount_reds_importers.libtransactionbuilder import investments
+
 
 class Importer(investments.Importer, csv_multitable_reader.Importer):
     IMPORTER_NAME = 'Vanguard 529'
@@ -39,11 +36,11 @@ class Importer(investments.Importer, csv_multitable_reader.Importer):
         self.skip_transaction_types = []
         self.section_titles_are_headers = True
         self.config['add_currency_precision'] = self.config.get('add_currency_precision', True)
-    
+
     def deep_identify(self, file):
         account_number = self.config.get('account_number', '')
         return super().deep_identify(file) and account_number in file.head()
-    
+
     def file_date(self, file):
         date = None
         # Use the date in the file name. If that doesn't exist, fall back to the maximum date we found in the transactions
@@ -54,23 +51,26 @@ class Importer(investments.Importer, csv_multitable_reader.Importer):
         else:
             date = self.maxdate
         return date
-    
+
     def prepare_tables(self):
         ticker_by_desc = {desc: ticker for ticker, _, desc in self.fund_data}
 
         alltables = {}
-        maxdate = None
+        self.maxdate = None
         for section, table in self.alltables.items():
             if section == 'Fund Account Number':
                 section = 'Balance Positions'
                 table = table.addfield('security', lambda x: ticker_by_desc.get(x['Fund Name'], x['Fund Name']))
-                # We need to add a date field but we can't do that yet because we need to make sure 
+                # We need to add a date field but we can't do that yet because we need to make sure
                 #  the transactions section has been processed and set
             elif section == 'Account Number':
                 section = 'Transactions'
                 table = table.addfield('security', lambda x: ticker_by_desc.get(x['Investment Name'], x['Investment Name']))
                 # We have to do our own finding of the max date because the table data hasn't been cleaned up yet
-                self.maxdate = max(datetime.strptime(d[0], self.date_format) for d in table.cut('Trade Date').rename('Trade Date', 'date').namedtuples()).date().strftime(self.date_format)
+                self.maxdate = max(datetime.strptime(d[0], self.date_format)
+                                   for d in table.cut('Trade Date').rename('Trade Date', 'date').namedtuples()) \
+                    .date().strftime(self.date_format)
+
             alltables[section] = table
         self.alltables = alltables
 
@@ -80,7 +80,7 @@ class Importer(investments.Importer, csv_multitable_reader.Importer):
         if len(row) == 0:
             return False
         return row[0] == 'Fund Account Number' or row[0] == 'Account Number'
-    
+
     def get_transactions(self):
         yield from self.alltables['Transactions'].namedtuples()
 

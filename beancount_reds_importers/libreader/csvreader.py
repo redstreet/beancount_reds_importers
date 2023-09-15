@@ -108,6 +108,7 @@ class Importer(reader.Reader, importer.ImporterProtocol):
         # fixup currencies
         def remove_non_numeric(x):
             return re.sub("[^0-9\.-]", "", str(x).strip())  # noqa: W605
+
         def add_decimal(x):
             if '.' not in x:
                 return x+".00"
@@ -202,12 +203,11 @@ class Importer(reader.Reader, importer.ImporterProtocol):
         #  and will complain if we try to rename a header that doesn't exist
         existing_headers = {key: value for key, value in self.header_map.items() if key in rdr.header()}
         rdr = rdr.rename(existing_headers)
-        
+
         rdr = self.convert_columns(rdr)
         rdr = self.fix_column_names(rdr)
         rdr = self.prepare_processed_table(rdr)
         return rdr
-
 
     def get_transactions(self):
         for ot in self.rdr.namedtuples():
