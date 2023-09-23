@@ -115,7 +115,7 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
             "capgainsd_lt": self.config['capgainsd_lt'],
             "capgainsd_st": self.config['capgainsd_st'],
             "income":       self.config['interest'],
-            "invexpense":   self.config['invexpense'],
+            "invexpense":   self.config.get('invexpense', "ACCOUNT_NOT_CONFIGURED:INVEXPENSE"),
         }
 
         if 'transfer' in self.config:

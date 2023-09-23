@@ -124,7 +124,7 @@ class Importer(reader.Reader, importer.ImporterProtocol):
 
         def vd(x): return x if x else datetime.date.min
         return_date = max(*[vd(x) for x in dates])
-        print("Smart date computation. Dates were: ", dates)
+        # print("Smart date computation. Dates were: ", dates)
 
         return return_date
 
