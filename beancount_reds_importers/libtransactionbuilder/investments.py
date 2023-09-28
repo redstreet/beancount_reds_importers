@@ -311,7 +311,7 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
         try:
             if ot.type in ['transfer']:
                 units = ot.units
-            elif ot.type in ['other', 'credit', 'debit', 'dep', 'cash', 'payment', 'check']:
+            elif ot.type in ['other', 'credit', 'debit', 'dep', 'cash', 'payment', 'check', 'xfer']:
                 units = ot.amount
             else:
                 units = ot.total
@@ -371,7 +371,7 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
                 continue
             if ot.type in ['buymf', 'sellmf', 'buystock', 'buydebt', 'sellstock', 'buyother', 'sellother', 'reinvest']:
                 entry = self.generate_trade_entry(ot, file, counter)
-            elif ot.type in ['other', 'credit', 'debit', 'transfer', 'dep', 'income',
+            elif ot.type in ['other', 'credit', 'debit', 'transfer', 'xfer', 'dep', 'income',
                              'dividends', 'capgainsd_st', 'capgainsd_lt', 'cash', 'payment', 'check', 'invexpense']:
                 entry = self.generate_transfer_entry(ot, file, counter)
             else:
