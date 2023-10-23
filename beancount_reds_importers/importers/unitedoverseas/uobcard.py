@@ -68,7 +68,7 @@ class Importer(xlsreader.Importer, banking.Importer):
 
     def get_balance_statement(self, file=None):
         """Return the balance on the first and last dates"""
-        date = self.get_balance_assertion_date
+        date = self.get_balance_assertion_date()
         if date:
             balance_row = self.get_row_by_label(file, 'Statement Balance:')
             units, currency = balance_row[1], balance_row[2]
