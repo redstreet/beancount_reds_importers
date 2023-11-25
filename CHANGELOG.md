@@ -1,5 +1,39 @@
 # Changelog
 
+## (unreleased)
+
+
+### Improvements
+
+- Handle the INVEXPENSE field (#79) [Jacob Farkas]
+  * Handle the INVEXPENSE field
+  * Rename the 'expenses' property to 'invexpense' to match the OFX tag
+- handle 'fee' ofx type in investments. [Red S]
+- configurable balance assertion dates. [Red S]
+- smarter balance assertion dates. [Red S]
+  We find the statement's end date from the OFX file. However, banks and
+  credit cards typically have pending transactions that are not included
+  in downloads. When we download the next statement, new transactions may
+  appear prior to the balance assertion date that we generate for this
+  statement. To attempt to avoid this, we set the balance assertion date
+  to either two days before the statement's end date or the last
+  transaction's date, whichever is later.
+- needs_update: add --all-accounts. [Red S]
+
+### Fixes
+
+- update requirements.txt; also replace == with >= #87. [Red S]
+- #85, balance dates were returning function instead of date. [Red S]
+- update unit tests to match smart date. [Red S]
+- add 'xfer' to ofx types. [Red S]
+- make "invexpense" optional with a smart default. [Red S]
+- resolved several gotchas with balance assertion dates with ofx files. [Red S]
+- #80 document xlrd requirement. [Red S]
+  xlrd is optional, and thus not in requirements.txt, but is needed for
+  xls files and for testing
+
+
+
 ## 0.7.0 (2023-08-28)
 
 ### New Features
