@@ -380,6 +380,7 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
                 print("ERROR: unknown entry type:", ot.type)
                 raise Exception('Unknown entry type')
             self.add_fee_postings(entry, ot)
+            self.add_custom_postings(entry, ot)
             new_entries.append(entry)
         return new_entries
 
@@ -435,6 +436,9 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
                 data.create_simple_posting(entry, config['fees'], ot.fees, self.currency)
             if getattr(ot, 'commission', 0) != 0:
                 data.create_simple_posting(entry, config['fees'], ot.commission, self.currency)
+
+    def add_custom_postings(self, entry, ot):
+        pass
 
     def extract_custom_entries(self, file, counter):
         """For custom importers to override"""
