@@ -115,7 +115,8 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
             "capgainsd_lt": self.config['capgainsd_lt'],
             "capgainsd_st": self.config['capgainsd_st'],
             "income":       self.config['interest'],
-            "invexpense":   self.config['invexpense'],
+            "fee":          self.config['fees'],
+            "invexpense":   self.config.get('invexpense', "ACCOUNT_NOT_CONFIGURED:INVEXPENSE"),
         }
 
         if 'transfer' in self.config:
@@ -311,7 +312,7 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
         try:
             if ot.type in ['transfer']:
                 units = ot.units
-            elif ot.type in ['other', 'credit', 'debit', 'dep', 'cash', 'payment', 'check']:
+            elif ot.type in ['other', 'credit', 'debit', 'dep', 'cash', 'payment', 'check', 'xfer']:
                 units = ot.amount
             else:
                 units = ot.total
@@ -339,9 +340,10 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
             target_acct = self.subst_acct_vars(target_acct, ot, ticker)
 
         # Build postings
-        if ot.type in ['income', 'dividends', 'capgainsd_st', 'capgainsd_lt']:  # cash
-            data.create_simple_posting(entry, config['cash_account'], ot.total, self.currency)
-            data.create_simple_posting(entry, target_acct, -1 * ot.total, self.currency)
+        if ot.type in ['income', 'dividends', 'capgainsd_st', 'capgainsd_lt', 'fee']:  # cash
+            amount = ot.total if hasattr(ot, 'total') else ot.amount
+            data.create_simple_posting(entry, config['cash_account'], amount, self.currency)
+            data.create_simple_posting(entry, target_acct, -1 * amount, self.currency)
         else:
             data.create_simple_posting(entry, main_acct, units, ticker)
             if target_acct:
@@ -371,7 +373,7 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
                 continue
             if ot.type in ['buymf', 'sellmf', 'buystock', 'buydebt', 'sellstock', 'buyother', 'sellother', 'reinvest']:
                 entry = self.generate_trade_entry(ot, file, counter)
-            elif ot.type in ['other', 'credit', 'debit', 'transfer', 'dep', 'income',
+            elif ot.type in ['other', 'credit', 'debit', 'transfer', 'xfer', 'dep', 'income', 'fee',
                              'dividends', 'capgainsd_st', 'capgainsd_lt', 'cash', 'payment', 'check', 'invexpense']:
                 entry = self.generate_transfer_entry(ot, file, counter)
             else:

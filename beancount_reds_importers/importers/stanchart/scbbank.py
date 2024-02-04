@@ -50,7 +50,7 @@ class Importer(csvreader.Importer, banking.Importer):
 
     def get_balance_statement(self, file=None):
         """Return the balance on the first and last dates"""
-        date = self.get_balance_assertion_date
+        date = self.get_balance_assertion_date()
         if date:
             rdr = self.read_raw(file)
             rdr = self.prepare_raw_file(rdr)

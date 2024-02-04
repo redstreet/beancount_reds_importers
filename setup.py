@@ -18,6 +18,11 @@ setup(
     license='GPL-3.0',
     packages=find_packages(),
     include_package_data=True,
+    extras_require={
+        'dev': [
+            'ruff',
+        ]
+    },
     install_requires=[
         'Click >= 7.0',
         'beancount >= 2.3.5',

@@ -16,9 +16,9 @@
   Assets:Investments:Etrade:USD                         -21.89 USD
   Expenses:Expenses:Investment-Expenses:Taxable:Etrade   21.89 USD
 
-2023-09-07 balance Assets:Investments:Etrade:TSM                   55.55 TSM
-2023-09-07 balance Assets:Investments:Etrade:VISA                  500 VISA
-2023-09-07 balance Assets:Investments:Etrade:USD                   555.55 USD
-
 2023-09-08 price TSM                                 89.64 USD
 2023-09-08 price VISA                               247.29 USD
+
+2023-09-10 balance Assets:Investments:Etrade:TSM                   55.55 TSM
+2023-09-10 balance Assets:Investments:Etrade:VISA                  500 VISA
+2023-09-10 balance Assets:Investments:Etrade:USD                   555.55 USD
