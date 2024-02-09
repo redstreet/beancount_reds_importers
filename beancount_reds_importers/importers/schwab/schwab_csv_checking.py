@@ -30,6 +30,10 @@ class Importer(csvreader.Importer, banking.Importer):
         }
         self.skip_transaction_types = ['Journal']
 
+    def deep_identify(self, file):
+        last_three = self.config.get('account_number', '')[-3:]
+        return self.column_labels_line in file.head() and f'XX{last_three}' in file.name
+
     def prepare_table(self, rdr):
         rdr = rdr.addfield('amount',
                            lambda x: "-" + x['Withdrawal'] if x['Withdrawal'] != '' else x['Deposit'])

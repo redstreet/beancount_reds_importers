@@ -1,5 +1,6 @@
 """ Schwab Brokerage .csv importer."""
 
+import re
 from beancount_reds_importers.libreader import csvreader
 from beancount_reds_importers.libtransactionbuilder import investments
 
@@ -50,6 +51,10 @@ class Importer(csvreader.Importer, investments.Importer):
             'Stock Split':                  'cash',
             'Cash In Lieu':                 'cash',
             }
+
+    def deep_identify(self, file):
+        last_three = self.config.get('account_number', '')[-3:]
+        return re.match(self.header_identifier, file.head()) and f'XX{last_three}' in file.name
 
     def skip_transaction(self, ot):
         return ot.type in ['', 'Journal']
