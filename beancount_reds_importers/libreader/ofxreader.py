@@ -79,11 +79,8 @@ class Importer(reader.Reader, importer.ImporterProtocol):
     def get_ofx_end_date(self, field='end_date'):
         end_date = getattr(self.ofx_account.statement, field, None)
 
-        # Convert end_date from utc to local timezone if needed and return
-        # This is needed only if there is an actual timestamp other than time(0, 0)
         if end_date:
-            if end_date.time() != datetime.time(0, 0):
-                end_date = end_date.replace(tzinfo=datetime.timezone.utc).astimezone()
+            # We don't care about timestamps, remove them so they don't affect date calculations
             return end_date.date()
 
         return None
