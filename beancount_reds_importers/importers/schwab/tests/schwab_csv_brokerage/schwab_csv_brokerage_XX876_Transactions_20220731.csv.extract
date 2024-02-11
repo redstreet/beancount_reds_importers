@@ -29,12 +29,20 @@
 
 2023-04-18 * "Sell" "[BND] Vanguard Total Bond Market Index Fund"
   todo: "TODO: this entry is incomplete until lots are selected (bean-doctor context <filename> <lineno>)"
-  Assets:Investments:Schwab:BND                              -10.065 BND {} @ 73.4049 USD
+  Assets:Investments:Schwab:BND                      -10.065 BND {} @ 73.4049 USD
   Income:Investments:Taxable:Capital-Gains:Schwab:BND
   Assets:Investments:Schwab:USD                               738.81 USD
-  Equity:Rounding-Errors:Imports                           0.0103185 USD
+  Equity:Rounding-Errors:Imports                                                   0.0103185 USD
   Expenses:Fees-and-Charges:Brokerage-Fees:Taxable:Schwab       0.01 USD
+
+2023-04-20 * "Journal" "cash"
+  Assets:Investments:Schwab:USD                                  -7461.72 USD
+  Assets:Zero-Sum-Accounts:Transfers:Bank-Account                 7461.72 USD
 
 2023-04-27 * "Buy" "[BND] Vanguard Total Bond Market Index Fund"
   Assets:Investments:Schwab:BND        45 BND {73.7789 USD}
   Assets:Investments:Schwab:USD  -3320.05 USD
+
+2023-04-27 * "Journal" "cash"
+  Assets:Investments:Schwab:USD                                   7461.72 USD
+  Assets:Zero-Sum-Accounts:Transfers:Bank-Account                -7461.72 USD

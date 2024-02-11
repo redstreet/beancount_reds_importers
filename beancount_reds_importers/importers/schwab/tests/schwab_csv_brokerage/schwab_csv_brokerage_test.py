@@ -27,7 +27,7 @@ def build_config():
     leaf = 'Schwab'
     currency = 'USD'
     config = {
-        'account_number' : 9876,
+        'account_number' : '9876',
         'main_account'   : acct + ':{ticker}',
         'cash_account'   : f'{acct}:{{currency}}',
         'transfer'       : 'Assets:Zero-Sum-Accounts:Transfers:Bank-Account',
@@ -51,5 +51,5 @@ def build_config():
     )
 )
 @regtest.with_testdir(path.dirname(__file__))
-class TestSchwabCSV(regtest.ImporterTestBase):
+class TestSchwabBrokerage(regtest.ImporterTestBase):
     pass

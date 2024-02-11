@@ -170,8 +170,7 @@ class Importer(reader.Reader, importer.ImporterProtocol):
         return rdr.rowslice(start, len(rdr))
 
     def read_file(self, file):
-        if not self.file_read_done:
-
+        if not getattr(self, 'file_read_done', False):
             # read file
             rdr = self.read_raw(file)
             rdr = self.prepare_raw_file(rdr)
@@ -199,9 +198,6 @@ class Importer(reader.Reader, importer.ImporterProtocol):
             if self.skip_transaction(ot):
                 continue
             yield ot
-
-    def get_available_cash(self, settlement_fund_balance=0):
-        return None
 
     # TOOD: custom, overridable
     def skip_transaction(self, row):
