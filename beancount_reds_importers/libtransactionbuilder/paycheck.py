@@ -3,7 +3,7 @@
 from beancount.core import data
 from beancount.core.number import D
 from beancount_reds_importers.libtransactionbuilder import banking
-
+from collections import defaultdict
 
 # paychecks are typically transaction with many (10-40) postings including several each of income, taxes,
 # pre-tax and post-tax deductions, transfers, reimbursements, etc. This importer enables importing a single
@@ -66,15 +66,19 @@ class Importer(banking.Importer):
         template = self.config['paycheck_template']
         currency = self.config['currency']
         total = 0
+        template_missing = defaultdict(set)
 
         for section, table in self.alltables.items():
             if section not in template:
+                template_missing[section] = set()
                 continue
             for row in table.namedtuples():
                 # TODO: 'bank' is workday specific; move it there
                 row_description = getattr(row, 'description', getattr(row, 'bank', None))
                 row_pattern = next(filter(lambda ts: row_description.startswith(ts), template[section]), None)
-                if row_pattern:
+                if not row_pattern:
+                    template_missing[section].add(row_description)
+                else:
                     accounts = template[section][row_pattern]
                     accounts = [accounts] if not isinstance(accounts, list) else accounts
                     for account in accounts:
@@ -89,6 +93,14 @@ class Importer(banking.Importer):
                         total += amount
                         if amount:
                             data.create_simple_posting(entry, account, amount, currency)
+
+        if self.config.get('show_unconfigured', False):
+            for section in template_missing:
+                print(section)
+                if template_missing[section]:
+                    print('  ' + '\n  '.join(i for i in template_missing[section]))
+                print()
+
         if total != 0:
             data.create_simple_posting(entry, "TOTAL:NONZERO", total, currency)
 
