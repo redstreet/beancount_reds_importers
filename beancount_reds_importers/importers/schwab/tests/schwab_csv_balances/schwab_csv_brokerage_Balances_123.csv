@@ -1,0 +1,18 @@
+"Balances  for account General Investing ...XXX as of 05/03/2023"
+"Stocks"
+"Symbol","Description","Quantity","Price"
+"MMM","3M INC","656","$16,516.92"
+
+"Bonds"
+"Symbol","Description","Quantity","Price"
+"BND","VANGUARD TOTAL BOND MARKET ETF","45","$3320.05"
+
+"Ignored"
+"Symbol","Description","Quantity","Price"
+"PP","PIED PIPER INC","62","$51.95"
+
+"Money Market"
+"Symbol","Description","Quantity","Price"
+"VMMX","VANGUARD MONEY MARKET","6225","$6225"
+"VMMX2","VANGUARD MONEY MARKET MONEY SHARES","129","$5952"
+"HOOLI","HOOLI MONEY MARKET","4591","$4591"

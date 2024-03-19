@@ -1,0 +1,36 @@
+
+2023-01-03 * "Contribution AIP" "[VTE2040] Vanguard Target Enrollment 2040/2041 Portfolio"
+  Assets:Vanguard:529:VTE2040  29.6912 VTE2040 {8.42 USD}
+  Assets:Vanguard:529:Cash     -250.00 USD
+
+2023-01-31 * "Contribution AIP" "[VTE2040] Vanguard Target Enrollment 2040/2041 Portfolio"
+  Assets:Vanguard:529:VTE2040  27.6855 VTE2040 {9.03 USD}
+  Assets:Vanguard:529:Cash     -250.00 USD
+
+2023-02-17 * "Contribution EBT" "[VTE2040] Vanguard Target Enrollment 2040/2041 Portfolio"
+  Assets:Vanguard:529:VTE2040  22.2469 VTE2040 {8.99 USD}
+  Assets:Vanguard:529:Cash     -200.00 USD
+
+2023-02-28 * "Contribution AIP" "[VTE2040] Vanguard Target Enrollment 2040/2041 Portfolio"
+  Assets:Vanguard:529:VTE2040  28.5388 VTE2040 {8.76 USD}
+  Assets:Vanguard:529:Cash     -250.00 USD
+
+2023-03-31 * "Contribution AIP" "[VTE2040] Vanguard Target Enrollment 2040/2041 Portfolio"
+  Assets:Vanguard:529:VTE2040  27.7778 VTE2040 {9.00 USD}
+  Assets:Vanguard:529:Cash     -250.00 USD
+
+2023-04-28 * "Contribution AIP" "[VTE2040] Vanguard Target Enrollment 2040/2041 Portfolio"
+  Assets:Vanguard:529:VTE2040  27.4424 VTE2040 {9.11 USD}
+  Assets:Vanguard:529:Cash     -250.00 USD
+
+2023-05-31 * "Contribution AIP" "[VTE2040] Vanguard Target Enrollment 2040/2041 Portfolio"
+  Assets:Vanguard:529:VTE2040  27.7469 VTE2040 {9.01 USD}
+  Assets:Vanguard:529:Cash     -250.00 USD
+
+2023-06-30 * "Contribution AIP" "[VTE2040] Vanguard Target Enrollment 2040/2041 Portfolio"
+  Assets:Vanguard:529:VTE2040  26.2881 VTE2040 {9.51 USD}
+  Assets:Vanguard:529:Cash     -250.00 USD
+
+2023-06-30 price VTE2040                              9.45 USD
+
+2023-07-01 balance Assets:Vanguard:529:VTE2040                     348.5265 VTE2040
