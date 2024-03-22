@@ -4,7 +4,7 @@ paycheck inherit this."""
 from beancount.core import data
 
 
-class TransactionBuilder():
+class TransactionBuilder:
     def skip_transaction(self, ot):
         """For custom importers to override"""
         return False
@@ -16,7 +16,7 @@ class TransactionBuilder():
     @staticmethod
     def remove_empty_subaccounts(acct):
         """Translates 'Assets:Foo::Bar' to 'Assets:Foo:Bar'."""
-        return ':'.join(x for x in acct.split(':') if x)
+        return ":".join(x for x in acct.split(":") if x)
 
     def set_config_variables(self, substs):
         """
@@ -31,11 +31,16 @@ class TransactionBuilder():
                   'source401k': '{source401k}',
                   }
         """
-        self.config = {k: v.format(**substs) if isinstance(v, str) else v for k, v in self.config.items()}
+        self.config = {
+            k: v.format(**substs) if isinstance(v, str) else v
+            for k, v in self.config.items()
+        }
 
         # Prevent the replacement fields from appearing in the output of
         # the file_account method
-        if 'filing_account' not in self.config:
-            kwargs = {k: '' for k in substs}
-            filing_account = self.config['main_account'].format(**kwargs)
-            self.config['filing_account'] = self.remove_empty_subaccounts(filing_account)
+        if "filing_account" not in self.config:
+            kwargs = {k: "" for k in substs}
+            filing_account = self.config["main_account"].format(**kwargs)
+            self.config["filing_account"] = self.remove_empty_subaccounts(
+                filing_account
+            )

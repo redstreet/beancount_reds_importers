@@ -59,10 +59,10 @@ import sys
 
 
 class Importer(reader.Reader, importer.ImporterProtocol):
-    FILE_EXTS = ['csv']
+    FILE_EXTS = ["csv"]
 
     def initialize_reader(self, file):
-        if getattr(self, 'file', None) != file:
+        if getattr(self, "file", None) != file:
             self.file = file
             self.reader_ready = self.deep_identify(file)
             if self.reader_ready:
@@ -96,19 +96,26 @@ class Importer(reader.Reader, importer.ImporterProtocol):
 
     def convert_columns(self, rdr):
         # convert data in transaction types column
-        if 'type' in rdr.header():
-            rdr = rdr.convert('type', self.transaction_type_map)
+        if "type" in rdr.header():
+            rdr = rdr.convert("type", self.transaction_type_map)
 
         # fixup decimals
-        decimals = ['units']
+        decimals = ["units"]
         for i in decimals:
             if i in rdr.header():
                 rdr = rdr.convert(i, D)
 
         # fixup currencies
         def remove_non_numeric(x):
-            return re.sub(r'[^0-9\.-]', "", str(x).strip())  # noqa: W605
-        currencies = getattr(self, 'currency_fields', []) + ['unit_price', 'fees', 'total', 'amount', 'balance']
+            return re.sub(r"[^0-9\.-]", "", str(x).strip())  # noqa: W605
+
+        currencies = getattr(self, "currency_fields", []) + [
+            "unit_price",
+            "fees",
+            "total",
+            "amount",
+            "balance",
+        ]
         for i in currencies:
             if i in rdr.header():
                 rdr = rdr.convert(i, remove_non_numeric)
@@ -117,7 +124,8 @@ class Importer(reader.Reader, importer.ImporterProtocol):
         # fixup dates
         def convert_date(d):
             return datetime.datetime.strptime(d, self.date_format)
-        dates = getattr(self, 'date_fields', []) + ['date', 'tradeDate', 'settleDate']
+
+        dates = getattr(self, "date_fields", []) + ["date", "tradeDate", "settleDate"]
         for i in dates:
             if i in rdr.header():
                 rdr = rdr.convert(i, convert_date)
@@ -131,8 +139,8 @@ class Importer(reader.Reader, importer.ImporterProtocol):
         """Skip csv lines until the header line is found."""
         # TODO: convert this into an 'extract_table()' method that handles the tail as well
         if not col_labels:
-            if hasattr(self, 'column_labels_line'):
-                col_labels = self.column_labels_line.replace('"', '').split(',')
+            if hasattr(self, "column_labels_line"):
+                col_labels = self.column_labels_line.replace('"', "").split(",")
             else:
                 return rdr
         skip = None
@@ -151,8 +159,8 @@ class Importer(reader.Reader, importer.ImporterProtocol):
     def extract_table_with_header(self, rdr, col_labels=None):
         rdr = self.skip_until_main_table(rdr, col_labels)
         nrows = len(rdr)
-        for (n, r) in enumerate(rdr):
-            if not r or all(i == '' for i in r):
+        for n, r in enumerate(rdr):
+            if not r or all(i == "" for i in r):
                 # blank line, terminate
                 nrows = n - 1
                 break
@@ -170,18 +178,22 @@ class Importer(reader.Reader, importer.ImporterProtocol):
         return rdr.rowslice(start, len(rdr))
 
     def read_file(self, file):
-        if not getattr(self, 'file_read_done', False):
+        if not getattr(self, "file_read_done", False):
             # read file
             rdr = self.read_raw(file)
             rdr = self.prepare_raw_file(rdr)
 
             # extract main table
-            rdr = rdr.skip(getattr(self, 'skip_head_rows', 0))                 # chop unwanted header rows
-            rdr = rdr.head(len(rdr) - getattr(self, 'skip_tail_rows', 0) - 1)  # chop unwanted footer rows
+            rdr = rdr.skip(
+                getattr(self, "skip_head_rows", 0)
+            )  # chop unwanted header rows
+            rdr = rdr.head(
+                len(rdr) - getattr(self, "skip_tail_rows", 0) - 1
+            )  # chop unwanted footer rows
             rdr = self.extract_table_with_header(rdr)
-            if hasattr(self, 'skip_comments'):
+            if hasattr(self, "skip_comments"):
                 rdr = rdr.skipcomments(self.skip_comments)
-            rdr = rdr.rowslice(getattr(self, 'skip_data_rows', 0), None)
+            rdr = rdr.rowslice(getattr(self, "skip_data_rows", 0), None)
             rdr = self.prepare_table(rdr)
 
             # process table
@@ -201,7 +213,7 @@ class Importer(reader.Reader, importer.ImporterProtocol):
 
     # TOOD: custom, overridable
     def skip_transaction(self, row):
-        return getattr(row, 'type', 'NO_TYPE') in self.skip_transaction_types
+        return getattr(row, "type", "NO_TYPE") in self.skip_transaction_types
 
     def get_balance_assertion_date(self):
         """
@@ -220,8 +232,10 @@ class Importer(reader.Reader, importer.ImporterProtocol):
 
             # TODO: clean this up. this probably suffices:
             # return max(ot.date for ot in self.get_transactions()).date()
-            date = max(ot.tradeDate if hasattr(ot, 'tradeDate') else ot.date
-                       for ot in self.get_transactions()).date()
+            date = max(
+                ot.tradeDate if hasattr(ot, "tradeDate") else ot.date
+                for ot in self.get_transactions()
+            ).date()
         except Exception as err:
             print("ERROR: no end_date. SKIPPING input.")
             traceback.print_tb(err.__traceback__)

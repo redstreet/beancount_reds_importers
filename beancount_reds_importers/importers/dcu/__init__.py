@@ -14,19 +14,20 @@ class Importer(csvreader.Importer, banking.Importer):
             self.header_identifier = ""
             self.column_labels_line = '"DATE","TRANSACTION TYPE","DESCRIPTION","AMOUNT","ID","MEMO","CURRENT BALANCE"'
             self.date_format = "%m/%d/%Y"
+            # fmt: off
             self.header_map = {
-                "DATE": "date",
-                "DESCRIPTION": "payee",
-                "MEMO": "memo",
-                "AMOUNT": "amount",
-                "CURRENT BALANCE": "balance",
+                "DATE":             "date",
+                "DESCRIPTION":      "payee",
+                "MEMO":             "memo",
+                "AMOUNT":           "amount",
+                "CURRENT BALANCE":  "balance",
                 "TRANSACTION TYPE": "type",
             }
-
             self.transaction_type_map = {
-                "DEBIT": "transfer",
-                "CREDIT": "transfer",
+                "DEBIT":    "transfer",
+                "CREDIT":   "transfer",
             }
+            # fmt: on
             self.skip_transaction_types = []
 
     def get_balance_statement(self, file=None):

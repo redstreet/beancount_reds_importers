@@ -1,1 +1,7 @@
-line-length = 127
+line-length = 88
+
+[format]
+docstring-code-format = true
+indent-style = "space"
+line-ending = "lf"
+quote-style = "double"

@@ -4,11 +4,13 @@ from beancount_reds_importers.importers import ally
 
 
 @regtest.with_importer(
-    ally.Importer({
-        "account_number": "23456",
-        "main_account": "Assets:Banks:Checking",
-        "balance_assertion_date_type": "last_transaction",
-    })
+    ally.Importer(
+        {
+            "account_number": "23456",
+            "main_account": "Assets:Banks:Checking",
+            "balance_assertion_date_type": "last_transaction",
+        }
+    )
 )
 @regtest.with_testdir(path.dirname(__file__))
 class TestSmart(regtest.ImporterTestBase):
