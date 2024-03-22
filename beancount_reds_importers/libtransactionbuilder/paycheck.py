@@ -50,10 +50,15 @@ from collections import defaultdict
 #         },
 # }
 
+
 def flip_if_needed(amount, account):
-    if amount >= 0 and any(account.startswith(prefix) for prefix in ['Income:', 'Equity:', 'Liabilities:']):
+    if amount >= 0 and any(
+        account.startswith(prefix) for prefix in ["Income:", "Equity:", "Liabilities:"]
+    ):
         amount *= -1
-    if amount < 0 and any(account.startswith(prefix) for prefix in ['Expenses:', 'Assets:']):
+    if amount < 0 and any(
+        account.startswith(prefix) for prefix in ["Expenses:", "Assets:"]
+    ):
         amount *= -1
     return amount
 
@@ -63,8 +68,8 @@ class Importer(banking.Importer):
         return self.paycheck_date(input_file)
 
     def build_postings(self, entry):
-        template = self.config['paycheck_template']
-        currency = self.config['currency']
+        template = self.config["paycheck_template"]
+        currency = self.config["currency"]
         total = 0
         template_missing = defaultdict(set)
 
@@ -74,16 +79,29 @@ class Importer(banking.Importer):
                 continue
             for row in table.namedtuples():
                 # TODO: 'bank' is workday specific; move it there
-                row_description = getattr(row, 'description', getattr(row, 'bank', None))
-                row_pattern = next(filter(lambda ts: row_description.startswith(ts), template[section]), None)
+                row_description = getattr(
+                    row, "description", getattr(row, "bank", None)
+                )
+                row_pattern = next(
+                    filter(
+                        lambda ts: row_description.startswith(ts), template[section]
+                    ),
+                    None,
+                )
                 if not row_pattern:
                     template_missing[section].add(row_description)
                 else:
                     accounts = template[section][row_pattern]
-                    accounts = [accounts] if not isinstance(accounts, list) else accounts
+                    accounts = (
+                        [accounts] if not isinstance(accounts, list) else accounts
+                    )
                     for account in accounts:
                         # TODO: 'amount_in_pay_group_currency' is workday specific; move it there
-                        amount = getattr(row, 'amount', getattr(row, 'amount_in_pay_group_currency', None))
+                        amount = getattr(
+                            row,
+                            "amount",
+                            getattr(row, "amount_in_pay_group_currency", None),
+                        )
                         # import pdb; pdb.set_trace()
 
                         if not amount:
@@ -94,17 +112,17 @@ class Importer(banking.Importer):
                         if amount:
                             data.create_simple_posting(entry, account, amount, currency)
 
-        if self.config.get('show_unconfigured', False):
+        if self.config.get("show_unconfigured", False):
             for section in template_missing:
                 print(section)
                 if template_missing[section]:
-                    print('  ' + '\n  '.join(i for i in template_missing[section]))
+                    print("  " + "\n  ".join(i for i in template_missing[section]))
                 print()
 
         if total != 0:
             data.create_simple_posting(entry, "TOTAL:NONZERO", total, currency)
 
-        if self.config.get('sort_postings', True):
+        if self.config.get("sort_postings", True):
             postings = sorted(entry.postings)
         else:
             postings = entry.postings
@@ -123,9 +141,17 @@ class Importer(banking.Importer):
 
         self.read_file(file)
         metadata = data.new_metadata(file.name, 0)
-        metadata.update(self.build_metadata(file, metatype='transaction'))
-        entry = data.Transaction(metadata, self.paycheck_date(file), self.FLAG,
-                                 None, config['desc'], self.get_tags(), data.EMPTY_SET, [])
+        metadata.update(self.build_metadata(file, metatype="transaction"))
+        entry = data.Transaction(
+            metadata,
+            self.paycheck_date(file),
+            self.FLAG,
+            None,
+            config["desc"],
+            self.get_tags(),
+            data.EMPTY_SET,
+            [],
+        )
 
         entry = self.build_postings(entry)
         return [entry]

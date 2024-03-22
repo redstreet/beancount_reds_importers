@@ -8,14 +8,15 @@ from beancount.ingest import importer
 from beancount_reds_importers.libreader import reader
 from bs4.builder import XMLParsedAsHTMLWarning
 import warnings
+
 warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
 
 
 class Importer(reader.Reader, importer.ImporterProtocol):
-    FILE_EXTS = ['ofx', 'qfx']
+    FILE_EXTS = ["ofx", "qfx"]
 
     def initialize_reader(self, file):
-        if getattr(self, 'file', None) != file:
+        if getattr(self, "file", None) != file:
             self.file = file
             self.ofx_account = None
             self.reader_ready = False
@@ -26,9 +27,10 @@ class Importer(reader.Reader, importer.ImporterProtocol):
             for acc in self.ofx.accounts:
                 # account identifying info fieldname varies across institutions
                 # self.acc_num_field can be overridden in self.custom_init() if needed
-                acc_num_field = getattr(self, 'account_number_field', 'account_id')
-                if self.match_account_number(getattr(acc, acc_num_field),
-                                             self.config['account_number']):
+                acc_num_field = getattr(self, "account_number_field", "account_id")
+                if self.match_account_number(
+                    getattr(acc, acc_num_field), self.config["account_number"]
+                ):
                     self.ofx_account = acc
                     self.reader_ready = True
             if self.reader_ready:
@@ -41,7 +43,7 @@ class Importer(reader.Reader, importer.ImporterProtocol):
 
     def file_date(self, file):
         """Get the ending date of the statement."""
-        if not getattr(self, 'ofx_account', None):
+        if not getattr(self, "ofx_account", None):
             self.initialize(file)
         try:
             return self.ofx_account.statement.end_date
@@ -56,27 +58,27 @@ class Importer(reader.Reader, importer.ImporterProtocol):
         yield from self.ofx_account.statement.transactions
 
     def get_balance_statement(self, file=None):
-        if not hasattr(self.ofx_account.statement, 'balance'):
+        if not hasattr(self.ofx_account.statement, "balance"):
             return []
         date = self.get_balance_assertion_date()
         if date:
-            Balance = namedtuple('Balance', ['date', 'amount'])
+            Balance = namedtuple("Balance", ["date", "amount"])
             yield Balance(date, self.ofx_account.statement.balance)
 
     def get_balance_positions(self):
-        if not hasattr(self.ofx_account.statement, 'positions'):
+        if not hasattr(self.ofx_account.statement, "positions"):
             return []
         yield from self.ofx_account.statement.positions
 
     def get_available_cash(self, settlement_fund_balance=0):
-        available_cash = getattr(self.ofx_account.statement, 'available_cash', None)
+        available_cash = getattr(self.ofx_account.statement, "available_cash", None)
         if available_cash is not None:
             # Some institutions compute available_cash this way. For others, override this method
             # in the importer
             return available_cash - settlement_fund_balance
         return None
 
-    def get_ofx_end_date(self, field='end_date'):
+    def get_ofx_end_date(self, field="end_date"):
         end_date = getattr(self.ofx_account.statement, field, None)
 
         if end_date:
@@ -86,7 +88,7 @@ class Importer(reader.Reader, importer.ImporterProtocol):
         return None
 
     def get_smart_date(self):
-        """ We want the latest date we can assert balance on. Let's consider all the dates we have:
+        """We want the latest date we can assert balance on. Let's consider all the dates we have:
         b--------e-------(s-2)----(s)----(d)
 
         - b: date of first transaction in this ofx file (end_date)
@@ -105,28 +107,41 @@ class Importer(reader.Reader, importer.ImporterProtocol):
         have.
         """
 
-        ofx_max_transation_date = self.get_ofx_end_date('end_date')
-        ofx_balance_date1 = self.get_ofx_end_date('available_balance_date')
-        ofx_balance_date2 = self.get_ofx_end_date('balance_date')
+        ofx_max_transation_date = self.get_ofx_end_date("end_date")
+        ofx_balance_date1 = self.get_ofx_end_date("available_balance_date")
+        ofx_balance_date2 = self.get_ofx_end_date("balance_date")
         max_transaction_date = self.get_max_transaction_date()
 
         if ofx_balance_date1:
-            ofx_balance_date1 -= datetime.timedelta(days=self.config.get('balance_assertion_date_fudge', 2))
+            ofx_balance_date1 -= datetime.timedelta(
+                days=self.config.get("balance_assertion_date_fudge", 2)
+            )
         if ofx_balance_date2:
-            ofx_balance_date2 -= datetime.timedelta(days=self.config.get('balance_assertion_date_fudge', 2))
+            ofx_balance_date2 -= datetime.timedelta(
+                days=self.config.get("balance_assertion_date_fudge", 2)
+            )
 
-        dates = [ofx_max_transation_date, max_transaction_date, ofx_balance_date1, ofx_balance_date2]
-        if all(v is None for v in dates[:2]):  # because ofx_balance_date appears even for closed accounts
+        dates = [
+            ofx_max_transation_date,
+            max_transaction_date,
+            ofx_balance_date1,
+            ofx_balance_date2,
+        ]
+        if all(
+            v is None for v in dates[:2]
+        ):  # because ofx_balance_date appears even for closed accounts
             return None
 
-        def vd(x): return x if x else datetime.date.min
+        def vd(x):
+            return x if x else datetime.date.min
+
         return_date = max(*[vd(x) for x in dates])
         # print("Smart date computation. Dates were: ", dates)
 
         return return_date
 
     def get_balance_assertion_date(self):
-        """ Choices for the date of the generated balance assertion can be specified in
+        """Choices for the date of the generated balance assertion can be specified in
         self.config['balance_assertion_date_type'], which can be:
         - 'smart':            smart date (default)
         - 'ofx_date':         date specified in ofx file
@@ -139,16 +154,20 @@ class Importer(reader.Reader, importer.ImporterProtocol):
         on the beginning of the assertion date.
         """
 
-        date_type_map = {'smart': self.get_smart_date,
-                         'ofx_date': self.get_ofx_end_date,
-                         'last_transaction': self.get_max_transaction_date,
-                         'today': datetime.date.today}
-        date_type = self.config.get('balance_assertion_date_type', 'smart')
+        date_type_map = {
+            "smart": self.get_smart_date,
+            "ofx_date": self.get_ofx_end_date,
+            "last_transaction": self.get_max_transaction_date,
+            "today": datetime.date.today,
+        }
+        date_type = self.config.get("balance_assertion_date_type", "smart")
         return_date = date_type_map[date_type]()
 
         if not return_date:
             return None
-        return return_date + datetime.timedelta(days=1)  # Next day, as defined by Beancount
+        return return_date + datetime.timedelta(
+            days=1
+        )  # Next day, as defined by Beancount
 
     def get_max_transaction_date(self):
         """
@@ -160,9 +179,10 @@ class Importer(reader.Reader, importer.ImporterProtocol):
 
         """
         try:
-
-            date = max(ot.tradeDate if hasattr(ot, 'tradeDate') else ot.date
-                       for ot in self.get_transactions()).date()
+            date = max(
+                ot.tradeDate if hasattr(ot, "tradeDate") else ot.date
+                for ot in self.get_transactions()
+            ).date()
         except TypeError:
             return None
         except ValueError:

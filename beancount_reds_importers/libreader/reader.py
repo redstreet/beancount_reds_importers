@@ -5,9 +5,9 @@ from os import path
 import re
 
 
-class Reader():
-    FILE_EXTS = ['']
-    IMPORTER_NAME = 'NOT SET'
+class Reader:
+    FILE_EXTS = [""]
+    IMPORTER_NAME = "NOT SET"
 
     def identify(self, file):
         # quick check to filter out files that are not the right format
@@ -18,17 +18,19 @@ class Reader():
             # print("No match on extension")
             return False
         self.custom_init()
-        self.filename_pattern = self.config.get('filename_pattern', self.filename_pattern_def)
+        self.filename_pattern = self.config.get(
+            "filename_pattern", self.filename_pattern_def
+        )
         if not re.match(self.filename_pattern, path.basename(file.name)):
             # print("No match on filename_pattern", self.filename_pattern, path.basename(file.name))
             return False
-        self.currency = self.config.get('currency', 'CURRENCY_NOT_CONFIGURED')
+        self.currency = self.config.get("currency", "CURRENCY_NOT_CONFIGURED")
         self.initialize_reader(file)
         # print("reader_ready:", self.reader_ready)
         return self.reader_ready
 
     def file_name(self, file):
-        return '{}'.format(ntpath.basename(file.name))
+        return "{}".format(ntpath.basename(file.name))
 
     def file_account(self, file):
         # Ugly hack to handle an interaction with smart_importer. See:
@@ -36,17 +38,18 @@ class Reader():
         # https://github.com/beancount/smart_importer/issues/122
         # https://github.com/beancount/smart_importer/issues/30
         import inspect
+
         curframe = inspect.currentframe()
         calframe = inspect.getouterframes(curframe, 2)
-        if any('predictor' in i.filename for i in calframe):
-            if 'smart_importer_hack' in self.config:
-                return self.config['smart_importer_hack']
+        if any("predictor" in i.filename for i in calframe):
+            if "smart_importer_hack" in self.config:
+                return self.config["smart_importer_hack"]
 
         # Otherwise handle a typical bean-file call
         self.initialize(file)
-        if 'filing_account' in self.config:
-            return self.config['filing_account']
-        return self.config['main_account']
+        if "filing_account" in self.config:
+            return self.config["filing_account"]
+        return self.config["main_account"]
 
     def get_balance_statement(self, file=None):
         return []
