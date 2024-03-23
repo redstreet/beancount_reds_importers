@@ -23,9 +23,10 @@ amazongc.Importer({
 import datetime
 import itertools
 import ntpath
+
 from beancount.core import data
-from beancount.ingest import importer
 from beancount.core.number import D
+from beancount.ingest import importer
 
 # account flow                          ingest source
 # ----------------------------------------------------

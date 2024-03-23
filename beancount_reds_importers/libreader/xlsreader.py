@@ -1,10 +1,12 @@
 """xlsx importer module for beancount to be used along with investment/banking/other importer modules in
 beancount_reds_importers."""
 
-import petl as etl
 import re
-from beancount_reds_importers.libreader import csvreader
 from os import devnull
+
+import petl as etl
+
+from beancount_reds_importers.libreader import csvreader
 
 
 class Importer(csvreader.Importer):

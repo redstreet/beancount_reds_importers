@@ -2,13 +2,15 @@
 """Download account statements automatically when possible, or display a reminder of how to download them.
 Multi-threaded."""
 
-from click_aliases import ClickAliasedGroup
 import asyncio
-import click
 import configparser
 import os
+
+import click
 import tabulate
 import tqdm
+from click_aliases import ClickAliasedGroup
+
 import beancount_reds_importers.util.needs_update as needs_update
 
 

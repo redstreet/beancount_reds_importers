@@ -1,4 +1,5 @@
 from os import path
+
 from setuptools import find_packages, setup
 
 with open(path.join(path.dirname(__file__), "README.md")) as readme:
@@ -21,6 +22,7 @@ setup(
     extras_require={
         "dev": [
             "ruff",
+            "isort",
         ]
     },
     install_requires=[

@@ -1,11 +1,13 @@
 """xlsx importer module for beancount to be used along with investment/banking/other importer modules in
 beancount_reds_importers."""
 
-import petl as etl
-from io import StringIO
 import csv
-import openpyxl
 import warnings
+from io import StringIO
+
+import openpyxl
+import petl as etl
+
 from beancount_reds_importers.libreader import csv_multitable_reader
 
 # This xlsx reader uses petl to read a .csv with multiple tables into a dictionary of petl tables. The section

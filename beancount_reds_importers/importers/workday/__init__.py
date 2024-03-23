@@ -1,6 +1,7 @@
 """Workday paycheck importer."""
 
 import datetime
+
 from beancount_reds_importers.libreader import xlsx_multitable_reader
 from beancount_reds_importers.libtransactionbuilder import paycheck
 

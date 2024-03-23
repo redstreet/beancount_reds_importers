@@ -1,9 +1,10 @@
 # flake8: noqa
 
 from os import path
-from beancount.ingest import regression_pytest as regtest
-from beancount_reds_importers.importers import etrade
 
+from beancount.ingest import regression_pytest as regtest
+
+from beancount_reds_importers.importers import etrade
 
 fund_data = [
     ("TSM", "874039100", "Taiwan Semiconductor Mfg LTD"),

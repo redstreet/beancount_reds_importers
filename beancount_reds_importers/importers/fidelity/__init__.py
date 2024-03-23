@@ -1,6 +1,7 @@
 """Fidelity Net Benefits and Fidelity Investments OFX importer."""
 
 import ntpath
+
 from beancount_reds_importers.libreader import ofxreader
 from beancount_reds_importers.libtransactionbuilder import investments
 

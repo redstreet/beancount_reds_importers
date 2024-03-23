@@ -3,10 +3,11 @@ beancount_reads_importers to work."""
 
 import itertools
 import sys
-from beancount.core import data
-from beancount.core import amount
-from beancount.ingest import importer
+
+from beancount.core import amount, data
 from beancount.core.position import CostSpec
+from beancount.ingest import importer
+
 from beancount_reds_importers.libtransactionbuilder import common, transactionbuilder
 
 
