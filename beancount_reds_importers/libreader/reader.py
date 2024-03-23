@@ -1,8 +1,8 @@
 """Reader module base class for beancount_reds_importers. ofx, csv, etc. readers inherit this."""
 
 import ntpath
-from os import path
 import re
+from os import path
 
 
 class Reader:

@@ -2,11 +2,11 @@
 
 import itertools
 from collections import namedtuple
-from beancount.core import data
-from beancount.core import amount
-from beancount.ingest import importer
-from beancount_reds_importers.libtransactionbuilder import common, transactionbuilder
 
+from beancount.core import amount, data
+from beancount.ingest import importer
+
+from beancount_reds_importers.libtransactionbuilder import common, transactionbuilder
 
 Balance = namedtuple("Balance", ["date", "amount", "currency"])
 

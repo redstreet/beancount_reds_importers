@@ -11,16 +11,18 @@ goal is to make this reader automatically "understand" the schema of any json gi
 Until that happens, perhaps this file should be renamed to schwabjsonreader.py.
 """
 
-# import datetime
-# import ofxparse
-# from collections import namedtuple
-from beancount.ingest import importer
-from beancount_reds_importers.libreader import reader
-from bs4.builder import XMLParsedAsHTMLWarning
 import json
 
 # import re
 import warnings
+
+# import datetime
+# import ofxparse
+# from collections import namedtuple
+from beancount.ingest import importer
+from bs4.builder import XMLParsedAsHTMLWarning
+
+from beancount_reds_importers.libreader import reader
 
 warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
 

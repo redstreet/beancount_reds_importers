@@ -1,8 +1,9 @@
 """Fidelity CMA/checking csv importer for beancount."""
 
+import re
+
 from beancount_reds_importers.libreader import csvreader
 from beancount_reds_importers.libtransactionbuilder import banking
-import re
 
 
 class Importer(banking.Importer, csvreader.Importer):

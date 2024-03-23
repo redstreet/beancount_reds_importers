@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 """Determine the list of accounts needing updates based on the last balance entry."""
 
-import click
+import ast
 import re
+from datetime import datetime
+
+import click
 import tabulate
 from beancount import loader
 from beancount.core import getters
 from beancount.core.data import Balance, Close, Custom
-from datetime import datetime
-import ast
-
 
 tbl_options = {"tablefmt": "simple"}
 

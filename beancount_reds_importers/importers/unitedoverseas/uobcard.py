@@ -1,9 +1,11 @@
 """SCB Credit .csv importer."""
 
+import re
+
+from beancount.core.number import D
+
 from beancount_reds_importers.libreader import xlsreader
 from beancount_reds_importers.libtransactionbuilder import banking
-import re
-from beancount.core.number import D
 
 
 class Importer(xlsreader.Importer, banking.Importer):

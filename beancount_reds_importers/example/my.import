@@ -6,9 +6,11 @@ from os import path
 
 sys.path.insert(0, path.join(path.dirname(__file__)))
 
+from fund_info import *
+
 from beancount_reds_importers.importers import vanguard
 from beancount_reds_importers.importers.schwab import schwab_csv_brokerage
-from fund_info import *
+
 # For a better solution for fund_info, see: https://reds-rants.netlify.app/personal-finance/tickers-and-identifiers/
 
 # Setting this variable provides a list of importer instances.

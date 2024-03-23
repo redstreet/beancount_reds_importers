@@ -4,7 +4,9 @@ Note: Schwab "Positions" CSV is not the same as Schwab "Balances" CSV."""
 
 import datetime
 import re
+
 from beancount.core.number import D
+
 from beancount_reds_importers.libreader import csvreader
 from beancount_reds_importers.libtransactionbuilder import investments
 

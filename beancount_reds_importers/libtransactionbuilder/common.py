@@ -2,9 +2,8 @@
 
 from beancount.core import data
 from beancount.core.amount import Amount
+from beancount.core.number import D, Decimal
 from beancount.core.position import Cost
-from beancount.core.number import Decimal
-from beancount.core.number import D
 
 
 class PriceCostBothZeroException(Exception):

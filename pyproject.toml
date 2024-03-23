@@ -1,7 +1,11 @@
+[tool.ruff]
 line-length = 88
 
-[format]
+[tool.ruff.format]
 docstring-code-format = true
 indent-style = "space"
 line-ending = "lf"
 quote-style = "double"
+
+[tool.isort]
+profile = "black"

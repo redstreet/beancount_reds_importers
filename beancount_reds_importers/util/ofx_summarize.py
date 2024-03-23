@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """Quick and dirty way to summarize a .ofx file and peek inside it."""
 
-import click
 import os
 import sys
-from collections import defaultdict
-from ofxparse import OfxParser
-from bs4.builder import XMLParsedAsHTMLWarning
 import warnings
+from collections import defaultdict
+
+import click
+from bs4.builder import XMLParsedAsHTMLWarning
+from ofxparse import OfxParser
 
 warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
 

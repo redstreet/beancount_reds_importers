@@ -1,9 +1,11 @@
 """Generic banking ofx importer for beancount."""
 
+from collections import defaultdict
+
 from beancount.core import data
 from beancount.core.number import D
+
 from beancount_reds_importers.libtransactionbuilder import banking
-from collections import defaultdict
 
 # paychecks are typically transaction with many (10-40) postings including several each of income, taxes,
 # pre-tax and post-tax deductions, transfers, reimbursements, etc. This importer enables importing a single

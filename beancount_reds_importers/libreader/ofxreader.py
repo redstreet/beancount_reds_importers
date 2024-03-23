@@ -2,12 +2,14 @@
 beancount_reds_importers."""
 
 import datetime
-import ofxparse
-from collections import namedtuple
-from beancount.ingest import importer
-from beancount_reds_importers.libreader import reader
-from bs4.builder import XMLParsedAsHTMLWarning
 import warnings
+from collections import namedtuple
+
+import ofxparse
+from beancount.ingest import importer
+from bs4.builder import XMLParsedAsHTMLWarning
+
+from beancount_reds_importers.libreader import reader
 
 warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
 
