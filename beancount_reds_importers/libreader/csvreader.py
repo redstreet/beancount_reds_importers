@@ -12,7 +12,7 @@ from beancount.ingest import importer
 
 from beancount_reds_importers.libreader import reader
 
-# This csv reader uses petl to read a .csv into a table for maniupulation. The output of this reader is a list
+# This csv reader uses petl to read a .csv into a table for manipulation. The output of this reader is a list
 # of namedtuples corresponding roughly to ofx transactions. The following steps achieve this. When writing
 # your own importer, you only should need to:
 # - override prepare_table()
