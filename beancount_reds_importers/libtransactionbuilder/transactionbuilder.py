@@ -53,5 +53,9 @@ class TransactionBuilder:
         # This 'filing_account' is read by a patch to bean-extract so it can output transactions to
         # a file that corresponds with filing_account, when the one-file-per-account feature is
         # used.
-        acct = self.config.get("filing_account", self.config.get("main_account", None))
-        return {"filing_account": acct}
+        if self.config.get("emit_filing_account_metadata"):
+            acct = self.config.get(
+                "filing_account", self.config.get("main_account", None)
+            )
+            return {"filing_account": acct}
+        return {}
