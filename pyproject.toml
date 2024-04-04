@@ -1,5 +1,5 @@
 [tool.ruff]
-line-length = 88
+line-length = 99
 
 [tool.ruff.format]
 docstring-code-format = true
