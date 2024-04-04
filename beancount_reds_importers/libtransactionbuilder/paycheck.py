@@ -58,9 +58,7 @@ def flip_if_needed(amount, account):
         account.startswith(prefix) for prefix in ["Income:", "Equity:", "Liabilities:"]
     ):
         amount *= -1
-    if amount < 0 and any(
-        account.startswith(prefix) for prefix in ["Expenses:", "Assets:"]
-    ):
+    if amount < 0 and any(account.startswith(prefix) for prefix in ["Expenses:", "Assets:"]):
         amount *= -1
     return amount
 
@@ -81,22 +79,16 @@ class Importer(banking.Importer):
                 continue
             for row in table.namedtuples():
                 # TODO: 'bank' is workday specific; move it there
-                row_description = getattr(
-                    row, "description", getattr(row, "bank", None)
-                )
+                row_description = getattr(row, "description", getattr(row, "bank", None))
                 row_pattern = next(
-                    filter(
-                        lambda ts: row_description.startswith(ts), template[section]
-                    ),
+                    filter(lambda ts: row_description.startswith(ts), template[section]),
                     None,
                 )
                 if not row_pattern:
                     template_missing[section].add(row_description)
                 else:
                     accounts = template[section][row_pattern]
-                    accounts = (
-                        [accounts] if not isinstance(accounts, list) else accounts
-                    )
+                    accounts = [accounts] if not isinstance(accounts, list) else accounts
                     for account in accounts:
                         # TODO: 'amount_in_pay_group_currency' is workday specific; move it there
                         amount = getattr(

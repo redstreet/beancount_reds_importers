@@ -17,9 +17,7 @@ class Importer(xlsreader.Importer, banking.Importer):
         self.header_identifier = self.config.get(
             "custom_header", "United Overseas Bank Limited.*Account Type:SRS Account"
         )
-        self.column_labels_line = (
-            "Transaction Date,Transaction Description,Withdrawal,Deposit"
-        )
+        self.column_labels_line = "Transaction Date,Transaction Description,Withdrawal,Deposit"
         self.date_format = "%Y%m%d"
         # fmt: off
         self.header_map = {
@@ -32,10 +30,7 @@ class Importer(xlsreader.Importer, banking.Importer):
 
     def deep_identify(self, file):
         account_number = self.config.get("account_number", "")
-        return (
-            re.match(self.header_identifier, file.head())
-            and account_number in file.head()
-        )
+        return re.match(self.header_identifier, file.head()) and account_number in file.head()
 
     def prepare_table(self, rdr):
         # Remove carriage returns in description
@@ -46,9 +41,7 @@ class Importer(xlsreader.Importer, banking.Importer):
 
         rdr = rdr.addfield(
             "amount",
-            lambda x: -1 * Ds(x["Withdrawal"])
-            if x["Withdrawal"] != ""
-            else Ds(x["Deposit"]),
+            lambda x: -1 * Ds(x["Withdrawal"]) if x["Withdrawal"] != "" else Ds(x["Deposit"]),
         )
         rdr = rdr.addfield("memo", lambda x: "")
         return rdr

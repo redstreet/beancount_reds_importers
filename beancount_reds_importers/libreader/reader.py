@@ -18,9 +18,7 @@ class Reader:
             # print("No match on extension")
             return False
         self.custom_init()
-        self.filename_pattern = self.config.get(
-            "filename_pattern", self.filename_pattern_def
-        )
+        self.filename_pattern = self.config.get("filename_pattern", self.filename_pattern_def)
         if not re.match(self.filename_pattern, path.basename(file.name)):
             # print("No match on filename_pattern", self.filename_pattern, path.basename(file.name))
             return False

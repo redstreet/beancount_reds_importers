@@ -27,9 +27,7 @@ def analyze(filename, ttype="dividends", pdb_explore=False):
 
 @click.command()
 @click.argument("filename", type=click.Path(exists=True))
-@click.option(
-    "-n", "--num-transactions", default=5, help="Number of transactions to show"
-)
+@click.option("-n", "--num-transactions", default=5, help="Number of transactions to show")
 @click.option("-e", "--pdb-explore", is_flag=True, help="Open a pdb shell to explore")
 @click.option(
     "--stats-only",
@@ -101,9 +99,7 @@ def summarize(filename, pdb_explore, num_transactions, stats_only):  # noqa: C90
         if pdb_explore:
             print("Hints:")
             print("- try dir(acc), dir(acc.statement.transactions)")
-            print(
-                "- try the 'interact' command to start an interactive python interpreter"
-            )
+            print("- try the 'interact' command to start an interactive python interpreter")
             if len(ofx.accounts) > 1:
                 print("- type 'c' to explore the next account in this file")
             import pdb

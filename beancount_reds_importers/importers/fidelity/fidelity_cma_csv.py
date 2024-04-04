@@ -13,7 +13,9 @@ class Importer(banking.Importer, csvreader.Importer):
         self.max_rounding_error = 0.04
         self.filename_pattern_def = ".*History"
         self.date_format = "%m/%d/%Y"
-        header_s0 = ".*Run Date,Action,Symbol,Security Description,Security Type,Quantity,Price \\(\\$\\),"
+        header_s0 = (
+            ".*Run Date,Action,Symbol,Security Description,Security Type,Quantity,Price \\(\\$\\),"
+        )
         header_s1 = "Commission \\(\\$\\),Fees \\(\\$\\),Accrued Interest \\(\\$\\),Amount \\(\\$\\),Settlement Date"
         header_sum = header_s0 + header_s1
         self.header_identifier = header_sum
@@ -42,12 +44,8 @@ class Importer(banking.Importer, csvreader.Importer):
         for field in ["Action"]:
             rdr = rdr.convert(field, lambda x: x.lstrip())
 
-        rdr = rdr.capture(
-            "Action", "(?:\\s)(?:\\w*)(.*)", ["memo"], include_original=True
-        )
-        rdr = rdr.capture(
-            "Action", "(\\S+(?:\\s+\\S+)?)", ["payee"], include_original=True
-        )
+        rdr = rdr.capture("Action", "(?:\\s)(?:\\w*)(.*)", ["memo"], include_original=True)
+        rdr = rdr.capture("Action", "(\\S+(?:\\s+\\S+)?)", ["payee"], include_original=True)
 
         for field in ["memo", "payee"]:
             rdr = rdr.convert(field, lambda x: x.lstrip())

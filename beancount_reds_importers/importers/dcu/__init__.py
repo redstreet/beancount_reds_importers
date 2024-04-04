@@ -12,7 +12,9 @@ class Importer(csvreader.Importer, banking.Importer):
             self.max_rounding_error = 0.04
             self.filename_pattern_def = ".*Account_Transactions"
             self.header_identifier = ""
-            self.column_labels_line = '"DATE","TRANSACTION TYPE","DESCRIPTION","AMOUNT","ID","MEMO","CURRENT BALANCE"'
+            self.column_labels_line = (
+                '"DATE","TRANSACTION TYPE","DESCRIPTION","AMOUNT","ID","MEMO","CURRENT BALANCE"'
+            )
             self.date_format = "%m/%d/%Y"
             # fmt: off
             self.header_map = {
@@ -35,6 +37,4 @@ class Importer(csvreader.Importer, banking.Importer):
 
         date = self.get_balance_assertion_date()
         if date:
-            yield banking.Balance(
-                date, self.rdr.namedtuples()[0].balance, self.currency
-            )
+            yield banking.Balance(date, self.rdr.namedtuples()[0].balance, self.currency)

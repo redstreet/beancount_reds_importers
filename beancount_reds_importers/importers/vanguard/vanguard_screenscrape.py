@@ -59,9 +59,7 @@ class Importer(investments.Importer, tsvreader.Importer):
         )
         rdr = rdr.pushheader(header)
 
-        rdr = rdr.addfield(
-            "action", lambda x: x["description"].rsplit(" ", 2)[1].strip()
-        )
+        rdr = rdr.addfield("action", lambda x: x["description"].rsplit(" ", 2)[1].strip())
 
         for field in [
             "date",

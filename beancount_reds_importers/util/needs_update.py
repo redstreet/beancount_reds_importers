@@ -21,22 +21,16 @@ def get_config(entries, args):
         e for e in entries if isinstance(e, Custom) and e.type == "reds-importers"
     ]
     config_meta = {
-        entry.values[0].value: (
-            entry.values[1].value if (len(entry.values) == 2) else None
-        )
+        entry.values[0].value: (entry.values[1].value if (len(entry.values) == 2) else None)
         for entry in _extension_entries
     }
 
-    config = {
-        k: ast.literal_eval(v) for k, v in config_meta.items() if "needs-updates" in k
-    }
+    config = {k: ast.literal_eval(v) for k, v in config_meta.items() if "needs-updates" in k}
     config = config.get("needs-updates", {})
     if args["all_accounts"]:
         config["included_account_pats"] = []
         config["excluded_account_pats"] = ["$-^"]
-    included_account_pats = config.get(
-        "included_account_pats", ["^Assets:", "^Liabilities:"]
-    )
+    included_account_pats = config.get("included_account_pats", ["^Assets:", "^Liabilities:"])
     excluded_account_pats = config.get(
         "excluded_account_pats", ["$-^"]
     )  # exclude nothing by default
@@ -45,11 +39,7 @@ def get_config(entries, args):
 
 
 def is_interesting_account(account, closes):
-    return (
-        account not in closes
-        and included_re.match(account)
-        and not excluded_re.match(account)
-    )
+    return account not in closes and included_re.match(account) and not excluded_re.match(account)
 
 
 def handle_commodity_leaf_accounts(last_balance):
@@ -104,9 +94,7 @@ def accounts_with_no_balance_entries(entries, closes, last_balance):
 
 def pretty_print_table(not_updated_accounts, sort_by_date):
     field = 0 if sort_by_date else 1
-    output = sorted(
-        [(v.date, k) for k, v in not_updated_accounts.items()], key=lambda x: x[field]
-    )
+    output = sorted([(v.date, k) for k, v in not_updated_accounts.items()], key=lambda x: x[field])
     headers = ["Last Updated", "Account"]
     print(click.style(tabulate.tabulate(output, headers=headers, **tbl_options)))
 
@@ -118,9 +106,7 @@ def pretty_print_table(not_updated_accounts, sort_by_date):
     help="How many days ago should the last balance assertion be to be considered old",
     default=15,
 )
-@click.option(
-    "--sort-by-date", help="Sort output by date (instead of account name)", is_flag=True
-)
+@click.option("--sort-by-date", help="Sort output by date (instead of account name)", is_flag=True)
 @click.option(
     "--all-accounts",
     help="Show all account (ignore include/exclude in config)",
@@ -169,9 +155,7 @@ def accounts_needing_updates(beancount_file, recency, sort_by_date, all_accounts
     get_config(entries, locals())
     closes = [a.account for a in entries if isinstance(a, Close)]
     balance_entries = [
-        a
-        for a in entries
-        if isinstance(a, Balance) and is_interesting_account(a.account, closes)
+        a for a in entries if isinstance(a, Balance) and is_interesting_account(a.account, closes)
     ]
     last_balance = {v.account: v for v in balance_entries}
     d = handle_commodity_leaf_accounts(last_balance)
@@ -190,8 +174,7 @@ def accounts_needing_updates(beancount_file, recency, sort_by_date, all_accounts
         headers = ["Accounts without balance entries:"]
         print(
             click.style(
-                "\n"
-                + tabulate.tabulate(sorted(accs_no_bal), headers=headers, **tbl_options)
+                "\n" + tabulate.tabulate(sorted(accs_no_bal), headers=headers, **tbl_options)
             )
         )
 

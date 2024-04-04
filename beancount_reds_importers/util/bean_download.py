@@ -120,9 +120,7 @@ def download(config_file, sites, site_types, dry_run, verbose):  # noqa: C901
         sites = config.sections()
         if site_types:
             site_types = site_types.split(",")
-            sites_lists = [
-                get_sites(sites, site_type, config) for site_type in site_types
-            ]
+            sites_lists = [get_sites(sites, site_type, config) for site_type in site_types]
             sites = [j for i in sites_lists for j in i]
 
     errors = []

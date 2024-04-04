@@ -49,6 +49,4 @@ class Importer(csvreader.Importer, banking.Importer):
 
         date = self.get_balance_assertion_date()
         if date:
-            yield banking.Balance(
-                date, self.rdr.namedtuples()[0].balance, self.currency
-            )
+            yield banking.Balance(date, self.rdr.namedtuples()[0].balance, self.currency)

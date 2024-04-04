@@ -9,4 +9,6 @@ class Importer(schwab_csv_checking.Importer):
     def custom_init(self):
         super().custom_init()
         self.filename_pattern_def = ".*_Transactions_"
-        self.column_labels_line = '"Date","Type","CheckNumber","Description","Withdrawal","Deposit","RunningBalance"'
+        self.column_labels_line = (
+            '"Date","Type","CheckNumber","Description","Withdrawal","Deposit","RunningBalance"'
+        )

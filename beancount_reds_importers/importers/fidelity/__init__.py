@@ -13,18 +13,14 @@ class Importer(investments.Importer, ofxreader.Importer):
         self.max_rounding_error = 0.18
         self.filename_pattern_def = ".*fidelity"
         self.get_ticker_info = self.get_ticker_info_from_id
-        self.get_payee = (
-            lambda ot: ot.memo.split(";", 1)[0] if ";" in ot.memo else ot.memo
-        )
+        self.get_payee = lambda ot: ot.memo.split(";", 1)[0] if ";" in ot.memo else ot.memo
 
     def security_narration(self, ot):
         ticker, ticker_long_name = self.get_ticker_info(ot.security)
         return f"[{ticker}]"
 
     def file_name(self, file):
-        return "fidelity-{}-{}".format(
-            self.config["account_number"], ntpath.basename(file.name)
-        )
+        return "fidelity-{}-{}".format(self.config["account_number"], ntpath.basename(file.name))
 
     def get_target_acct_custom(self, transaction, ticker=None):
         if transaction.memo.startswith("CONTRIBUTION"):

@@ -13,7 +13,9 @@ class Importer(csvreader.Importer, investments.Importer):
         self.max_rounding_error = 0.04
         self.filename_pattern_def = ".*_Transactions_"
         self.header_identifier = ""
-        self.column_labels_line = '"Date","Action","Symbol","Description","Quantity","Price","Fees & Comm","Amount"'
+        self.column_labels_line = (
+            '"Date","Action","Symbol","Description","Quantity","Price","Fees & Comm","Amount"'
+        )
         self.get_ticker_info = self.get_ticker_info_from_id
         self.date_format = "%m/%d/%Y"
         self.funds_db_txt = "funds_by_ticker"
@@ -59,10 +61,7 @@ class Importer(csvreader.Importer, investments.Importer):
 
     def deep_identify(self, file):
         last_three = self.config.get("account_number", "")[-3:]
-        return (
-            re.match(self.header_identifier, file.head())
-            and f"XX{last_three}" in file.name
-        )
+        return re.match(self.header_identifier, file.head()) and f"XX{last_three}" in file.name
 
     def skip_transaction(self, ot):
         return ot.type in ["", "Journal"]

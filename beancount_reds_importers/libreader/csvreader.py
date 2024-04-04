@@ -186,9 +186,7 @@ class Importer(reader.Reader, importer.ImporterProtocol):
             rdr = self.prepare_raw_file(rdr)
 
             # extract main table
-            rdr = rdr.skip(
-                getattr(self, "skip_head_rows", 0)
-            )  # chop unwanted header rows
+            rdr = rdr.skip(getattr(self, "skip_head_rows", 0))  # chop unwanted header rows
             rdr = rdr.head(
                 len(rdr) - getattr(self, "skip_tail_rows", 0) - 1
             )  # chop unwanted footer rows

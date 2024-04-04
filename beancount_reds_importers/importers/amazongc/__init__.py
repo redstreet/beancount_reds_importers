@@ -84,9 +84,7 @@ class Importer(importer.ImporterProtocol):
                 data.EMPTY_SET,
                 [],
             )
-            data.create_simple_posting(
-                entry, config["main_account"], number, self.currency
-            )
+            data.create_simple_posting(entry, config["main_account"], number, self.currency)
             data.create_simple_posting(entry, config["target_account"], None, None)
             new_entries.append(entry)
 

@@ -32,8 +32,7 @@ class TransactionBuilder:
                   }
         """
         self.config = {
-            k: v.format(**substs) if isinstance(v, str) else v
-            for k, v in self.config.items()
+            k: v.format(**substs) if isinstance(v, str) else v for k, v in self.config.items()
         }
 
         # Prevent the replacement fields from appearing in the output of
@@ -41,9 +40,7 @@ class TransactionBuilder:
         if "filing_account" not in self.config:
             kwargs = {k: "" for k in substs}
             filing_account = self.config["main_account"].format(**kwargs)
-            self.config["filing_account"] = self.remove_empty_subaccounts(
-                filing_account
-            )
+            self.config["filing_account"] = self.remove_empty_subaccounts(filing_account)
 
     def build_metadata(self, file, metatype=None, data={}):
         """This method is for importers to override. The overridden method can
@@ -54,8 +51,6 @@ class TransactionBuilder:
         # a file that corresponds with filing_account, when the one-file-per-account feature is
         # used.
         if self.config.get("emit_filing_account_metadata"):
-            acct = self.config.get(
-                "filing_account", self.config.get("main_account", None)
-            )
+            acct = self.config.get("filing_account", self.config.get("main_account", None))
             return {"filing_account": acct}
         return {}

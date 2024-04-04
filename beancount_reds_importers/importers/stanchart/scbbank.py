@@ -14,10 +14,10 @@ class Importer(csvreader.Importer, banking.Importer):
     def custom_init(self):
         self.max_rounding_error = 0.04
         self.filename_pattern_def = "AccountTransactions[0-9]*"
-        self.header_identifier = self.config.get(
-            "custom_header", "Account transactions shown:"
+        self.header_identifier = self.config.get("custom_header", "Account transactions shown:")
+        self.column_labels_line = (
+            "Date,Transaction,Currency,Deposit,Withdrawal,Running Balance,SGD Equivalent Balance"
         )
-        self.column_labels_line = "Date,Transaction,Currency,Deposit,Withdrawal,Running Balance,SGD Equivalent Balance"
         self.balance_column_labels_line = (
             "Account Name,Account Number,Currency,Current Balance,Available Balance"
         )
@@ -40,10 +40,7 @@ class Importer(csvreader.Importer, banking.Importer):
 
     def deep_identify(self, file):
         account_number = self.config.get("account_number", "")
-        return (
-            re.match(self.header_identifier, file.head())
-            and account_number in file.head()
-        )
+        return re.match(self.header_identifier, file.head()) and account_number in file.head()
 
     # TODO: move into utils, since this is probably a common operation
     def prepare_table(self, rdr):
