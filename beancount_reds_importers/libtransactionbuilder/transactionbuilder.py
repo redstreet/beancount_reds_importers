@@ -44,3 +44,14 @@ class TransactionBuilder:
             self.config["filing_account"] = self.remove_empty_subaccounts(
                 filing_account
             )
+
+    def build_metadata(self, file, metatype=None, data={}):
+        """This method is for importers to override. The overridden method can
+        look at the metatype ('transaction', 'balance', 'account', 'commodity', etc.)
+        and the data dictionary to return additional metadata"""
+
+        # This 'filing_account' is read by a patch to bean-extract so it can output transactions to
+        # a file that corresponds with filing_account, when the one-file-per-account feature is
+        # used.
+        acct = self.config.get("filing_account", self.config.get("main_account", None))
+        return {"filing_account": acct}

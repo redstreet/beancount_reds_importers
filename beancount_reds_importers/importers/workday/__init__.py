@@ -50,6 +50,3 @@ class Importer(paycheck.Importer, xlsx_multitable_reader.Importer):
             for header in table.header():
                 table = table.rename(header, valid_header_label(header))
             self.alltables[section] = table
-
-    def build_metadata(self, file, metatype=None, data={}):
-        return {"filing_account": self.config["main_account"]}
