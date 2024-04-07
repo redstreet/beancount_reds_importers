@@ -74,7 +74,10 @@ class Importer(reader.Reader, importer.ImporterProtocol):
             #     print(self.header_identifier, file.head())
 
     def deep_identify(self, file):
-        return re.match(self.header_identifier, file.head())
+        return re.match(
+            self.header_identifier,
+            file.head(encoding=getattr(self, "file_encoding", None)),
+        )
 
     def file_date(self, file):
         "Get the maximum date from the file."
@@ -135,7 +138,7 @@ class Importer(reader.Reader, importer.ImporterProtocol):
         return rdr
 
     def read_raw(self, file):
-        return etl.fromcsv(file.name)
+        return etl.fromcsv(file.name, encoding=getattr(self, "file_encoding", None))
 
     def skip_until_main_table(self, rdr, col_labels=None):
         """Skip csv lines until the header line is found."""
