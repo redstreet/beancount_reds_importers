@@ -544,9 +544,6 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
             if getattr(ot, "commission", 0) != 0:
                 data.create_simple_posting(entry, config["fees"], ot.commission, self.currency)
 
-    def add_custom_postings(self, entry, ot):
-        pass
-
     def extract_custom_entries(self, file, counter):
         """For custom importers to override"""
         return []

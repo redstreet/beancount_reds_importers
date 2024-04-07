@@ -154,6 +154,7 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
             if target_acct:
                 data.create_simple_posting(entry, target_acct, None, None)
 
+            self.add_custom_postings(entry, ot)
             new_entries.append(entry)
 
         new_entries += self.extract_balance(file, counter)

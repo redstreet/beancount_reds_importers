@@ -42,6 +42,10 @@ class TransactionBuilder:
             filing_account = self.config["main_account"].format(**kwargs)
             self.config["filing_account"] = self.remove_empty_subaccounts(filing_account)
 
+    def add_custom_postings(self, entry, ot):
+        """This method is for importers to override. Add arbitrary posting to each entry."""
+        pass
+
     def build_metadata(self, file, metatype=None, data={}):
         """This method is for importers to override. The overridden method can
         look at the metatype ('transaction', 'balance', 'account', 'commodity', etc.)
