@@ -20,15 +20,15 @@
 # mutual funds since those are brokerage specific.
 
 fund_data = [
- ('SCHF',   '808524805', 'Schwab International Equity ETF'),
- ('VGTEST', '012345678', 'Vanguard Test Fund'),
- ('VMFXX',  '922906300', 'Vanguard Federal Money Market Fund'),
+    ("SCHF", "808524805", "Schwab International Equity ETF"),
+    ("VGTEST", "012345678", "Vanguard Test Fund"),
+    ("VMFXX", "922906300", "Vanguard Federal Money Market Fund"),
 ]
 
 # list of money_market accounts. These will not be held at cost, and instead will use price conversions
-money_market = ['VMFXX']
+money_market = ["VMFXX"]
 
 fund_info = {
-        'fund_data': fund_data,
-        'money_market': money_market,
-        }
+    "fund_data": fund_data,
+    "money_market": money_market,
+}

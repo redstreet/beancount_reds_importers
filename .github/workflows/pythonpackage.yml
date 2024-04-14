@@ -34,3 +34,7 @@ jobs:
     - name: Test with pytest
       run: |
         pytest
+    - name: Check formatting is applied
+      run: |
+        ruff format --check
+        isort --profile black --check .

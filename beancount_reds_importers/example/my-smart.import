@@ -4,7 +4,8 @@
 import sys
 from os import path
 
-from smart_importer import apply_hooks, PredictPayees, PredictPostings
+from smart_importer import PredictPayees, PredictPostings, apply_hooks
+
 sys.path.insert(0, path.join(path.dirname(__file__)))
 
 from beancount_reds_importers.importers import ally

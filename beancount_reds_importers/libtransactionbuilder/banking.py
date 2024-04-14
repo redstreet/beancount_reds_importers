@@ -2,13 +2,13 @@
 
 import itertools
 from collections import namedtuple
-from beancount.core import data
-from beancount.core import amount
+
+from beancount.core import amount, data
 from beancount.ingest import importer
+
 from beancount_reds_importers.libtransactionbuilder import common, transactionbuilder
 
-
-Balance = namedtuple('Balance', ['date', 'amount', 'currency'])
+Balance = namedtuple("Balance", ["date", "amount", "currency"])
 
 
 class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder):
@@ -43,19 +43,13 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
         # }
         pass
 
-    def build_metadata(self, file, metatype=None, data={}):
-        """This method is for importers to override. The overridden method can
-        look at the metatype ('transaction', 'balance', 'account', 'commodity', etc.)
-        and the data dictionary to return additional metadata"""
-        return {}
-
     def match_account_number(self, file_account, config_account):
         return file_account.endswith(config_account)
 
     def custom_init(self):
         if not self.custom_init_run:
             self.max_rounding_error = 0.04
-            self.filename_pattern_def = '.*bank_specific_filename.*'
+            self.filename_pattern_def = ".*bank_specific_filename.*"
             self.custom_init_run = True
 
     # def get_target_acct(self, transaction):
@@ -68,11 +62,11 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
 
     def get_main_account(self, ot):
         """Can be overridden by importer"""
-        return self.config['main_account']
+        return self.config["main_account"]
 
     def get_target_account(self, ot):
         """Can be overridden by importer"""
-        return self.config.get('target_account')
+        return self.config.get("target_account")
 
     # --------------------------------------------------------------------------------
 
@@ -82,10 +76,15 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
         for bal in self.get_balance_statement(file=file):
             if bal:
                 metadata = data.new_metadata(file.name, next(counter))
-                metadata.update(self.build_metadata(file, metatype='balance'))
-                balance_entry = data.Balance(metadata, bal.date, self.config['main_account'],
-                                             amount.Amount(bal.amount, self.get_currency(bal)),
-                                             None, None)
+                metadata.update(self.build_metadata(file, metatype="balance"))
+                balance_entry = data.Balance(
+                    metadata,
+                    bal.date,
+                    self.config["main_account"],
+                    amount.Amount(bal.amount, self.get_currency(bal)),
+                    None,
+                    None,
+                )
                 entries.append(balance_entry)
         return entries
 
@@ -110,9 +109,9 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
                 continue
             metadata = data.new_metadata(file.name, next(counter))
             # metadata['type'] = ot.type # Optional metadata, useful for debugging #TODO
-            metadata.update(self.build_metadata(file,
-                                                metatype='transaction',
-                                                data={'transaction': ot}))
+            metadata.update(
+                self.build_metadata(file, metatype="transaction", data={"transaction": ot})
+            )
 
             # description fields: With OFX, ot.payee tends to be the "main" description field,
             # while ot.memo is optional
@@ -125,22 +124,28 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
             # Banking transactions might include foreign currency transactions. TODO: figure out
             # how ofx handles this and use the same interface for csv and other files
             entry = data.Transaction(
-                    meta=metadata,
-                    date=ot.date.date(),
-                    flag=self.FLAG,
-                    # payee and narration are switched. See the preceding note
-                    payee=self.get_narration(ot),
-                    narration=self.get_payee(ot),
-                    tags=self.get_tags(ot),
-                    links=data.EMPTY_SET,
-                    postings=[])
+                meta=metadata,
+                date=ot.date.date(),
+                flag=self.FLAG,
+                # payee and narration are switched. See the preceding note
+                payee=self.get_narration(ot),
+                narration=self.get_payee(ot),
+                tags=self.get_tags(ot),
+                links=data.EMPTY_SET,
+                postings=[],
+            )
 
             main_account = self.get_main_account(ot)
 
-            if self.fields_contain_data(ot, ['foreign_amount', 'foreign_currency']):
-                common.create_simple_posting_with_price(entry, main_account,
-                                                        ot.amount, self.get_currency(ot),
-                                                        ot.foreign_amount, ot.foreign_currency)
+            if self.fields_contain_data(ot, ["foreign_amount", "foreign_currency"]):
+                common.create_simple_posting_with_price(
+                    entry,
+                    main_account,
+                    ot.amount,
+                    self.get_currency(ot),
+                    ot.foreign_amount,
+                    ot.foreign_currency,
+                )
             else:
                 data.create_simple_posting(entry, main_account, ot.amount, self.get_currency(ot))
 
@@ -149,6 +154,7 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
             if target_acct:
                 data.create_simple_posting(entry, target_acct, None, None)
 
+            self.add_custom_postings(entry, ot)
             new_entries.append(entry)
 
         new_entries += self.extract_balance(file, counter)

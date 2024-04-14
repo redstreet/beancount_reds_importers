@@ -59,22 +59,26 @@ class Importer(csvreader.Importer):
 
         self.raw_rdr = rdr = self.read_raw(file)
 
-        rdr = rdr.skip(getattr(self, 'skip_head_rows', 0))                 # chop unwanted file header rows
-        rdr = rdr.head(len(rdr) - getattr(self, 'skip_tail_rows', 0) - 1)  # chop unwanted file footer rows
+        rdr = rdr.skip(getattr(self, "skip_head_rows", 0))  # chop unwanted file header rows
+        rdr = rdr.head(
+            len(rdr) - getattr(self, "skip_tail_rows", 0) - 1
+        )  # chop unwanted file footer rows
 
         #     [0, 2, 10] <-- starts
         # [-1, 1, 9]     <-- ends
-        table_starts = [i for (i, row) in enumerate(rdr) if self.is_section_title(row)] + [len(rdr)]
-        table_ends = [r-1 for r in table_starts][1:]
+        table_starts = [i for (i, row) in enumerate(rdr) if self.is_section_title(row)] + [
+            len(rdr)
+        ]
+        table_ends = [r - 1 for r in table_starts][1:]
         table_indexes = zip(table_starts, table_ends)
 
         # build the dictionary of tables
         self.alltables = {}
-        for (s, e) in table_indexes:
+        for s, e in table_indexes:
             if s == e:
                 continue
-            table = rdr.skip(s+1)      # skip past start index and header row
-            table = table.head(e-s-1)  # chop lines after table section data
+            table = rdr.skip(s + 1)  # skip past start index and header row
+            table = table.head(e - s - 1)  # chop lines after table section data
             self.alltables[rdr[s][0]] = table
 
         for section, table in self.alltables.items():

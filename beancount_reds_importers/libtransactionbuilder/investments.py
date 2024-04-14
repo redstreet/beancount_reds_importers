@@ -3,10 +3,11 @@ beancount_reads_importers to work."""
 
 import itertools
 import sys
-from beancount.core import data
-from beancount.core import amount
-from beancount.ingest import importer
+
+from beancount.core import amount, data
 from beancount.core.position import CostSpec
+from beancount.ingest import importer
+
 from beancount_reds_importers.libtransactionbuilder import common, transactionbuilder
 
 
@@ -83,75 +84,82 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
         self.initialize_reader(file)
 
         if self.reader_ready:
-            config_subst_vars = {'currency': self.currency,
-                                 # Leave the other values as is
-                                 'ticker': '{ticker}',
-                                 'source401k': '{source401k}',
-                                 }
+            config_subst_vars = {
+                "currency": self.currency,
+                # Leave the other values as is
+                "ticker": "{ticker}",
+                "source401k": "{source401k}",
+            }
             self.set_config_variables(config_subst_vars)
-            self.money_market_funds = self.config['fund_info']['money_market']
-            self.fund_data = self.config['fund_info']['fund_data']  # [(ticker, id, long_name), ...]
+            self.money_market_funds = self.config["fund_info"]["money_market"]
+            self.fund_data = self.config["fund_info"][
+                "fund_data"
+            ]  # [(ticker, id, long_name), ...]
             self.funds_by_id = {i: (ticker, desc) for ticker, i, desc in self.fund_data}
             self.funds_by_ticker = {ticker: (ticker, desc) for ticker, _, desc in self.fund_data}
 
             # Most ofx/csv files refer to funds by id (cusip/isin etc.) Some use tickers instead
-            self.funds_db = getattr(self, getattr(self, 'funds_db_txt', 'funds_by_id'))
+            self.funds_db = getattr(self, getattr(self, "funds_db_txt", "funds_by_id"))
             self.build_account_map()
 
         self.initialized = True
 
     def build_account_map(self):
+        # fmt: off
         # map transaction types to target posting accounts
         self.target_account_map = {
-            "buymf":        self.config['cash_account'],
-            "sellmf":       self.config['cash_account'],
-            "buystock":     self.config['cash_account'],
-            "sellstock":    self.config['cash_account'],
-            "buyother":     self.config['cash_account'],
-            "sellother":    self.config['cash_account'],
-            "buydebt":      self.config['cash_account'],
-            "reinvest":     self.config['dividends'],
-            "dividends":    self.config['dividends'],
-            "capgainsd_lt": self.config['capgainsd_lt'],
-            "capgainsd_st": self.config['capgainsd_st'],
-            "income":       self.config['interest'],
-            "fee":          self.config['fees'],
-            "invexpense":   self.config.get('invexpense', "ACCOUNT_NOT_CONFIGURED:INVEXPENSE"),
+            "buymf":        self.config["cash_account"],
+            "sellmf":       self.config["cash_account"],
+            "buystock":     self.config["cash_account"],
+            "sellstock":    self.config["cash_account"],
+            "buyother":     self.config["cash_account"],
+            "sellother":    self.config["cash_account"],
+            "buydebt":      self.config["cash_account"],
+            "reinvest":     self.config["dividends"],
+            "dividends":    self.config["dividends"],
+            "capgainsd_lt": self.config["capgainsd_lt"],
+            "capgainsd_st": self.config["capgainsd_st"],
+            "income":       self.config["interest"],
+            "fee":          self.config["fees"],
+            "invexpense":   self.config.get("invexpense", "ACCOUNT_NOT_CONFIGURED:INVEXPENSE"),
         }
+        # fmt: on
 
-        if 'transfer' in self.config:
-            self.target_account_map.update({
-                "other":    self.config['transfer'],
-                "credit":   self.config['transfer'],
-                "debit":    self.config['transfer'],
-                "transfer": self.config['transfer'],
-                "cash":     self.config['transfer'],
-                "dep":      self.config['transfer'],
-            })
-
-    def build_metadata(self, file, metatype=None, data={}):
-        """This method is for importers to override. The overridden method can
-        look at the metatype ('transaction', 'balance', 'account', 'commodity', etc.)
-        and the data dictionary to return additional metadata"""
-        return {}
+        if "transfer" in self.config:
+            # fmt: off
+            self.target_account_map.update(
+                {
+                    "other":    self.config["transfer"],
+                    "credit":   self.config["transfer"],
+                    "debit":    self.config["transfer"],
+                    "transfer": self.config["transfer"],
+                    "cash":     self.config["transfer"],
+                    "dep":      self.config["transfer"],
+                }
+            )
+            # fmt: on
 
     def custom_init(self):
         if not self.custom_init_run:
             self.max_rounding_error = 0.04
-            self.filename_pattern_def = '.*bank_specific_filename.*'
+            self.filename_pattern_def = ".*bank_specific_filename.*"
             self.custom_init_run = True
 
     def get_ticker_info(self, security_id):
-        return security_id, 'UNKNOWN'
+        return security_id, "UNKNOWN"
 
     def get_ticker_info_from_id(self, security_id):
         try:
             # isin might look like "US293409829" while the ofx use only a substring like "29340982"
             ticker = None
             try:  # first try a full match, fall back to substring
-                ticker, ticker_long_name = [v for k, v in self.funds_db.items() if security_id == k][0]
+                ticker, ticker_long_name = [
+                    v for k, v in self.funds_db.items() if security_id == k
+                ][0]
             except IndexError:
-                ticker, ticker_long_name = [v for k, v in self.funds_db.items() if security_id in k][0]
+                ticker, ticker_long_name = [
+                    v for k, v in self.funds_db.items() if security_id in k
+                ][0]
         except IndexError:
             print(f"Error: fund info not found for {security_id}", file=sys.stderr)
             securities = self.get_security_list()
@@ -189,8 +197,8 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
         target = self.get_target_acct_custom(transaction, ticker)
         if target:
             return target
-        if transaction.type == 'income' and getattr(transaction, 'income_type', None) == 'DIV':
-            return self.target_account_map.get('dividends', None)
+        if transaction.type == "income" and getattr(transaction, "income_type", None) == "DIV":
+            return self.target_account_map.get("dividends", None)
         return self.target_account_map.get(transaction.type, None)
 
     def security_narration(self, ot):
@@ -200,32 +208,33 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
     def get_security_list(self):
         tickers = set()
         for ot in self.get_transactions():
-            if hasattr(ot, 'security'):
+            if hasattr(ot, "security"):
                 tickers.add(ot.security)
         return tickers
 
     def subst_acct_vars(self, raw_acct, ot, ticker):
-        """Resolve variables within an account like {ticker}.
-        """
+        """Resolve variables within an account like {ticker}."""
         ot = ot if ot else {}
         # inv401ksource is an ofx field that is 'PRETAX', 'AFTERTAX', etc.
-        kwargs = {'ticker': ticker, 'source401k': getattr(ot, 'inv401ksource', '').title()}
+        kwargs = {
+            "ticker": ticker,
+            "source401k": getattr(ot, "inv401ksource", "").title(),
+        }
         acct = raw_acct.format(**kwargs)
         return self.remove_empty_subaccounts(acct)  # if 'inv401ksource' was unavailable
 
     def get_acct(self, acct, ot, ticker):
-        """Get an account from self.config, resolve variables, and return
-        """
+        """Get an account from self.config, resolve variables, and return"""
         template = self.config.get(acct)
         if not template:
-            raise KeyError(f'{acct} not set in importer configuration. Config: {self.config}')
+            raise KeyError(f"{acct} not set in importer configuration. Config: {self.config}")
         return self.subst_acct_vars(template, ot, ticker)
 
     # extract() and supporting methods
     # --------------------------------------------------------------------------------
 
     def generate_trade_entry(self, ot, file, counter):
-        """ Involves a commodity. One of: ['buymf', 'sellmf', 'buystock', 'sellstock', 'buyother',
+        """Involves a commodity. One of: ['buymf', 'sellmf', 'buystock', 'sellstock', 'buyother',
         'sellother', 'reinvest']"""
 
         config = self.config
@@ -234,9 +243,11 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
 
         # Build metadata
         metadata = data.new_metadata(file.name, next(counter))
-        metadata.update(self.build_metadata(file, metatype='transaction_trade', data={'transaction': ot}))
-        if getattr(ot, 'settleDate', None) is not None and ot.settleDate != ot.tradeDate:
-            metadata['settlement_date'] = str(ot.settleDate.date())
+        metadata.update(
+            self.build_metadata(file, metatype="transaction_trade", data={"transaction": ot})
+        )
+        if getattr(ot, "settleDate", None) is not None and ot.settleDate != ot.tradeDate:
+            metadata["settlement_date"] = str(ot.settleDate.date())
 
         narration = self.security_narration(ot)
         raw_target_acct = self.get_target_acct(ot, ticker)
@@ -244,45 +255,71 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
         total = ot.total
 
         # special cases
-        if 'sell' in ot.type:
+        if "sell" in ot.type:
             units = -1 * abs(ot.units)
             if not is_money_market:
-                metadata['todo'] = 'TODO: this entry is incomplete until lots are selected (bean-doctor context <filename> <lineno>)'  # noqa: E501
-        if ot.type in ['reinvest']:  # dividends are booked to commodity_leaf. Eg: Income:Dividends:HOOLI
+                metadata["todo"] = (
+                    "TODO: this entry is incomplete until lots are selected (bean-doctor context <filename> <lineno>)"  # noqa: E501
+                )
+        if ot.type in [
+            "reinvest"
+        ]:  # dividends are booked to commodity_leaf. Eg: Income:Dividends:HOOLI
             ticker_val = ticker
         else:
             ticker_val = self.currency
         target_acct = self.subst_acct_vars(raw_target_acct, ot, ticker_val)
 
         # Build transaction entry
-        entry = data.Transaction(metadata, ot.tradeDate.date(), self.FLAG,
-                                 self.get_payee(ot), narration,
-                                 self.get_tags(ot), data.EMPTY_SET, [])
+        entry = data.Transaction(
+            metadata,
+            ot.tradeDate.date(),
+            self.FLAG,
+            self.get_payee(ot),
+            narration,
+            self.get_tags(ot),
+            data.EMPTY_SET,
+            [],
+        )
 
         # Main posting(s):
-        main_acct = self.get_acct('main_account', ot, ticker)
+        main_acct = self.get_acct("main_account", ot, ticker)
 
         if is_money_market:  # Use price conversions instead of holding these at cost
-            common.create_simple_posting_with_price(entry, main_acct,
-                                                    units, ticker, ot.unit_price, self.currency)
-        elif 'sell' in ot.type:
-            common.create_simple_posting_with_cost_or_price(entry, main_acct,
-                                                            units, ticker, price_number=ot.unit_price,
-                                                            price_currency=self.currency,
-                                                            costspec=CostSpec(None, None, None, None, None, None))
-            cg_acct = self.get_acct('cg', ot, ticker)
+            common.create_simple_posting_with_price(
+                entry, main_acct, units, ticker, ot.unit_price, self.currency
+            )
+        elif "sell" in ot.type:
+            common.create_simple_posting_with_cost_or_price(
+                entry,
+                main_acct,
+                units,
+                ticker,
+                price_number=ot.unit_price,
+                price_currency=self.currency,
+                costspec=CostSpec(None, None, None, None, None, None),
+            )
+            cg_acct = self.get_acct("cg", ot, ticker)
             data.create_simple_posting(entry, cg_acct, None, None)
         else:  # buy stock/fund
-            unit_price = getattr(ot, 'unit_price', 0)
+            unit_price = getattr(ot, "unit_price", 0)
             # annoyingly, vanguard reinvests have ot.unit_price set to zero. so manually compute it
-            if (hasattr(ot, 'security') and ot.security) and ot.units and not ot.unit_price:
+            if (hasattr(ot, "security") and ot.security) and ot.units and not ot.unit_price:
                 unit_price = round(abs(ot.total) / ot.units, 4)
-            common.create_simple_posting_with_cost(entry, main_acct, units, ticker, unit_price,
-                                                   self.currency, self.price_cost_both_zero_handler)
+            common.create_simple_posting_with_cost(
+                entry,
+                main_acct,
+                units,
+                ticker,
+                unit_price,
+                self.currency,
+                self.price_cost_both_zero_handler,
+            )
 
         # "Other" account posting
         reverser = 1
-        if units > 0 and total > 0:  # (ugly) hack for some brokerages with incorrect signs (TODO: remove)
+        if (
+            units > 0 and total > 0
+        ):  # (ugly) hack for some brokerages with incorrect signs (TODO: remove)
             reverser = -1
         data.create_simple_posting(entry, target_acct, reverser * total, self.currency)
 
@@ -290,7 +327,8 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
         rounding_error = (reverser * total) + (ot.unit_price * units)
         if 0.0005 <= abs(rounding_error) <= self.max_rounding_error:
             data.create_simple_posting(
-                entry, config['rounding_error'], -1 * rounding_error, self.currency)
+                entry, config["rounding_error"], -1 * rounding_error, self.currency
+            )
         # if abs(rounding_error) > self.max_rounding_error:
         #     print("Transactions legs do not sum up! Difference: {}. Entry: {}, ot: {}".format(
         #         rounding_error, entry, ot))
@@ -298,21 +336,32 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
         return entry
 
     def generate_transfer_entry(self, ot, file, counter):
-        """ Cash transactions, or in-kind transfers. One of:
-            [credit, debit, dep, transfer, income, dividends, capgainsd_lt, capgainsd_st, other]"""
+        """Cash transactions, or in-kind transfers. One of:
+        [credit, debit, dep, transfer, income, dividends, capgainsd_lt, capgainsd_st, other]"""
         config = self.config
         metadata = data.new_metadata(file.name, next(counter))
-        metadata.update(self.build_metadata(file, metatype='transaction_transfer', data={'transaction': ot}))
+        metadata.update(
+            self.build_metadata(file, metatype="transaction_transfer", data={"transaction": ot})
+        )
         ticker = None
-        date = getattr(ot, 'tradeDate', None)
+        date = getattr(ot, "tradeDate", None)
         if not date:
             date = ot.date
         date = date.date()
 
         try:
-            if ot.type in ['transfer']:
+            if ot.type in ["transfer"]:
                 units = ot.units
-            elif ot.type in ['other', 'credit', 'debit', 'dep', 'cash', 'payment', 'check', 'xfer']:
+            elif ot.type in [
+                "other",
+                "credit",
+                "debit",
+                "dep",
+                "cash",
+                "payment",
+                "check",
+                "xfer",
+            ]:
                 units = ot.amount
             else:
                 units = ot.total
@@ -321,28 +370,46 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
             # import pdb; pdb.set_trace()
 
         main_acct = None
-        if ot.type in ['income', 'dividends', 'capgainsd_lt',
-                       'capgainsd_st', 'transfer'] and (hasattr(ot, 'security') and ot.security):
+        if ot.type in [
+            "income",
+            "dividends",
+            "capgainsd_lt",
+            "capgainsd_st",
+            "transfer",
+        ] and (hasattr(ot, "security") and ot.security):
             ticker, ticker_long_name = self.get_ticker_info(ot.security)
             narration = self.security_narration(ot)
-            main_acct = self.get_acct('main_account', ot, ticker)
+            main_acct = self.get_acct("main_account", ot, ticker)
         else:  # cash transaction
             narration = ot.type
             ticker = self.currency
-            main_acct = config['cash_account']
+            main_acct = config["cash_account"]
 
         # Build transaction entry
-        entry = data.Transaction(metadata, date, self.FLAG,
-                                 self.get_payee(ot), narration,
-                                 self.get_tags(ot), data.EMPTY_SET, [])
+        entry = data.Transaction(
+            metadata,
+            date,
+            self.FLAG,
+            self.get_payee(ot),
+            narration,
+            self.get_tags(ot),
+            data.EMPTY_SET,
+            [],
+        )
         target_acct = self.get_target_acct(ot, ticker)
         if target_acct:
             target_acct = self.subst_acct_vars(target_acct, ot, ticker)
 
         # Build postings
-        if ot.type in ['income', 'dividends', 'capgainsd_st', 'capgainsd_lt', 'fee']:  # cash
-            amount = ot.total if hasattr(ot, 'total') else ot.amount
-            data.create_simple_posting(entry, config['cash_account'], amount, self.currency)
+        if ot.type in [
+            "income",
+            "dividends",
+            "capgainsd_st",
+            "capgainsd_lt",
+            "fee",
+        ]:  # cash
+            amount = ot.total if hasattr(ot, "total") else ot.amount
+            data.create_simple_posting(entry, config["cash_account"], amount, self.currency)
             data.create_simple_posting(entry, target_acct, -1 * amount, self.currency)
         else:
             data.create_simple_posting(entry, main_acct, units, ticker)
@@ -371,14 +438,38 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
         for ot in self.get_transactions():
             if self.skip_transaction(ot):
                 continue
-            if ot.type in ['buymf', 'sellmf', 'buystock', 'buydebt', 'sellstock', 'buyother', 'sellother', 'reinvest']:
+            if ot.type in [
+                "buymf",
+                "sellmf",
+                "buystock",
+                "buydebt",
+                "sellstock",
+                "buyother",
+                "sellother",
+                "reinvest",
+            ]:
                 entry = self.generate_trade_entry(ot, file, counter)
-            elif ot.type in ['other', 'credit', 'debit', 'transfer', 'xfer', 'dep', 'income', 'fee',
-                             'dividends', 'capgainsd_st', 'capgainsd_lt', 'cash', 'payment', 'check', 'invexpense']:
+            elif ot.type in [
+                "other",
+                "credit",
+                "debit",
+                "transfer",
+                "xfer",
+                "dep",
+                "income",
+                "fee",
+                "dividends",
+                "capgainsd_st",
+                "capgainsd_lt",
+                "cash",
+                "payment",
+                "check",
+                "invexpense",
+            ]:
                 entry = self.generate_transfer_entry(ot, file, counter)
             else:
                 print("ERROR: unknown entry type:", ot.type)
-                raise Exception('Unknown entry type')
+                raise Exception("Unknown entry type")
             self.add_fee_postings(entry, ot)
             self.add_custom_postings(entry, ot)
             new_entries.append(entry)
@@ -392,37 +483,53 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
         for pos in self.get_balance_positions():
             ticker, ticker_long_name = self.get_ticker_info(pos.security)
             metadata = data.new_metadata(file.name, next(counter))
-            metadata.update(self.build_metadata(file, metatype='balance', data={'pos': pos}))
+            metadata.update(self.build_metadata(file, metatype="balance", data={"pos": pos}))
 
             # if there are no transactions, use the date in the source file for the balance. This gives us the
             # bonus of an updated, recent balance assertion
             bal_date = date if date else pos.date.date()
-            main_acct = self.get_acct('main_account', None, ticker)
-            balance_entry = data.Balance(metadata, bal_date, main_acct,
-                                         amount.Amount(pos.units, ticker),
-                                         None, None)
+            main_acct = self.get_acct("main_account", None, ticker)
+            balance_entry = data.Balance(
+                metadata,
+                bal_date,
+                main_acct,
+                amount.Amount(pos.units, ticker),
+                None,
+                None,
+            )
             new_entries.append(balance_entry)
             if ticker in self.money_market_funds:
                 settlement_fund_balance = pos.units
 
             # extract price info if available
-            if hasattr(pos, 'unit_price') and hasattr(pos, 'date'):
+            if hasattr(pos, "unit_price") and hasattr(pos, "date"):
                 metadata = data.new_metadata(file.name, next(counter))
-                metadata.update(self.build_metadata(file, metatype='price', data={'pos': pos}))
-                price_entry = data.Price(metadata, pos.date.date(), ticker,
-                                         amount.Amount(pos.unit_price, self.currency))
+                metadata.update(self.build_metadata(file, metatype="price", data={"pos": pos}))
+                price_entry = data.Price(
+                    metadata,
+                    pos.date.date(),
+                    ticker,
+                    amount.Amount(pos.unit_price, self.currency),
+                )
                 new_entries.append(price_entry)
 
         # ----------------- available cash
         available_cash = self.get_available_cash(settlement_fund_balance)
         if available_cash is not None:
             metadata = data.new_metadata(file.name, next(counter))
-            metadata.update(self.build_metadata(file, metatype='balance_cash'))
+            metadata.update(self.build_metadata(file, metatype="balance_cash"))
             try:
-                bal_date = date if date else self.file_date(file).date()  # unavailable file_date raises AttributeError
-                balance_entry = data.Balance(metadata, bal_date, self.config['cash_account'],
-                                             amount.Amount(available_cash, self.currency),
-                                             None, None)
+                bal_date = (
+                    date if date else self.file_date(file).date()
+                )  # unavailable file_date raises AttributeError
+                balance_entry = data.Balance(
+                    metadata,
+                    bal_date,
+                    self.config["cash_account"],
+                    amount.Amount(available_cash, self.currency),
+                    None,
+                    None,
+                )
                 new_entries.append(balance_entry)
             except AttributeError:
                 pass
@@ -431,14 +538,11 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
 
     def add_fee_postings(self, entry, ot):
         config = self.config
-        if hasattr(ot, 'fees') or hasattr(ot, 'commission'):
-            if getattr(ot, 'fees', 0) != 0:
-                data.create_simple_posting(entry, config['fees'], ot.fees, self.currency)
-            if getattr(ot, 'commission', 0) != 0:
-                data.create_simple_posting(entry, config['fees'], ot.commission, self.currency)
-
-    def add_custom_postings(self, entry, ot):
-        pass
+        if hasattr(ot, "fees") or hasattr(ot, "commission"):
+            if getattr(ot, "fees", 0) != 0:
+                data.create_simple_posting(entry, config["fees"], ot.fees, self.currency)
+            if getattr(ot, "commission", 0) != 0:
+                data.create_simple_posting(entry, config["fees"], ot.commission, self.currency)
 
     def extract_custom_entries(self, file, counter):
         """For custom importers to override"""
