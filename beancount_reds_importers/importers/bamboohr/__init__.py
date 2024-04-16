@@ -1,7 +1,9 @@
 """BambooHR paycheck importer"""
 
 import re
+
 from dateparser.search import search_dates
+
 from beancount_reds_importers.libreader import pdfreader
 from beancount_reds_importers.libtransactionbuilder import paycheck
 

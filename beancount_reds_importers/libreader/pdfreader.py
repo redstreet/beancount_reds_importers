@@ -1,6 +1,8 @@
 from pprint import pformat
+
 import pdfplumber
 import petl as etl
+
 from beancount_reds_importers.libreader import csvreader
 
 LEFT = 0
@@ -95,7 +97,9 @@ class Importer(csvreader.Importer):
                 image = page.crop(adjusted_crop).to_image()
                 image.debug_tablefinder(tf=self.pdf_table_extraction_settings)
 
-                table_ref = page.crop(adjusted_crop).find_tables(table_settings=self.pdf_table_extraction_settings)
+                table_ref = page.crop(adjusted_crop).find_tables(
+                    table_settings=self.pdf_table_extraction_settings
+                )
                 page_tables = [{"table": i.extract(), "bbox": i.bbox} for i in table_ref]
 
                 # Get Metadata (all data outside tables)
@@ -127,7 +131,9 @@ class Importer(csvreader.Importer):
 
                     # replace None with ''
                     for row_idx, row in enumerate(table["table"]):
-                        page_tables[table_idx]["table"][row_idx] = ["" if v is None else v for v in row]
+                        page_tables[table_idx]["table"][row_idx] = [
+                            "" if v is None else v for v in row
+                        ]
 
                 tables = tables + page_tables
 
@@ -147,7 +153,9 @@ class Importer(csvreader.Importer):
                     # and the header rows are the same,
                     and tables[table_idx - 1]["table"][0] == tables[table_idx]["table"][0]
                 ):  # assume a page break
-                    tables[table_idx - 1]["table"] = tables[table_idx - 1]["table"] + tables[table_idx]["table"][1:]
+                    tables[table_idx - 1]["table"] = (
+                        tables[table_idx - 1]["table"] + tables[table_idx]["table"][1:]
+                    )
                     del tables[table_idx]
                     continue
 
@@ -178,7 +186,10 @@ class Importer(csvreader.Importer):
                                 "pdf_table_title_height": self.pdf_table_title_height,
                                 "pdf_page_break_top": self.pdf_page_break_top,
                             },
-                            "helpers": {"header_map_generated": header_map, "paycheck_template_generated": paycheck_template},
+                            "helpers": {
+                                "header_map_generated": header_map,
+                                "paycheck_template_generated": paycheck_template,
+                            },
                         }
                     )
                 )

@@ -1,6 +1,7 @@
 """Generic pdf paycheck importer"""
 
 import datetime
+
 from beancount_reds_importers.libreader import pdfreader
 from beancount_reds_importers.libtransactionbuilder import paycheck
 
