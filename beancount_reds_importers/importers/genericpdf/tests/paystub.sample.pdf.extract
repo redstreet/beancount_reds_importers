@@ -1,0 +1,11 @@
+
+2023-12-03 * "Paycheck"
+  filing_account: "Income:Salary:FakeCompany"
+  Assets:Checking:ABCBank         4228.00 USD
+  Expenses:Taxes:FederalIncome     416.00 USD
+  Expenses:Taxes:Medicare          128.00 USD
+  Expenses:Taxes:SocialSecurity     96.00 USD
+  Expenses:Taxes:StateIncome        32.00 USD
+  Income:Bonus:FakeCompany       -3000.00 USD
+  Income:Overtime:FakeCompany     -300.00 USD
+  Income:Salary:FakeCompany      -1600.00 USD
