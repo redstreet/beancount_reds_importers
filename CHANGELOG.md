@@ -1,5 +1,47 @@
 # Changelog
 
+## 0.9.0 (2024-05-14)
+
+### New Features
+
+- add genericpdf paycheck importer. [Ammon Sarver]
+- add bamboohr paycheck importer. [Ammon Sarver]
+- add pdfreader libreader importer. [Ammon Sarver]
+- minor: add 'show_configured' in paycheck transaction builder. [Red S]
+
+### New Importers
+- add CSV importer for Digital Credit Union (#89) [Harlan Lieberman-Berg]
+- add importer for Alliant Federal Credit Union (#88) [Harlan Lieberman-Berg]
+- add schwab csv credit line importer. [Red S]
+
+### Improvements
+
+- minor: add_custom_postings to banking.py. [Red S]
+- minor: add identification based on filename to schwab importers. [Red S]
+- minor: overridable add_custom_postings() [Red S]
+- minor: add tdameritrade to template.cfg. [Red S]
+
+
+### Fixes
+
+- update requirements to add back lost packages. [Ammon Sarver]
+- schwab_csv_creditline balance sign. [Red S]
+- add file encoding support to csvreader. [Ad Timmering]
+- only emit filing account metadata if configured #97. [Red S]
+- one-file-per-account broke with smart_importer #97. [Red S]
+- timestamp issue in balance assertions. [Red S]
+- balance date on test. [Red S]
+- schwab tests. [Red S]
+- schwab doesn't use a header in their csv any more. [Red S]
+- schwab_csv_checking format changed #91. [Red S]
+
+### Other
+- enforce formatting with ruff. [Rane Brown]
+- format with isort, use pyproject.toml. [Rane Brown]
+- switch to ruff for linting (#90) [Harlan Lieberman-Berg]
+- style: reformat to 99 col width (previously 88 col) [Red S]
+
+
 ## 0.8.0 (2023-11-24)
 
 
