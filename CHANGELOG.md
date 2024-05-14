@@ -1,6 +1,6 @@
 # Changelog
 
-## (unreleased)
+## 0.8.0 (2023-11-24)
 
 
 ### Improvements
