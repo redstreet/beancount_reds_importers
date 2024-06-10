@@ -34,6 +34,7 @@ class Importer(csvreader.Importer, investments.Importer):
         }
         self.transaction_type_map = {
             "Bank Interest":                "income",
+            "Credit Interest":              "income",
             "Bank Transfer":                "cash",
             "Buy":                          "buystock",
             "Journaled Shares":             "buystock",  # These are in-kind tranfers
