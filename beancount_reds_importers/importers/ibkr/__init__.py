@@ -176,3 +176,11 @@ class Importer(investments.Importer, xmlreader.Importer):
         """
         ac = list(self.get_xpath_elements('/FlexQueryResponse/FlexStatements/FlexStatement/CashReport/CashReportCurrency'))[0]
         return D(ac['slbNetCash'])
+
+    def get_balance_positions(self):
+        for pos in self.get_xpath_elements('/FlexQueryResponse/FlexStatements/FlexStatement/OpenPositions/OpenPosition'):
+            balance = {
+                'security': pos['isin'],
+                'units': D(pos['position']),
+            }
+            yield DictToObject(balance)
