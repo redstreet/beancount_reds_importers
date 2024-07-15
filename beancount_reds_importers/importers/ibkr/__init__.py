@@ -131,8 +131,8 @@ class Importer(investments.Importer, xmlreader.Importer):
             'type':       ofx_type_map[xml_data['buySell']],
             'units':      D(xml_data['quantity']),
             'unit_price': D(xml_data['tradePrice']),
-            'commission': D(xml_data['ibCommission']),
-            'total':      D(xml_data['proceeds']),
+            'commission': -1 * D(xml_data['ibCommission']),
+            'total':      D(xml_data['netCash']),
         }
         return ofx_dict
 
