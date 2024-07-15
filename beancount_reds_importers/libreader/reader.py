@@ -24,8 +24,12 @@ class Reader:
             return False
         self.currency = self.config.get("currency", "CURRENCY_NOT_CONFIGURED")
         self.initialize_reader(file)
-        # print("reader_ready:", self.reader_ready)
+        # print("reader_ready:", self.reader_ready, self.IMPORTER_NAME)
         return self.reader_ready
+
+    def set_currency(self):
+        """For overriding"""
+        self.currency = self.config.get("currency", "CURRENCY_NOT_CONFIGURED")
 
     def file_name(self, file):
         return "{}".format(ntpath.basename(file.name))
@@ -54,6 +58,9 @@ class Reader:
 
     def get_balance_positions(self):
         return []
+
+    def get_balance_assertion_date(self):
+        return None
 
     def get_available_cash(self, settlement_fund_balance=0):
         return None
