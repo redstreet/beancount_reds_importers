@@ -1,5 +1,10 @@
 """IBKR Flex Query importer for beancount.
 
+TODO:
+- balance assertions for positions
+- balance assertions for cash
+- Flex Web Service API to programmatically retrieve all of this
+
 Activity Flex Query Details
 Query ID XXX
 Query Name XXX
@@ -136,7 +141,7 @@ class Importer(investments.Importer, xmlreader.Importer):
         ofx_dict = {
             'tradeDate':  self.convert_date(xml_data['dateTime']),
             'amount':     D(xml_data['amount']),
-            'security':   getattr(xml_data, 'isin', None),
+            'security':   xml_data.get('isin', None),
             'type':       'cash',
             'memo':       xml_data['type'],
         }
@@ -160,3 +165,14 @@ class Importer(investments.Importer, xmlreader.Importer):
                                            xml_interpreter=self.xml_trade_interpreter)
         yield from self.get_xpath_elements('/FlexQueryResponse/FlexStatements/FlexStatement/CashTransactions/CashTransaction',
                                            xml_interpreter=self.xml_cash_interpreter)
+
+    def get_balance_assertion_date(self):
+        ac = list(self.get_xpath_elements('/FlexQueryResponse/FlexStatements/FlexStatement/CashReport/CashReportCurrency'))[0]
+        return self.convert_date(ac['toDate']).date()
+
+    def get_available_cash(self, settlement_fund_balance=0):
+        """Assumes there's only one cash currency.
+        TODO: get investments transaction builder to accept date from get_available_cash
+        """
+        ac = list(self.get_xpath_elements('/FlexQueryResponse/FlexStatements/FlexStatement/CashReport/CashReportCurrency'))[0]
+        return D(ac['slbNetCash'])
