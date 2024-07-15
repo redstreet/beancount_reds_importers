@@ -5,14 +5,10 @@ the logic will have to be the institution specific readers.
 
 """
 
-import datetime
-import warnings
-from collections import namedtuple
 from lxml import etree
 
 from beancount.ingest import importer
 from beancount_reds_importers.libreader import reader
-
 
 
 class Importer(reader.Reader, importer.ImporterProtocol):
@@ -22,10 +18,7 @@ class Importer(reader.Reader, importer.ImporterProtocol):
         if getattr(self, "file", None) != file:
             self.file = file
             self.reader_ready = False
-            try:
-                self.xmltree = etree.parse(file.name)
-            except:
-                return
+            self.xmltree = etree.parse(file.name)
             self.reader_ready = self.deep_identify()
         if self.reader_ready:
             self.set_currency()

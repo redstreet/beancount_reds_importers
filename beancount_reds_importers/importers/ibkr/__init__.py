@@ -20,7 +20,10 @@ Account Information
 Cash Transactions
 -----------------
 
-Options: Dividends, Payment in Lieu of Dividends, Withholding Tax, 871(m) Withholding, Advisor Fees, Other Fees, Deposits & Withdrawals, Carbon Credits, Bill Pay, Broker Interest Paid, Broker Interest Received, Broker Fees, Bond Interest Paid, Bond Interest Received, Price Adjustments, Commission Adjustments, Detail
+Options: Dividends, Payment in Lieu of Dividends, Withholding Tax, 871(m) Withholding,
+Advisor Fees, Other Fees, Deposits & Withdrawals, Carbon Credits, Bill Pay, Broker
+Interest Paid, Broker Interest Received, Broker Fees, Bond Interest Paid, Bond Interest
+Received, Price Adjustments, Commission Adjustments, Detail
 
 1.Date/Time
 2.Amount
@@ -91,10 +94,12 @@ from beancount_reds_importers.libreader import xmlreader
 from beancount_reds_importers.libtransactionbuilder import investments
 from beancount.core.number import D
 
+
 class DictToObject:
     def __init__(self, dictionary):
         for key, value in dictionary.items():
             setattr(self, key, value)
+
 
 # xml on left, ofx on right
 ofx_type_map = {

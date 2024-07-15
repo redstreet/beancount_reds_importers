@@ -45,7 +45,7 @@ class Importer(investments.Importer, ofxreader.Importer):
         # some vanguard files have memos repeated like this:
         # 'DIVIDEND REINVESTMENTDIVIDEND REINVESTMENT'
         retval = ot.memo
-        if ot.memo[: int(len(ot.memo) / 2)] == ot.memo[int(len(ot.memo) / 2) :]:
+        if ot.memo[: int(len(ot.memo) / 2)] == ot.memo[int(len(ot.memo) / 2):]:
             retval = ot.memo[: int(len(ot.memo) / 2)]
         return retval
 
