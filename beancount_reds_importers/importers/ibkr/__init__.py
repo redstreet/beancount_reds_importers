@@ -1,30 +1,23 @@
 """IBKR Flex Query importer for beancount.
 
 TODO:
-- balance assertions for positions
-- balance assertions for cash
-- Flex Web Service API to programmatically retrieve all of this
+- Flex Web Service API to programmatically retrieve data
 
 Activity Flex Query Details
-Query ID XXX
-Query Name XXX
 
 Sections
-========
-
 Account Information
--------------------
 1.ClientAccountID
 2.CurrencyPrimary
 
+Cash Report
+1.CurrencyPrimary
+2.StartingCash
+3.EndingCash
+4.NetCashBalanceSLB
+5.ToDate
+
 Cash Transactions
------------------
-
-Options: Dividends, Payment in Lieu of Dividends, Withholding Tax, 871(m) Withholding,
-Advisor Fees, Other Fees, Deposits & Withdrawals, Carbon Credits, Bill Pay, Broker
-Interest Paid, Broker Interest Received, Broker Fees, Bond Interest Paid, Bond Interest
-Received, Price Adjustments, Commission Adjustments, Detail
-
 1.Date/Time
 2.Amount
 3.Type
@@ -34,12 +27,12 @@ Received, Price Adjustments, Commission Adjustments, Detail
 7.ISIN
 
 Net Stock Position Summary
---------------------------
 1.Symbol
-2.CUSIP
+2.ISIN
+3.ReportDate
+4.NetShares
 
 Open Dividend Accruals
-----------------------
 1.Symbol
 2.GrossAmount
 3.NetAmount
@@ -47,8 +40,13 @@ Open Dividend Accruals
 5.Quantity
 6.ISIN
 
+Open Positions
+Options: Summary
+1.Symbol
+2.ISIN
+3.Quantity
+
 Trades
-------
 Options: Execution
 1.SecurityID
 2.DateTime
@@ -66,17 +64,22 @@ Options: Execution
 14.CurrencyPrimary
 15.ISIN
 
+Transfers
+Options: Transfer
+1.Symbol
+2.ISIN
+3.DateTime
+4.Quantity
+5.TransferPrice
+
 
 Delivery Configuration
-----------------------
-Accounts
-Format XML
+Accounts Format XML
 Period Last N Calendar Days
 Number of Days 120
 
 
 General Configuration
----------------------
 Profit and Loss Default
 Include Canceled Trades? No
 Include Currency Rates? No
