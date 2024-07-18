@@ -130,8 +130,19 @@ class Importer(investments.Importer, xmlreader.Importer):
         d = d.split(' ')[0]
         return datetime.datetime.strptime(d, self.date_format)
 
-    def trade_to_ofx_dict(self, xml_data):
-        # Mapping the input dictionary to the OFX dictionary format
+    def xml_transfer_interpreter(self, xml_data):
+        # map, with ofx fields on the left and xml fields on the right
+        ofx_dict = {
+            'security':   xml_data['isin'],
+            'tradeDate':  self.convert_date(xml_data['dateTime']),
+            'units':      D(xml_data['quantity']),
+            'memo':       'Transfer in kind',
+            'type':       'transfer',
+        }
+        return DictToObject(ofx_dict)
+
+    def xml_trade_interpreter(self, xml_data):
+        # map, with ofx fields on the left and xml fields on the right
         ofx_dict = {
             'security':   xml_data['isin'],
             'tradeDate':  self.convert_date(xml_data['dateTime']),
@@ -142,10 +153,10 @@ class Importer(investments.Importer, xmlreader.Importer):
             'commission': -1 * D(xml_data['ibCommission']),
             'total':      D(xml_data['netCash']),
         }
-        return ofx_dict
+        return DictToObject(ofx_dict)
 
-    def cash_to_ofx_dict(self, xml_data):
-        # Mapping the input dictionary to the OFX dictionary format
+    def xml_cash_interpreter(self, xml_data):
+        # map, with ofx fields on the left and xml fields on the right
         ofx_dict = {
             'tradeDate':  self.convert_date(xml_data['dateTime']),
             'amount':     D(xml_data['amount']),
@@ -158,21 +169,15 @@ class Importer(investments.Importer, xmlreader.Importer):
             ofx_dict['type'] = 'dividends'
             ofx_dict['total'] = ofx_dict['amount']
 
-        return ofx_dict
-
-    def xml_trade_interpreter(self, element):
-        ot = self.trade_to_ofx_dict(element)
-        return DictToObject(ot)
-
-    def xml_cash_interpreter(self, element):
-        ot = self.cash_to_ofx_dict(element)
-        return DictToObject(ot)
+        return DictToObject(ofx_dict)
 
     def get_transactions(self):
         yield from self.get_xpath_elements('/FlexQueryResponse/FlexStatements/FlexStatement/Trades/Trade',
                                            xml_interpreter=self.xml_trade_interpreter)
         yield from self.get_xpath_elements('/FlexQueryResponse/FlexStatements/FlexStatement/CashTransactions/CashTransaction',
                                            xml_interpreter=self.xml_cash_interpreter)
+        yield from self.get_xpath_elements('/FlexQueryResponse/FlexStatements/FlexStatement/Transfers/Transfer',
+                                           xml_interpreter=self.xml_transfer_interpreter)
 
     def get_balance_assertion_date(self):
         ac = list(self.get_xpath_elements('/FlexQueryResponse/FlexStatements/FlexStatement/CashReport/CashReportCurrency'))[0]
