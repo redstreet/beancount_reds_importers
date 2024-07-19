@@ -42,6 +42,7 @@ setup(
         "console_scripts": [
             "ofx-summarize = beancount_reds_importers.util.ofx_summarize:summarize",
             "bean-download = beancount_reds_importers.util.bean_download:cli",
+            "reds-ibkr-flexquery-download = beancount_reds_importers.importers.ibkr.flexquery_download:flexquery_download",
         ]
     },
     zip_safe=False,
