@@ -19,11 +19,11 @@ class Importer(reader.Reader, importer.ImporterProtocol):
             self.file = file
             self.reader_ready = False
             self.xmltree = etree.parse(file.name)
-            self.reader_ready = self.deep_identify()
+            self.reader_ready = self.deep_identify(file)
         if self.reader_ready:
             self.set_currency()
 
-    def deep_identify(self):
+    def deep_identify(self, file):
         """For overriding by institution specific importer which can check if an account name
         matches, and oother such things."""
         return True

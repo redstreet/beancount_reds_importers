@@ -117,10 +117,21 @@ class Importer(investments.Importer, xmlreader.Importer):
     def custom_init(self):
         if not self.custom_init_run:
             self.max_rounding_error = 0.04
-            self.filename_pattern_def = "Transaction_report"
+            self.filename_pattern_def = "ibkr"
             self.custom_init_run = True
             self.date_format = '%Y-%m-%d'
             self.get_ticker_info = self.get_ticker_info_from_id
+
+    def deep_identify(self, file):
+        try:
+            if self.config.get('account_number', None):
+                # account number specific matching
+                return self.config['account_number'] == list(self.get_xpath_elements("/FlexQueryResponse/FlexStatements/FlexStatement/AccountInformation"))[0]['accountId']
+            else:
+                # base check: simply ensure this looks like a valid IBKR Flex Query file
+                return list(self.get_xpath_elements("/FlexQueryResponse"))[0] is not None
+        except IndexError:
+            return False
 
     def set_currency(self):
         self.currency = list(self.get_xpath_elements("/FlexQueryResponse/FlexStatements/FlexStatement/AccountInformation"))[0]['currency']
