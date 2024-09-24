@@ -6,7 +6,7 @@ from os import path
 
 sys.path.insert(0, path.join(path.dirname(__file__)))
 
-from beancount_reds_importers import fidelity_cma_csv
+from beancount_reds_importers.importers.fidelity import fidelity_cma_csv
 
 fund_data = [
         ('FZFXX',     'helllo', 'Fideilty Zero',          ),
