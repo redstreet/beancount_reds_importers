@@ -98,7 +98,8 @@ for f in ~/.zcomplete/*; do source $f; done
 pip3 install beancount-reds-importers
 ```
 
-Or to install the bleeding edge version from git:
+Or to install the bleeding edge version from git (which I recommend, as long as you are
+willing to understand there might be a bug or two):
 ```
 pip3 install git+https://github.com/redstreet/beancount_reds_importers
 ```
