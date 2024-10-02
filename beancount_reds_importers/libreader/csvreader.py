@@ -128,7 +128,8 @@ class Importer(reader.Reader, importer.ImporterProtocol):
 
         # fixup dates
         def convert_date(d):
-            return datetime.datetime.strptime(d, self.date_format)
+            """Remove spaces and convert to datetime"""
+            return datetime.datetime.strptime(d.strip(), self.date_format)
 
         dates = getattr(self, "date_fields", []) + ["date", "tradeDate", "settleDate"]
         for i in dates:
