@@ -27,7 +27,7 @@ setup(
     },
     install_requires=[
         "Click >= 7.0",
-        "beancount >= 2.3.5",
+        "beancount >=2.3.5,<3.0.0",
         "click_aliases >= 1.0.1",
         "dateparser >= 1.2.0",
         "ofxparse >= 0.21",
