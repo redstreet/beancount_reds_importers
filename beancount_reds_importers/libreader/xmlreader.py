@@ -5,9 +5,9 @@ the logic will have to be the institution specific readers.
 
 """
 
+from beancount.ingest import importer
 from lxml import etree
 
-from beancount.ingest import importer
 from beancount_reds_importers.libreader import reader
 
 
