@@ -14,34 +14,35 @@ class Importer(investments.Importer, csvreader.Importer):
         self.filename_pattern_def = ".*History"
         self.date_format = "%m/%d/%Y"
         self.header_identifier = ""
-        self.column_labels_line = (
-            "Run Date,Action,Symbol,Description,Type,Quantity,Price ($),Commission ($),Fees ($),Accrued Interest ($),Amount ($),Cash Balance ($),Settlement Date"
-        )
+        self.column_labels_line = "Run Date,Action,Symbol,Description,Type,Quantity,Price ($),Commission ($),Fees ($),Accrued Interest ($),Amount ($),Cash Balance ($),Settlement Date"
         self.header_map = {
-            "Run Date":             "date",
-            "Action":               "memo",
-            "Symbol":               "security",
-            "Amount ($)":           "amount",
-            "Settlement Date":      "settleDate",
-            "Quantity":             "units",
+            "Run Date": "date",
+            "Action": "memo",
+            "Symbol": "security",
+            "Amount ($)": "amount",
+            "Settlement Date": "settleDate",
+            "Quantity": "units",
             "Accrued Interest ($)": "accrued_interest",
-            "Fees ($)":             "fees",
-            "Commission ($)":       "commission",
-            "Cash Balance ($)":     "balance",
-            "Price ($)":            "unit_price",
+            "Fees ($)": "fees",
+            "Commission ($)": "commission",
+            "Cash Balance ($)": "balance",
+            "Price ($)": "unit_price",
         }
         self.transaction_type_map = {
-            "DIVIDEND RECEIVED":      "dividends",
-            "TRANSFERRED FROM":       "cash",
-            "YOU BOUGHT":             "buystock",
-            "YOU SOLD":               "sellstock",
+            "DIVIDEND RECEIVED": "dividends",
+            "TRANSFERRED FROM": "cash",
+            "YOU BOUGHT": "buystock",
+            "YOU SOLD": "sellstock",
         }
         self.skip_transaction_types = []
         # fmt: on
 
     def deep_identify(self, file):
         last_four = self.config.get("account_number", "")[-4:]
-        return re.match(self.header_identifier, file.head(), flags=re.DOTALL) and f"{last_four}" in file.name
+        return (
+            re.match(self.header_identifier, file.head(), flags=re.DOTALL)
+            and f"{last_four}" in file.name
+        )
 
     def prepare_table(self, rdr):
         for field in ["Action", "Symbol", "Description"]:
@@ -49,7 +50,7 @@ class Importer(investments.Importer, csvreader.Importer):
 
         rdr = rdr.addfield("total", lambda x: x["Amount ($)"])
         rdr = rdr.addfield("tradeDate", lambda x: x["Run Date"])
-        rdr = rdr.cutout('Type')
+        rdr = rdr.cutout("Type")
         rdr = rdr.capture("Action", "(\\S+(?:\\s+\\S+)?)", ["type"], include_original=True)
 
         # for field in ["memo"]:
