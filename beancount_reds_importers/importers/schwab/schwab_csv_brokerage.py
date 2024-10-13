@@ -57,6 +57,9 @@ class Importer(csvreader.Importer, investments.Importer):
             "Funds Received":               "cash",
             "Stock Split":                  "cash",
             "Cash In Lieu":                 "cash",
+            "Wire Sent":                    "cash",
+            "Misc Cash Entry":              "cash",
+            "Service Fee":                  "fee",
         }
         # fmt: on
 
