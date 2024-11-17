@@ -64,3 +64,8 @@ class Reader:
 
     def get_available_cash(self, settlement_fund_balance=0):
         return None
+
+    def get_transactions(self):
+        raise NotImplementedError(
+            "get_transactions() must be implemented by a subclass (usually the reader, but sometimes the importer)."
+        )
