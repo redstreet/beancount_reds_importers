@@ -8,7 +8,7 @@ from beancount_reds_importers.libtransactionbuilder import paycheck
 # Generic pdf paystub importer. Use this to build your own pdf paystub importer.
 # Call this importer with a config that looks like:
 #
-#    genericpdf.Importer({"desc":"Paycheck (My Company)",
+#    genericpdfpaycheck.Importer({"desc":"Paycheck (My Company)",
 #        "main_account":"Income:Employment",
 #        "paycheck_template": {}, # See beancount_reds_importers/libtransactionbuilder/paycheck.py for sample template
 #        "currency": "PENNIES",
