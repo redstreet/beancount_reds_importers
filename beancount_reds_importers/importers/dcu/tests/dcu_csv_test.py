@@ -12,6 +12,7 @@ from beancount_reds_importers.importers import dcu
         {
             "main_account": "Assets:Banks:DCU:Checking",
             "currency": "USD",
+            "emit_filing_account_metadata": False,
         }
     )
 )

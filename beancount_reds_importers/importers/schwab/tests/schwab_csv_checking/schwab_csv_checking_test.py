@@ -13,6 +13,7 @@ from beancount_reds_importers.importers.schwab import schwab_csv_checking
             "account_number": "1234",
             "main_account": "Assets:Banks:Schwab",
             "currency": "USD",
+            "emit_filing_account_metadata": False,
         }
     )
 )

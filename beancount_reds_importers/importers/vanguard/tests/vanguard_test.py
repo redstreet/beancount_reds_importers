@@ -26,6 +26,7 @@ from beancount_reds_importers.importers import vanguard
                 ],
                 "money_market": ["VMFXX"],
             },
+            "emit_filing_account_metadata": False,
         }
     )
 )

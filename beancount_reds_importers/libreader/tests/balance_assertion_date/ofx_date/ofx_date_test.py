@@ -11,6 +11,7 @@ from beancount_reds_importers.importers import ally
             "account_number": "23456",
             "main_account": "Assets:Banks:Checking",
             "balance_assertion_date_type": "ofx_date",
+            "emit_filing_account_metadata": False,
         }
     )
 )

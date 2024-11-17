@@ -12,6 +12,7 @@ from beancount_reds_importers.importers.unitedoverseas import uobbank
             "account_number": "1234567890",
             "currency": "SGD",
             "rounding_error": "Equity:Rounding-Errors:Imports",
+            "emit_filing_account_metadata": False,
         }
     )
 )

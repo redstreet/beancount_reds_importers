@@ -42,6 +42,7 @@ def build_config():
         "rounding_error": "Equity:Rounding-Errors:Imports",
         "fund_info": fund_info,
         "currency": currency,
+        "emit_filing_account_metadata": False,
     }
     return config
 
