@@ -3,7 +3,7 @@ from pprint import pformat
 import pdfplumber
 import petl as etl
 
-from beancount_reds_importers.libreader import csvreader
+from beancount_reds_importers.libreader import csv_multitable_reader
 
 LEFT = 0
 TOP = 1
@@ -16,7 +16,7 @@ PURPLE = (135, 0, 255)
 TRANSPARENT = (0, 0, 0, 0)
 
 
-class Importer(csvreader.Importer):
+class Importer(csv_multitable_reader.Importer):
     """
     A reader that converts a pdf with tables into a multi-petl-table format understood by transaction builders.
 
@@ -50,6 +50,10 @@ class Importer(csvreader.Importer):
             .debug-pdf-data.txt
                 is a printout of the meta_text and table data found before being processed into petl tables, as well as some generated helper objects to add to new importers or import configs
 
+    self.transaction_table_section: `str`
+        When reading a pdf that contains transactions, set this setting to the name of the table section that 
+        contains the transactions. This is the key for the table in the self.alltables dictionary.
+                
     ### Outputs
     self.meta_text: `str`
         contains all text found in the document outside of tables
@@ -62,109 +66,133 @@ class Importer(csvreader.Importer):
 
     def initialize_reader(self, file):
         if getattr(self, "file", None) != file:
-            self.pdf_table_extraction_settings = {}
-            self.pdf_table_extraction_crop = (0, 0, 0, 0)
-            self.pdf_table_title_height = 20
-            self.pdf_page_break_top = 45
-            self.debug = False
-
-            self.meta_text = ""
             self.file = file
+            self.meta_text = ""
+            self.debug_images = {}
             self.file_read_done = False
             self.reader_ready = True
 
-    def file_date(self, file):
-        raise "Not implemented, must overwrite, check self.alltables, or self.meta_text for the data"
-        pass
-
     def prepare_tables(self):
+        """Make final adjustments to tables before processing by the transaction builder."""
+        for section, table in self.alltables.items():            
+            table = table.rename(self.header_map)
+            table = self.convert_columns(table)
+            table = self.fix_column_names(table)
+            table = self.prepare_processed_table(table) # override this to make additonal adjustments
+
+            self.alltables[section] = table
         return
 
-    def read_file(self, file):
-        tables = []
+    def get_transactions(self):
+        """Provides the transactions to the transaction builder."""        
+        # Transactions are usually in a single table with other tables containing additonal 
+        # context information for the institution or statement period (See csv_multitable_reader definition). 
+        # Specify the transaction table section in the config.
+        try:
+            transaction_table = self.alltables[self.transaction_table_section]
+        except KeyError:
+            raise KeyError(
+                f"Table section '{self.transaction_table_section}' not found in self.alltables."
+                "Check the configuration value set in self.transaction_table_section."
+            )
 
-        with pdfplumber.open(file.name) as pdf:
-            for page_idx, page in enumerate(pdf.pages):
-                # all bounding boxes are (left, top, right, bottom)
-                adjusted_crop = (
-                    min(0 + self.pdf_table_extraction_crop[LEFT], page.width),
-                    min(0 + self.pdf_table_extraction_crop[TOP], page.height),
-                    max(page.width - self.pdf_table_extraction_crop[RIGHT], 0),
-                    max(page.height - self.pdf_table_extraction_crop[BOTTOM], 0),
-                )
+        for ot in transaction_table.namedtuples():
+            if self.skip_transaction(ot):
+                continue
+            yield ot
+    
+    def get_adjusted_crop(self, page_idx, page):
+        """Calculate the adjusted crop coordinates for the page."""
+        return (
+            min(0 + self.pdf_table_extraction_crop[LEFT], page.width),
+            min(0 + self.pdf_table_extraction_crop[TOP], page.height),
+            max(page.width - self.pdf_table_extraction_crop[RIGHT], 0),
+            max(page.height - self.pdf_table_extraction_crop[BOTTOM], 0),
+        )
 
-                # Debug image
-                image = page.crop(adjusted_crop).to_image()
-                image.debug_tablefinder(tf=self.pdf_table_extraction_settings)
+    def extract_tables(self, page_idx, page, adjusted_crop):
+        """Extract tables from a page within the given crop area."""
+        cropped_page = page.crop(adjusted_crop)
+        
+        image = page.crop(adjusted_crop).to_image() #debug
+        image.debug_tablefinder(tf=self.pdf_table_extraction_settings) #debug
+        self.debug_images[page_idx] = image #debug
+        
+        table_refs = cropped_page.find_tables(
+            table_settings=self.pdf_table_extraction_settings
+        )
 
-                table_ref = page.crop(adjusted_crop).find_tables(
-                    table_settings=self.pdf_table_extraction_settings
-                )
-                page_tables = [{"table": i.extract(), "bbox": i.bbox} for i in table_ref]
+        return [{"table": t.extract(), "bbox": t.bbox} for t in table_refs]
 
-                # Get Metadata (all data outside tables)
-                meta_page = page
-                meta_image = meta_page.to_image()
-                for table in page_tables:
-                    meta_page = meta_page.outside_bbox(table["bbox"])
-                    meta_image.draw_rect(table["bbox"], BLACK, RED)
-
-                meta_text = meta_page.extract_text()
-                self.meta_text = self.meta_text + meta_text
-
-                # Attach section headers
-                for table_idx, table in enumerate(page_tables):
-                    section_title_bbox = (
-                        table["bbox"][LEFT],
-                        max(table["bbox"][TOP] - self.pdf_table_title_height, 0),
-                        table["bbox"][RIGHT],
-                        table["bbox"][TOP],
-                    )
-
-                    bbox_area = pdfplumber.utils.calculate_area(section_title_bbox)
-                    if bbox_area > 0:
-                        section_title = meta_page.crop(section_title_bbox).extract_text()
-                        image.draw_rect(section_title_bbox, TRANSPARENT, PURPLE)
-                        page_tables[table_idx]["section"] = section_title
-                    else:
-                        page_tables[table_idx]["section"] = ""
-
-                    # replace None with ''
-                    for row_idx, row in enumerate(table["table"]):
-                        page_tables[table_idx]["table"][row_idx] = [
-                            "" if v is None else v for v in row
-                        ]
-
-                tables = tables + page_tables
-
-                if self.debug:
-                    image.save(".debug-pdf-table-detection-page_{}.png".format(page_idx))
-                    meta_image.save(".debug-pdf-metadata-page_{}.png".format(page_idx))
-
-            # Find and fix page broken tables
-            for table_idx, table in enumerate(tables[:]):
-                if (
-                    # if not the first table,
-                    table_idx >= 1
-                    # and the top of the table is close to the top of the page
-                    and table["bbox"][TOP] < self.pdf_page_break_top
-                    # and there is no section title
-                    and table["section"] == ""
-                    # and the header rows are the same,
-                    and tables[table_idx - 1]["table"][0] == tables[table_idx]["table"][0]
-                ):  # assume a page break
-                    tables[table_idx - 1]["table"] = (
-                        tables[table_idx - 1]["table"] + tables[table_idx]["table"][1:]
-                    )
-                    del tables[table_idx]
-                    continue
-
-                # if there is no table section give it one
-                if table["section"] == "":
-                    tables[table_idx]["section"] = "table_{}".format(table_idx + 1)
-
+    def extract_metadata(self, page_idx, page, tables):
+        """Extract metadata text outside of table bounding boxes."""
+        meta_page = page
+        meta_image = meta_page.to_image() #debug
+        
+        for table in tables:
+            meta_page = meta_page.outside_bbox(table["bbox"])
+            meta_image.draw_rect(table["bbox"], BLACK, RED) #debug
+        
         if self.debug:
-            # generate helpers
+            meta_image.save(".debug-pdf-metadata-page_{}.png".format(page_idx)) #debug
+        
+        return meta_page.extract_text()
+
+    def attach_section_headers(self, page_idx, page_tables, page):
+        """Attach section headers to tables."""
+        image = self.debug_images[page_idx] #debug
+        
+        for table_idx, table in enumerate(page_tables):
+            section_title_bbox = (
+                table["bbox"][LEFT],
+                max(table["bbox"][TOP] - self.pdf_table_title_height, 0),
+                table["bbox"][RIGHT],
+                table["bbox"][TOP],
+            )
+
+            bbox_area = pdfplumber.utils.calculate_area(section_title_bbox)
+            if bbox_area > 0:
+                section_title = page.crop(section_title_bbox).extract_text()
+                image.draw_rect(section_title_bbox, TRANSPARENT, PURPLE) #debuglogic
+                page_tables[table_idx]["section"] = section_title
+            else:
+                page_tables[table_idx]["section"] = ""
+
+            # replace None with ''
+            for row_idx, row in enumerate(table["table"]):
+                page_tables[table_idx]["table"][row_idx] = [
+                    "" if v is None else v for v in row
+                ]
+            
+        return page_tables
+
+    def find_and_fix_broken_tables(self, tables):
+        """Combine tables that are split up by page breaks."""
+        for table_idx, table in enumerate(tables[:]):
+            if (
+                # if not the first table,
+                table_idx >= 1
+                # and the top of the table is close to the top of the page
+                and table["bbox"][TOP] < self.pdf_page_break_top
+                # and there is no section title
+                and table["section"] == ""
+                # and the header rows are the same,
+                and tables[table_idx - 1]["table"][0] == tables[table_idx]["table"][0]
+            ):  # assume a page break
+                tables[table_idx - 1]["table"] = (
+                    tables[table_idx - 1]["table"] + tables[table_idx]["table"][1:]
+                )
+                del tables[table_idx]
+                continue
+
+            # if there is no table section give it one
+            if table["section"] == "":
+                tables[table_idx]["section"] = "table_{}".format(table_idx + 1)
+
+        return tables
+    
+    def generate_debug_helpers(self, tables):
+        if self.debug:
             paycheck_template = {}
             header_map = {}
             for table in tables:
@@ -194,10 +222,33 @@ class Importer(csvreader.Importer):
                     )
                 )
 
+    def read_file(self, file):
+        """Main method to read and process a PDF into self.alltables."""
+        if self.file_read_done:
+            return
+
+        self.meta_text = ""
+        tables = []
+
+        with pdfplumber.open(file.name) as pdf:
+            for page_idx, page in enumerate(pdf.pages):
+                adjusted_crop = self.get_adjusted_crop(page_idx, page)
+                page_tables = self.extract_tables(page_idx, page, adjusted_crop)
+                self.meta_text += self.extract_metadata(page_idx, page, page_tables)
+                page_tables = self.attach_section_headers(page_idx, page_tables, page)
+
+                if self.debug:
+                    self.debug_images[page_idx].save(".debug-pdf-table-detection-page_{}.png".format(page_idx)) #debug
+
+                tables.extend(page_tables)
+
+        tables = self.find_and_fix_broken_tables(tables)
+        self.generate_debug_helpers(tables) #debug
+
         self.alltables = {table["section"]: etl.wrap(table["table"]) for table in tables}
         self.prepare_tables()
 
-        if self.debug:
+        if self.debug: #debug
             with open(".debug-pdf-prepared-tables.txt", "w") as debug_file:
                 debug_file.write(pformat({"prepared_tables": self.alltables}))
 
