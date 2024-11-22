@@ -1,8 +1,10 @@
 """Mercury Cards pdf importer for beancount."""
 
-from datetime import datetime
-import petl as etl
 import re
+from datetime import datetime
+
+import petl as etl
+
 from beancount_reds_importers.libreader import pdfreader
 from beancount_reds_importers.libtransactionbuilder import banking
 
