@@ -41,9 +41,6 @@ class Importer(csvreader.Importer):
         raise "Not yet implemented"
         pass
 
-    def convert_columns(self, rdr):
-        pass
-
     def is_section_title(self, row):
         # Match against rows that contain section titles. Eg: 'section1', 'section2', ...
         return len(row) == 1
@@ -58,6 +55,10 @@ class Importer(csvreader.Importer):
             return
 
         self.raw_rdr = rdr = self.read_raw(file)
+
+        skip_offset = 1
+        if getattr(self, 'section_titles_are_headers', False):
+            skip_offset = 0
 
         rdr = rdr.skip(getattr(self, "skip_head_rows", 0))  # chop unwanted file header rows
         rdr = rdr.head(
@@ -77,8 +78,8 @@ class Importer(csvreader.Importer):
         for s, e in table_indexes:
             if s == e:
                 continue
-            table = rdr.skip(s + 1)  # skip past start index and header row
-            table = table.head(e - s - 1)  # chop lines after table section data
+            table = rdr.skip(s + skip_offset)      # skip past start index and header row
+            table = table.head(e - s - skip_offset)  # chop lines after table section data
             self.alltables[rdr[s][0]] = table
 
         for section, table in self.alltables.items():
@@ -87,6 +88,11 @@ class Importer(csvreader.Importer):
             self.alltables[section] = table
 
         self.prepare_tables()  # to be overridden by importer
+
+        for section, table in self.alltables.items():
+            table = self.process_table(table)
+            self.alltables[section] = table
+
         self.file_read_done = True
 
     def get_transactions(self):
