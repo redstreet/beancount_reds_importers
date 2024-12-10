@@ -1,5 +1,7 @@
 from os import path
+
 from beancount.ingest import regression_pytest as regtest
+
 from beancount_reds_importers.importers import capitalonebank
 
 
@@ -8,6 +10,7 @@ from beancount_reds_importers.importers import capitalonebank
         {
             "account_number": "9876",
             "main_account": "Assets:Banks:CapitalOne",
+            "emit_filing_account_metadata": False,
         }
     )
 )

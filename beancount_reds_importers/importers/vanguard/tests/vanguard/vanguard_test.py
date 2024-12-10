@@ -1,5 +1,7 @@
 from os import path
+
 from beancount.ingest import regression_pytest as regtest
+
 from beancount_reds_importers.importers import vanguard
 
 
@@ -24,6 +26,7 @@ from beancount_reds_importers.importers import vanguard
                 ],
                 "money_market": ["VMFXX"],
             },
+            "emit_filing_account_metadata": False,
         }
     )
 )

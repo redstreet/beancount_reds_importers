@@ -1,11 +1,13 @@
 """xlsx importer module for beancount to be used along with investment/banking/other importer modules in
 beancount_reds_importers."""
 
-import petl as etl
-from io import StringIO
 import csv
-import openpyxl
 import warnings
+from io import StringIO
+
+import openpyxl
+import petl as etl
+
 from beancount_reds_importers.libreader import csv_multitable_reader
 
 # This xlsx reader uses petl to read a .csv with multiple tables into a dictionary of petl tables. The section
@@ -13,10 +15,10 @@ from beancount_reds_importers.libreader import csv_multitable_reader
 
 
 class Importer(csv_multitable_reader.Importer):
-    FILE_EXTS = ['xlsx']
+    FILE_EXTS = ["xlsx"]
 
     def initialize_reader(self, file):
-        if getattr(self, 'file', None) != file:
+        if getattr(self, "file", None) != file:
             self.file = file
             self.file_read_done = False
             self.reader_ready = True
@@ -43,4 +45,4 @@ class Importer(csv_multitable_reader.Importer):
     def is_section_title(self, row):
         if len(row) == 1:
             return True
-        return all(i == '' or i is None for i in row[1:])
+        return all(i == "" or i is None for i in row[1:])

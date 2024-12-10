@@ -23,9 +23,10 @@ amazongc.Importer({
 import datetime
 import itertools
 import ntpath
+
 from beancount.core import data
-from beancount.ingest import importer
 from beancount.core.number import D
+from beancount.ingest import importer
 
 # account flow                          ingest source
 # ----------------------------------------------------
@@ -37,25 +38,25 @@ from beancount.core.number import D
 class Importer(importer.ImporterProtocol):
     def __init__(self, config):
         self.config = config
-        self.currency = self.config.get('currency', 'CURRENCY_NOT_CONFIGURED')
-        self.filename_pattern_def = 'amazon-gift-card.tsv'
+        self.currency = self.config.get("currency", "CURRENCY_NOT_CONFIGURED")
+        self.filename_pattern_def = "amazon-gift-card.tsv"
 
     def identify(self, file):
         return self.filename_pattern_def in file.name
 
     def file_name(self, file):
-        return '{}'.format(ntpath.basename(file.name))
+        return "{}".format(ntpath.basename(file.name))
 
     def file_account(self, _):
-        return self.config['main_account']
+        return self.config["main_account"]
 
     def file_date(self, file):
         "Get the maximum date from the file."
         maxdate = datetime.date.min
-        for line in open(file.name, 'r').readlines()[1:]:
-            f = line.split('\t')
+        for line in open(file.name, "r").readlines()[1:]:
+            f = line.split("\t")
             f = [i.strip() for i in f]
-            date = datetime.datetime.strptime(f[0], '%B %d, %Y').date()
+            date = datetime.datetime.strptime(f[0], "%B %d, %Y").date()
             maxdate = max(date, maxdate)
         return maxdate
 
@@ -65,18 +66,26 @@ class Importer(importer.ImporterProtocol):
         new_entries = []
 
         counter = itertools.count()
-        for line in open(file.name, 'r').readlines()[1:]:
-            f = line.split('\t')
+        for line in open(file.name, "r").readlines()[1:]:
+            f = line.split("\t")
             f = [i.strip() for i in f]
-            date = datetime.datetime.strptime(f[0], '%B %d, %Y').date()
+            date = datetime.datetime.strptime(f[0], "%B %d, %Y").date()
             description = f[1].encode("ascii", "ignore").decode()
-            number = D(f[2].replace('$', ''))
+            number = D(f[2].replace("$", ""))
 
             metadata = data.new_metadata(file.name, next(counter))
-            entry = data.Transaction(metadata, date, self.FLAG,
-                                     None, description, data.EMPTY_SET, data.EMPTY_SET, [])
-            data.create_simple_posting(entry, config['main_account'], number, self.currency)
-            data.create_simple_posting(entry, config['target_account'], None, None)
+            entry = data.Transaction(
+                metadata,
+                date,
+                self.FLAG,
+                None,
+                description,
+                data.EMPTY_SET,
+                data.EMPTY_SET,
+                [],
+            )
+            data.create_simple_posting(entry, config["main_account"], number, self.currency)
+            data.create_simple_posting(entry, config["target_account"], None, None)
             new_entries.append(entry)
 
         return new_entries

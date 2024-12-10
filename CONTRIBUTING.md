@@ -1,3 +1,5 @@
+# Contributing
+
 Contributions welcome. Preferably:
 - include a test file. I realize this is sometimes a pain to create, but there is no way
   for me to test external contributions without test files
@@ -18,3 +20,30 @@ Contributions welcome. Preferably:
                ├── History_for_Account_X8YYYYYYY.csv
                └── run_test.bash
   ```
+
+## Setup
+
+Development setup would typically look something like this:
+
+```bash
+# clone repo, cd to repo
+
+# create virtual environment
+python3 -m venv venv
+
+# activate virtual environment
+source venv/bin/activate
+
+# install dependencies
+pip install -e .[dev]
+```
+
+## Formatting
+
+Prior to finalizing a pull request make sure to run the formatting tools and
+commit any resulting changes.
+
+```bash
+ruff format
+isort --profile black .
+```

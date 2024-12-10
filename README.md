@@ -32,6 +32,8 @@ File format readers included are:
 - `.ofx`
 - `.csv` (single and multitable support)
 - `.xlsx` (single and multitable support) (`pip3 install xlrd` if you plan to use this)
+- `.pdf` (single and multitable support)
+
 
 Transaction builders included are:
 - Banking (for banks and credit cards, which benefit from a postings predictor like
@@ -98,7 +100,8 @@ for f in ~/.zcomplete/*; do source $f; done
 pip3 install beancount-reds-importers
 ```
 
-Or to install the bleeding edge version from git:
+Or to install the bleeding edge version from git (which I recommend, as long as you are
+willing to understand there might be a bug or two):
 ```
 pip3 install git+https://github.com/redstreet/beancount_reds_importers
 ```
@@ -133,8 +136,12 @@ If you want something else, simply override this method in individual importer
 
 `smart` dates: Banks and credit cards typically have pending transactions that are not
 included in downloads. When we download the next statement, new transactions may appear
-prior to the balance assertion date that we generate for this statement. To attempt to
-avoid this, we set the balance assertion date to either two days (fudge factor to
+prior to the balance assertion date that we generate for this statement, which renders
+this balance assertion invalid. This problem manifests occasionally as an existing
+balance statement breaking  when a new statement is downloaded and is an annoyance as it
+needs manual fixing.
+
+To minimize this, we set the balance assertion date to either two days (fudge factor to
 account for pending transactions) before the statement's end date or the last
 transaction's date, whichever is later. To choose a different fudge factor, simply set
 `balance_assertion_date_fudge` in your config.

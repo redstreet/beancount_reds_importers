@@ -1,12 +1,13 @@
-""" Vanguard Brokerage ofx importer."""
+"""Vanguard Brokerage ofx importer."""
 
 import ntpath
+
 from beancount_reds_importers.libreader import ofxreader
 from beancount_reds_importers.libtransactionbuilder import investments
 
 
 class Importer(investments.Importer, ofxreader.Importer):
-    IMPORTER_NAME = 'Vanguard'
+    IMPORTER_NAME = "Vanguard"
 
     # Any memo in the source OFX that's in this set is not carried forward.
     # Vanguard sets memos that aren't very useful and would create noise in the
@@ -17,7 +18,7 @@ class Importer(investments.Importer, ofxreader.Importer):
 
     def custom_init(self):
         self.max_rounding_error = 0.11
-        self.filename_pattern_def = '.*OfxDownload'
+        self.filename_pattern_def = ".*OfxDownload"
         self.get_ticker_info = self.get_ticker_info_from_id
         self.get_payee = self.cleanup_memo
 
@@ -31,21 +32,21 @@ class Importer(investments.Importer, ofxreader.Importer):
         self.price_cost_both_zero_handler = lambda *args: None
 
     def file_name(self, file):
-        return 'vanguard-all-{}'.format(ntpath.basename(file.name))
+        return "vanguard-all-{}".format(ntpath.basename(file.name))
 
     def get_target_acct_custom(self, transaction, ticker=None):
-        if 'LT CAP GAIN' in transaction.memo:
-            return self.config['capgainsd_lt']
-        elif 'ST CAP GAIN' in transaction.memo:
-            return self.config['capgainsd_st']
+        if "LT CAP GAIN" in transaction.memo:
+            return self.config["capgainsd_lt"]
+        elif "ST CAP GAIN" in transaction.memo:
+            return self.config["capgainsd_st"]
         return None
 
     def cleanup_memo(self, ot):
         # some vanguard files have memos repeated like this:
         # 'DIVIDEND REINVESTMENTDIVIDEND REINVESTMENT'
         retval = ot.memo
-        if ot.memo[:int(len(ot.memo)/2)] == ot.memo[int(len(ot.memo)/2):]:
-            retval = ot.memo[:int(len(ot.memo)/2)]
+        if ot.memo[: int(len(ot.memo) / 2)] == ot.memo[int(len(ot.memo) / 2) :]:
+            retval = ot.memo[: int(len(ot.memo) / 2)]
         return retval
 
         # For users to comment out in their local file if they so prefer

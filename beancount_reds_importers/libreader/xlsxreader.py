@@ -2,11 +2,12 @@
 beancount_reds_importers."""
 
 import petl as etl
+
 from beancount_reds_importers.libreader import xlsreader
 
 
 class Importer(xlsreader.Importer):
-    FILE_EXTS = ['xlsx']
+    FILE_EXTS = ["xlsx"]
 
     def read_raw(self, file):
         rdr = etl.fromxlsx(file.name)

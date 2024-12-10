@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
 from os import path
+
 from beancount.ingest import regression_pytest as regtest
+
 from beancount_reds_importers.importers import dcu
 
 
@@ -10,6 +12,7 @@ from beancount_reds_importers.importers import dcu
         {
             "main_account": "Assets:Banks:DCU:Checking",
             "currency": "USD",
+            "emit_filing_account_metadata": False,
         }
     )
 )
