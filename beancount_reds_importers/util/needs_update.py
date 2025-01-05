@@ -166,7 +166,8 @@ def accounts_needing_updates(beancount_file, recency, sort_by_date, all_accounts
         for acc, bal in d.items()
         if ((datetime.now().date() - d[acc].date).days > recency)
     }
-    pretty_print_table(need_updates, sort_by_date)
+    if need_updates:
+        pretty_print_table(need_updates, sort_by_date)
 
     # If there are accounts with zero balance entries, print them
     accs_no_bal = accounts_with_no_balance_entries(entries, closes, last_balance)
