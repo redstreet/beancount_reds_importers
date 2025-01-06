@@ -33,6 +33,10 @@ class Importer(investments.Importer, csvreader.Importer):
             "TRANSFERRED FROM": "cash",
             "YOU BOUGHT": "buystock",
             "YOU SOLD": "sellstock",
+            "INTEREST EARNED": "income",
+            "REINVESTMENT": "reinvest",
+            "SHORT-TERM CAP GAIN": "capgainsd_st",
+            "LONG-TERM CAP GAIN": "capgainsd_lt",
         }
         self.skip_transaction_types = []
         # fmt: on
