@@ -34,7 +34,7 @@ class Importer(investments.Importer, csvreader.Importer):
             "YOU BOUGHT": "buystock",
             "YOU SOLD": "sellstock",
             "INTEREST EARNED": "income",
-            "REINVESTMENT FIDELITY": "buystock",
+            "REINVESTMENT": "buystock",
             "SHORT-TERM CAP": "capgainsd_st",
             "LONG-TERM CAP": "capgainsd_lt",
         }
