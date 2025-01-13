@@ -52,7 +52,7 @@ class Importer(investments.Importer, csvreader.Importer):
         for field in ["Action", "Symbol", "Description"]:
             rdr = rdr.convert(field, lambda x: x.lstrip())
 
-        rdr = rdr.addfield("total", lambda x: x["Amount ($)"])
+        rdr = rdr.addfield("total", lambda x: x["Amount"])
         rdr = rdr.addfield("tradeDate", lambda x: x["Run Date"])
         rdr = rdr.cutout("Type")
         rdr = rdr.capture("Action", "(\\S+(?:\\s+\\S+)?)", ["type"], include_original=True)
