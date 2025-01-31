@@ -42,7 +42,8 @@ class Importer(csvreader.Importer):
         pass
 
     def convert_columns(self, rdr):
-        pass
+        # Convert columns for a single table. Can be called from prepare_tables for each table.
+        return super().convert_columns(rdr)
 
     def is_section_title(self, row):
         # Match against rows that contain section titles. Eg: 'section1', 'section2', ...
