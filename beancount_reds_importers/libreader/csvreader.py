@@ -112,7 +112,12 @@ class Importer(reader.Reader, importer.ImporterProtocol):
 
         # fixup currencies
         def remove_non_numeric(x):
-            return re.sub(r"[^0-9\.-]", "", str(x).strip())  # noqa: W605
+            return re.sub(r'[^0-9\.-]', "", str(x).strip())  # noqa: W605
+
+        def add_decimal(x):
+            if '.' not in x:
+                return x+".00"
+            return x
 
         currencies = getattr(self, "currency_fields", []) + [
             "unit_price",
@@ -121,9 +126,12 @@ class Importer(reader.Reader, importer.ImporterProtocol):
             "amount",
             "balance",
         ]
+
         for i in currencies:
             if i in rdr.header():
                 rdr = rdr.convert(i, remove_non_numeric)
+                if self.config.get('add_currency_precision', False):
+                    rdr = rdr.convert(i, add_decimal)
                 rdr = rdr.convert(i, D)
 
         # fixup dates
@@ -201,13 +209,21 @@ class Importer(reader.Reader, importer.ImporterProtocol):
             rdr = self.prepare_table(rdr)
 
             # process table
-            rdr = rdr.rename(self.header_map)
-            rdr = self.convert_columns(rdr)
-            rdr = self.fix_column_names(rdr)
-            rdr = self.prepare_processed_table(rdr)
+            rdr = self.process_table(rdr)
             self.rdr = rdr
             self.ifile = file
             self.file_read_done = True
+
+    def process_table(self, rdr):
+        # Filter out any header mappings that don't exist in this table, since petl doesn't do this for us
+        #  and will complain if we try to rename a header that doesn't exist
+        existing_headers = {key: value for key, value in self.header_map.items() if key in rdr.header()}
+        rdr = rdr.rename(existing_headers)
+
+        rdr = self.convert_columns(rdr)
+        rdr = self.fix_column_names(rdr)
+        rdr = self.prepare_processed_table(rdr)
+        return rdr
 
     def get_transactions(self):
         for ot in self.rdr.namedtuples():
