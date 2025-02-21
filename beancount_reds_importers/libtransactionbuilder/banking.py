@@ -4,14 +4,14 @@ import itertools
 from collections import namedtuple
 
 from beancount.core import amount, data
-from beancount.ingest import importer
+from beangulp import Importer as BGImporter
 
 from beancount_reds_importers.libtransactionbuilder import common, transactionbuilder
 
 Balance = namedtuple("Balance", ["date", "amount", "currency"])
 
 
-class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder):
+class Importer(BGImporter, transactionbuilder.TransactionBuilder):
     def __init__(self, config):
         self.config = config
         self.initialized = False
@@ -75,7 +75,7 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
 
         for bal in self.get_balance_statement(file=file):
             if bal:
-                metadata = data.new_metadata(file.name, next(counter))
+                metadata = data.new_metadata(file, next(counter))
                 metadata.update(self.build_metadata(file, metatype="balance"))
                 balance_entry = data.Balance(
                     metadata,
@@ -107,7 +107,7 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
         for ot in self.get_transactions():
             if self.skip_transaction(ot):
                 continue
-            metadata = data.new_metadata(file.name, next(counter))
+            metadata = data.new_metadata(file, next(counter))
             # metadata['type'] = ot.type # Optional metadata, useful for debugging #TODO
             metadata.update(
                 self.build_metadata(file, metatype="transaction", data={"transaction": ot})

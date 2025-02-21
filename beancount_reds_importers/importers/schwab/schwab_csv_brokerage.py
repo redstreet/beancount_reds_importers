@@ -4,6 +4,7 @@ import re
 
 from beancount_reds_importers.libreader import csvreader
 from beancount_reds_importers.libtransactionbuilder import investments
+from beangulp import cache
 
 
 class Importer(csvreader.Importer, investments.Importer):
@@ -63,9 +64,12 @@ class Importer(csvreader.Importer, investments.Importer):
         }
         # fmt: on
 
+    def account(self, filename):
+        return self.config["main_account"]
+
     def deep_identify(self, file):
         last_three = self.config.get("account_number", "")[-3:]
-        return re.match(self.header_identifier, file.head()) and f"XX{last_three}" in file.name
+        return re.match(self.header_identifier, cache.get_file(file).head()) and f"XX{last_three}" in file
 
     def skip_transaction(self, ot):
         return ot.type in ["", "Journal"]

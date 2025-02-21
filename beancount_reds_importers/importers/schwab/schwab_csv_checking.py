@@ -34,7 +34,7 @@ class Importer(csvreader.Importer, banking.Importer):
 
     def deep_identify(self, file):
         last_three = self.config.get("account_number", "")[-3:]
-        return self.column_labels_line in file.head() and f"XX{last_three}" in file.name
+        return self.column_labels_line in cache.get_file(file).head() and f"XX{last_three}" in file
 
     def prepare_table(self, rdr):
         rdr = rdr.addfield(

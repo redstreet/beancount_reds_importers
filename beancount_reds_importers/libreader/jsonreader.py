@@ -9,12 +9,17 @@ the logic will have to be the institution specific readers.
 
 import json
 
-from beancount.ingest import importer
+# import re
+
+# import datetime
+# import ofxparse
+# from collections import namedtuple
+from beangulp import Importer as BGImporter
 
 from beancount_reds_importers.libreader import reader
 
 
-class Importer(reader.Reader, importer.ImporterProtocol):
+class Importer(reader.Reader, BGImporter):
     FILE_EXTS = ["json"]
 
     def initialize_reader(self, file):
@@ -41,7 +46,7 @@ class Importer(reader.Reader, importer.ImporterProtocol):
         return None
 
     def read_file(self, file):
-        with open(file.name, "r") as f:
+        with open(file, "r") as f:
             self.json_data = json.load(f)
 
     def get_json_elements(self, json_path, json_interpreter=lambda x: x):

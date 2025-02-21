@@ -39,7 +39,7 @@ class Importer(banking.Importer, csvreader.Importer):
         # fmt: on
 
     def deep_identify(self, file):
-        return re.match(self.header_identifier, file.head(), flags=re.DOTALL)
+        return re.match(self.header_identifier, cache.get_file(file).head(), flags=re.DOTALL)
 
     def prepare_raw_columns(self, rdr):
         for field in ["Action"]:

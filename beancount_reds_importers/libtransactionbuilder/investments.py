@@ -6,12 +6,14 @@ import sys
 
 from beancount.core import amount, data
 from beancount.core.position import CostSpec
-from beancount.ingest import importer
+from beangulp import Importer as BGImporter
+from beancount.core import flags
 
 from beancount_reds_importers.libtransactionbuilder import common, transactionbuilder
 
 
-class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder):
+class Importer(BGImporter, transactionbuilder.TransactionBuilder):
+    FLAG = flags.FLAG_OKAY
     def __init__(self, config):
         """Initializes the importer.
 
@@ -244,7 +246,7 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
         is_money_market = ticker in self.money_market_funds
 
         # Build metadata
-        metadata = data.new_metadata(file.name, next(counter))
+        metadata = data.new_metadata(file, next(counter))
         metadata.update(
             self.build_metadata(file, metatype="transaction_trade", data={"transaction": ot})
         )
@@ -341,7 +343,7 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
         """Cash transactions, or in-kind transfers. One of:
         [credit, debit, dep, transfer, income, dividends, capgainsd_lt, capgainsd_st, other]"""
         config = self.config
-        metadata = data.new_metadata(file.name, next(counter))
+        metadata = data.new_metadata(file, next(counter))
         metadata.update(
             self.build_metadata(file, metatype="transaction_transfer", data={"transaction": ot})
         )
@@ -484,7 +486,7 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
         settlement_fund_balance = 0
         for pos in self.get_balance_positions():
             ticker, ticker_long_name = self.get_ticker_info(pos.security)
-            metadata = data.new_metadata(file.name, next(counter))
+            metadata = data.new_metadata(file, next(counter))
             metadata.update(self.build_metadata(file, metatype="balance", data={"pos": pos}))
 
             # if there are no transactions, use the date in the source file for the balance. This gives us the
@@ -505,7 +507,7 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
 
             # extract price info if available
             if hasattr(pos, "unit_price") and hasattr(pos, "date"):
-                metadata = data.new_metadata(file.name, next(counter))
+                metadata = data.new_metadata(file, next(counter))
                 metadata.update(self.build_metadata(file, metatype="price", data={"pos": pos}))
                 price_entry = data.Price(
                     metadata,
@@ -518,7 +520,7 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
         # ----------------- available cash
         available_cash = self.get_available_cash(settlement_fund_balance)
         if available_cash is not None:
-            metadata = data.new_metadata(file.name, next(counter))
+            metadata = data.new_metadata(file, next(counter))
             metadata.update(self.build_metadata(file, metatype="balance_cash"))
             try:
                 bal_date = (
