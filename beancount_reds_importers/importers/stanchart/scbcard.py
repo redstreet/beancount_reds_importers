@@ -6,6 +6,7 @@ from beancount.core.number import D
 
 from beancount_reds_importers.libreader import csvreader
 from beancount_reds_importers.libtransactionbuilder import banking
+from beangulp import cache
 
 
 class Importer(csvreader.Importer, banking.Importer):
@@ -31,7 +32,10 @@ class Importer(csvreader.Importer, banking.Importer):
 
     def deep_identify(self, file):
         account_number = self.config.get("account_number", "")
-        return re.match(self.header_identifier, cache.get_file(file).head()) and account_number in cache.get_file(file).head()
+        return (
+            re.match(self.header_identifier, cache.get_file(file).head())
+            and account_number in cache.get_file(file).head()
+        )
 
     def skip_transaction(self, row):
         return "[UNPOSTED]" in row.payee
@@ -56,13 +60,19 @@ class Importer(csvreader.Importer, banking.Importer):
         rdr = rdr.cutout("Foreign Currency Amount")
 
         # parse SGD Amount: "SGD 141.02 CR" into a single amount column
-        rdr = rdr.capture("SGD Amount", "(.*) (.*) (.*)", ["currency", "amount", "crdr"])
+        rdr = rdr.capture(
+            "SGD Amount", "(.*) (.*) (.*)", ["currency", "amount", "crdr"]
+        )
 
         # change DR into -ve. TODO: move this into csvreader or csvreader.utils
         crdrdict = {"DR": "-", "CR": ""}
-        rdr = rdr.convert("amount", lambda i, row: crdrdict[row.crdr] + i, pass_row=True)
+        rdr = rdr.convert(
+            "amount", lambda i, row: crdrdict[row.crdr] + i, pass_row=True
+        )
 
-        rdr = rdr.addfield("memo", lambda x: "")  # TODO: make this non-mandatory in csvreader
+        rdr = rdr.addfield(
+            "memo", lambda x: ""
+        )  # TODO: make this non-mandatory in csvreader
         return rdr
 
     def prepare_raw_file(self, rdr):

@@ -6,6 +6,7 @@ from beancount.core.number import D
 
 from beancount_reds_importers.libreader import xlsreader
 from beancount_reds_importers.libtransactionbuilder import banking
+from beangulp import cache
 
 
 class Importer(xlsreader.Importer, banking.Importer):
@@ -18,9 +19,7 @@ class Importer(xlsreader.Importer, banking.Importer):
             "custom_header",
             "United Overseas Bank Limited.*Account Type:Uniplus Account",
         )
-        self.column_labels_line = (
-            "Transaction Date,Transaction Description,Withdrawal,Deposit,Available Balance"
-        )
+        self.column_labels_line = "Transaction Date,Transaction Description,Withdrawal,Deposit,Available Balance"
         self.date_format = "%d %b %Y"
         # fmt: off
         self.header_map = {
@@ -34,7 +33,10 @@ class Importer(xlsreader.Importer, banking.Importer):
 
     def deep_identify(self, file):
         account_number = self.config.get("account_number", "")
-        return re.match(self.header_identifier, cache.get_file(file).head()) and account_number in cache.get_file(file).head()
+        return (
+            re.match(self.header_identifier, cache.get_file(file).head())
+            and account_number in cache.get_file(file).head()
+        )
 
     # TODO: move these into utils, since this is probably a common operation
     def prepare_table(self, rdr):
@@ -46,7 +48,9 @@ class Importer(xlsreader.Importer, banking.Importer):
 
         rdr = rdr.addfield(
             "amount",
-            lambda x: -1 * Ds(x["Withdrawal"]) if x["Withdrawal"] != 0 else Ds(x["Deposit"]),
+            lambda x: (
+                -1 * Ds(x["Withdrawal"]) if x["Withdrawal"] != 0 else Ds(x["Deposit"])
+            ),
         )
         rdr = rdr.addfield("memo", lambda x: "")
         return rdr
