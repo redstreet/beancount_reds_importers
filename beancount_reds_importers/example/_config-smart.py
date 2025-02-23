@@ -3,6 +3,7 @@
 
 import sys
 from os import path
+import beangulp
 
 from smart_importer import PredictPayees, PredictPostings, apply_hooks
 
@@ -12,12 +13,19 @@ from beancount_reds_importers.importers import ally
 
 # Setting this variable provides a list of importer instances.
 CONFIG = [
-
     # Banks and credit cards
     # --------------------------------------------------------------------------------------
-    apply_hooks(ally.Importer({
-        'account_number'  : '23456',
-        'main_account'    : 'Assets:Banks:Checking',
-        }), [PredictPostings()]),
-
+    apply_hooks(
+        ally.Importer(
+            {
+                "account_number": "23456",
+                "main_account": "Assets:Banks:Checking",
+            }
+        ),
+        [PredictPostings()],
+    ),
 ]
+
+if __name__ == "__main__":
+    ingest = beangulp.Ingest(CONFIG)
+    ingest()

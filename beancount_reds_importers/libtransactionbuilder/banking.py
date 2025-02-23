@@ -5,6 +5,7 @@ from collections import namedtuple
 
 from beancount.core import amount, data
 from beangulp import Importer as BGImporter
+from beancount.core import flags
 
 from beancount_reds_importers.libtransactionbuilder import common, transactionbuilder
 
@@ -12,6 +13,11 @@ Balance = namedtuple("Balance", ["date", "amount", "currency"])
 
 
 class Importer(BGImporter, transactionbuilder.TransactionBuilder):
+    FLAG = flags.FLAG_OKAY
+
+    def account(self, filename):
+        return self.config.get("main_account", "Assets:US:UNINIT:Bank")
+
     def __init__(self, config):
         self.config = config
         self.initialized = False
@@ -110,7 +116,9 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
             metadata = data.new_metadata(file, next(counter))
             # metadata['type'] = ot.type # Optional metadata, useful for debugging #TODO
             metadata.update(
-                self.build_metadata(file, metatype="transaction", data={"transaction": ot})
+                self.build_metadata(
+                    file, metatype="transaction", data={"transaction": ot}
+                )
             )
 
             # description fields: With OFX, ot.payee tends to be the "main" description field,
@@ -147,7 +155,9 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
                     ot.foreign_currency,
                 )
             else:
-                data.create_simple_posting(entry, main_account, ot.amount, self.get_currency(ot))
+                data.create_simple_posting(
+                    entry, main_account, ot.amount, self.get_currency(ot)
+                )
 
             # smart_importer can fill this in if the importer doesn't override self.get_target_acct()
             target_acct = self.get_target_account(ot)
