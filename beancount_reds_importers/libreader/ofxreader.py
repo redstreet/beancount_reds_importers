@@ -167,7 +167,9 @@ class Importer(reader.Reader, BGImporter):
 
         if not return_date:
             return None
-        return return_date + datetime.timedelta(days=1)  # Next day, as defined by Beancount
+        return return_date + datetime.timedelta(
+            days=1
+        )  # Next day, as defined by Beancount
 
     def get_max_transaction_date(self):
         """

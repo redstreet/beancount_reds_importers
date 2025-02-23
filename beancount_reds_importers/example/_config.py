@@ -7,7 +7,7 @@ import beangulp
 
 sys.path.insert(0, path.join(path.dirname(__file__)))
 
-from fund_info import *
+from fund_info import fund_info
 
 from beancount_reds_importers.importers import vanguard
 from beancount_reds_importers.importers.schwab import schwab_csv_brokerage
@@ -59,7 +59,7 @@ CONFIG = [
     schwab_csv_brokerage.Importer(
         {
             "main_account": "Assets:Investments:Schwab:{ticker}",
-            "main_account": "Assets:Investments:Schwab:{currency}",
+            # "main_account": "Assets:Investments:Schwab:{currency}",
             "account_number": "18181",
             "transfer": "Assets:Zero-Sum-Accounts:Transfers:Bank-Account",
             "dividends": "Income:Dividends:Schwab:{ticker}",
