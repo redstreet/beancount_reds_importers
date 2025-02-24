@@ -5,13 +5,13 @@ the logic will have to be the institution specific readers.
 
 """
 
-from beancount.ingest import importer
+from beangulp import Importer as BGImporter
 from lxml import etree
 
 from beancount_reds_importers.libreader import reader
 
 
-class Importer(reader.Reader, importer.ImporterProtocol):
+class Importer(reader.Reader, BGImporter):
     FILE_EXTS = ["xml"]
 
     def initialize_reader(self, file):
