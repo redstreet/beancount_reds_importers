@@ -1,18 +1,23 @@
 # Changelog
 
-## 0.10.0
+## 0.10.0 (2025-02-23)
 
 
 ### Improvements
 
+- improvements to pdfreader. [gary-roach]
+
+  Refactored pdfreader to be more extensible and added a mercurycards importer which uses the pdfreader to read credit card transactions.
 - turn on emit_filing_account by default. [Red S]
+
   Else, we are dependent on the order of postings determined by Python
-- 
 - feat! : add generic json reader. [dev]
+
   BREAKING CHANGE: old jsonreader.py is rename into schwabjsonreader.py
 - fidelity_brokerage_csv importer (ofx is limited to 90 days) [Red S]
 - minor: add deep_identify to ibkr. [Red S]
 - ibkr flex query web API downloader (reds-ibkr-flexquery-download) [Red S]
+
   the new command is: reds-ibkr-flexquery-download
 - ibkr: add transfers; minor refactor. [Red S]
 - IBKR add balance assertions for positions. [Red S]
@@ -37,6 +42,7 @@
   The project doesn't work with beancount v3.
 - '' in securities bug. [Red S]
 - csvreader: strip before parsing dates. [Red S]
+- wip, fix fidelity_cma_csv. [Red S]
 
   TODO:
   - this needs a pytest so tests don't go stale
@@ -48,6 +54,7 @@
 ### Other
 
 - Merge pull request #117 from hoostus/main. [Red S]
+
   Only print table header if there are actually accounts that need updates
 - Merge pull request #107 from dev590t/main. [Red S]
 
