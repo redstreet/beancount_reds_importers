@@ -1,3 +1,12 @@
+## Transitioning to Beangulp
+
+beancount_reds_importers is being transitioned from Beancount v2 to Beangulp (Beancount
+v3's importer framework). The Beangulp version is not yet ready for release. So:
+- if you want v2, use version 0.10.0: `pip3 install beancount-reds-importers`
+- if you want v3 (beangulp), use the head (`pip3 install
+  git+https://github.com/redstreet/beancount_reds_importers`), but be warned that you'll
+  run into breakages (please file bug reports!)
+
 # Beancount Red's Importers
 
 Simple importers and tools for [Beancount](https://beancount.github.io/), software for
