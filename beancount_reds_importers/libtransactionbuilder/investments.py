@@ -6,12 +6,15 @@ import sys
 
 from beancount.core import amount, data
 from beancount.core.position import CostSpec
-from beancount.ingest import importer
+from beangulp import Importer as BGImporter
+from beancount.core import flags
 
 from beancount_reds_importers.libtransactionbuilder import common, transactionbuilder
 
 
-class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder):
+class Importer(BGImporter, transactionbuilder.TransactionBuilder):
+    FLAG = flags.FLAG_OKAY
+
     def __init__(self, config):
         """Initializes the importer.
 
@@ -76,6 +79,9 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
         # For overriding in custom_init()
         self.get_payee = lambda ot: ot.memo
 
+    def account(self, filename):
+        return self.config.get("main_account", "Assets:US:UNINIT:Investments")
+
     def initialize(self, file):
         if self.initialized:
             return
@@ -96,7 +102,9 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
                 "fund_data"
             ]  # [(ticker, id, long_name), ...]
             self.funds_by_id = {i: (ticker, desc) for ticker, i, desc in self.fund_data}
-            self.funds_by_ticker = {ticker: (ticker, desc) for ticker, _, desc in self.fund_data}
+            self.funds_by_ticker = {
+                ticker: (ticker, desc) for ticker, _, desc in self.fund_data
+            }
 
             # Most ofx/csv files refer to funds by id (cusip/isin etc.) Some use tickers instead
             self.funds_db = getattr(self, getattr(self, "funds_db_txt", "funds_by_id"))
@@ -192,14 +200,18 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
 
     def get_target_acct_custom(self, transaction, ticker=None):
         """This method is for importers to override. The overridden method can return a target account for
-        special cases, or return None, which will let get_target_acct() decide the target account"""
+        special cases, or return None, which will let get_target_acct() decide the target account
+        """
         return None
 
     def get_target_acct(self, transaction, ticker):
         target = self.get_target_acct_custom(transaction, ticker)
         if target:
             return target
-        if transaction.type == "income" and getattr(transaction, "income_type", None) == "DIV":
+        if (
+            transaction.type == "income"
+            and getattr(transaction, "income_type", None) == "DIV"
+        ):
             return self.target_account_map.get("dividends", None)
         return self.target_account_map.get(transaction.type, None)
 
@@ -229,7 +241,9 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
         """Get an account from self.config, resolve variables, and return"""
         template = self.config.get(acct)
         if not template:
-            raise KeyError(f"{acct} not set in importer configuration. Config: {self.config}")
+            raise KeyError(
+                f"{acct} not set in importer configuration. Config: {self.config}"
+            )
         return self.subst_acct_vars(template, ot, ticker)
 
     # extract() and supporting methods
@@ -244,11 +258,16 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
         is_money_market = ticker in self.money_market_funds
 
         # Build metadata
-        metadata = data.new_metadata(file.name, next(counter))
+        metadata = data.new_metadata(file, next(counter))
         metadata.update(
-            self.build_metadata(file, metatype="transaction_trade", data={"transaction": ot})
+            self.build_metadata(
+                file, metatype="transaction_trade", data={"transaction": ot}
+            )
         )
-        if getattr(ot, "settleDate", None) is not None and ot.settleDate != ot.tradeDate:
+        if (
+            getattr(ot, "settleDate", None) is not None
+            and ot.settleDate != ot.tradeDate
+        ):
             metadata["settlement_date"] = str(ot.settleDate.date())
 
         narration = self.security_narration(ot)
@@ -305,7 +324,11 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
         else:  # buy stock/fund
             unit_price = getattr(ot, "unit_price", 0)
             # annoyingly, vanguard reinvests have ot.unit_price set to zero. so manually compute it
-            if (hasattr(ot, "security") and ot.security) and ot.units and not ot.unit_price:
+            if (
+                (hasattr(ot, "security") and ot.security)
+                and ot.units
+                and not ot.unit_price
+            ):
                 unit_price = round(abs(ot.total) / ot.units, 4)
             common.create_simple_posting_with_cost(
                 entry,
@@ -339,11 +362,14 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
 
     def generate_transfer_entry(self, ot, file, counter):
         """Cash transactions, or in-kind transfers. One of:
-        [credit, debit, dep, transfer, income, dividends, capgainsd_lt, capgainsd_st, other]"""
+        [credit, debit, dep, transfer, income, dividends, capgainsd_lt, capgainsd_st, other]
+        """
         config = self.config
-        metadata = data.new_metadata(file.name, next(counter))
+        metadata = data.new_metadata(file, next(counter))
         metadata.update(
-            self.build_metadata(file, metatype="transaction_transfer", data={"transaction": ot})
+            self.build_metadata(
+                file, metatype="transaction_transfer", data={"transaction": ot}
+            )
         )
         ticker = None
         date = getattr(ot, "tradeDate", None)
@@ -411,7 +437,9 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
             "fee",
         ]:  # cash
             amount = ot.total if hasattr(ot, "total") else ot.amount
-            data.create_simple_posting(entry, config["cash_account"], amount, self.currency)
+            data.create_simple_posting(
+                entry, config["cash_account"], amount, self.currency
+            )
             data.create_simple_posting(entry, target_acct, -1 * amount, self.currency)
         else:
             data.create_simple_posting(entry, main_acct, units, ticker)
@@ -484,8 +512,10 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
         settlement_fund_balance = 0
         for pos in self.get_balance_positions():
             ticker, ticker_long_name = self.get_ticker_info(pos.security)
-            metadata = data.new_metadata(file.name, next(counter))
-            metadata.update(self.build_metadata(file, metatype="balance", data={"pos": pos}))
+            metadata = data.new_metadata(file, next(counter))
+            metadata.update(
+                self.build_metadata(file, metatype="balance", data={"pos": pos})
+            )
 
             # if there are no transactions, use the date in the source file for the balance. This gives us the
             # bonus of an updated, recent balance assertion
@@ -505,8 +535,10 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
 
             # extract price info if available
             if hasattr(pos, "unit_price") and hasattr(pos, "date"):
-                metadata = data.new_metadata(file.name, next(counter))
-                metadata.update(self.build_metadata(file, metatype="price", data={"pos": pos}))
+                metadata = data.new_metadata(file, next(counter))
+                metadata.update(
+                    self.build_metadata(file, metatype="price", data={"pos": pos})
+                )
                 price_entry = data.Price(
                     metadata,
                     pos.date.date(),
@@ -518,7 +550,7 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
         # ----------------- available cash
         available_cash = self.get_available_cash(settlement_fund_balance)
         if available_cash is not None:
-            metadata = data.new_metadata(file.name, next(counter))
+            metadata = data.new_metadata(file, next(counter))
             metadata.update(self.build_metadata(file, metatype="balance_cash"))
             try:
                 bal_date = (
@@ -542,9 +574,13 @@ class Importer(importer.ImporterProtocol, transactionbuilder.TransactionBuilder)
         config = self.config
         if hasattr(ot, "fees") or hasattr(ot, "commission"):
             if getattr(ot, "fees", 0) != 0:
-                data.create_simple_posting(entry, config["fees"], ot.fees, self.currency)
+                data.create_simple_posting(
+                    entry, config["fees"], ot.fees, self.currency
+                )
             if getattr(ot, "commission", 0) != 0:
-                data.create_simple_posting(entry, config["fees"], ot.commission, self.currency)
+                data.create_simple_posting(
+                    entry, config["fees"], ot.commission, self.currency
+                )
 
     def extract_custom_entries(self, file, counter):
         """For custom importers to override"""

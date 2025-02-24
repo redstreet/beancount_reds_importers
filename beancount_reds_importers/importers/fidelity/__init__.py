@@ -20,7 +20,7 @@ class Importer(investments.Importer, ofxreader.Importer):
         return f"[{ticker}]"
 
     def file_name(self, file):
-        return "fidelity-{}-{}".format(self.config["account_number"], ntpath.basename(file.name))
+        return "fidelity-{}-{}".format(self.config["account_number"], ntpath.basename(file))
 
     def get_target_acct_custom(self, transaction, ticker=None):
         if transaction.memo.startswith("CONTRIBUTION"):

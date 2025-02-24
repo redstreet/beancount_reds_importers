@@ -27,12 +27,12 @@ class Importer(csvreader.Importer):
 
             # TODO
             # account_number = self.config.get('account_number', '')
-            # self.reader_ready = re.match(self.header_identifier, file.head()) and \
-            #                     account_number in file.head()
+            # self.reader_ready = re.match(self.header_identifier, cache.get_file(file).head()) and \
+            #                     account_number in cache.get_file(file).head()
 
             if re.match(self.header_identifier, header):
                 self.reader_ready = True
 
     def read_raw(self, file):
         # set logfile to ignore WARNING *** file size (92598) not 512 + multiple of sector size (512)
-        return etl.fromxls(file.name, logfile=open(devnull, "w"))
+        return etl.fromxls(file, logfile=open(devnull, "w"))

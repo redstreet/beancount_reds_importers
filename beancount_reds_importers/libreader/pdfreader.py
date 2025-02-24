@@ -120,7 +120,9 @@ class Importer(csv_multitable_reader.Importer):
         image.debug_tablefinder(tf=self.pdf_table_extraction_settings)  # debug
         self.debug_images[page_idx] = image  # debug
 
-        table_refs = cropped_page.find_tables(table_settings=self.pdf_table_extraction_settings)
+        table_refs = cropped_page.find_tables(
+            table_settings=self.pdf_table_extraction_settings
+        )
 
         return [{"table": t.extract(), "bbox": t.bbox} for t in table_refs]
 
@@ -160,7 +162,9 @@ class Importer(csv_multitable_reader.Importer):
 
             # replace None with ''
             for row_idx, row in enumerate(table["table"]):
-                page_tables[table_idx]["table"][row_idx] = ["" if v is None else v for v in row]
+                page_tables[table_idx]["table"][row_idx] = [
+                    "" if v is None else v for v in row
+                ]
 
         return page_tables
 
@@ -228,7 +232,7 @@ class Importer(csv_multitable_reader.Importer):
         self.meta_text = ""
         tables = []
 
-        with pdfplumber.open(file.name) as pdf:
+        with pdfplumber.open(file) as pdf:
             for page_idx, page in enumerate(pdf.pages):
                 adjusted_crop = self.get_adjusted_crop(page_idx, page)
                 page_tables = self.extract_tables(page_idx, page, adjusted_crop)
@@ -245,7 +249,9 @@ class Importer(csv_multitable_reader.Importer):
         tables = self.find_and_fix_broken_tables(tables)
         self.generate_debug_helpers(tables)  # debug
 
-        self.alltables = {table["section"]: etl.wrap(table["table"]) for table in tables}
+        self.alltables = {
+            table["section"]: etl.wrap(table["table"]) for table in tables
+        }
         self.prepare_tables()
 
         if self.debug:  # debug
