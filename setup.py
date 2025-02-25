@@ -26,17 +26,17 @@ setup(
         ]
     },
     install_requires=[
-        "Click >= 7.0",
-        "beancount >=2.3.5,<3.0.0",
-        "click_aliases >= 1.0.1",
+        "click >= 8.1.7",
+        "beancount >= 3.0.0",
+        "click_aliases >= 1.0.4",
         "dateparser >= 1.2.0",
         "ofxparse >= 0.21",
-        "openpyxl >= 3.0.9",
-        "packaging >= 20.3",
+        "openpyxl >= 3.1.2",
+        "packaging >= 23.1",
         "pdfplumber>=0.11.0",
-        "petl >= 1.7.4",
-        "tabulate >= 0.8.9",
-        "tqdm >= 4.64.0",
+        "petl >= 1.7.15",
+        "tabulate >= 0.9.0",
+        "tqdm >= 4.66.2",
     ],
     entry_points={
         "console_scripts": [
