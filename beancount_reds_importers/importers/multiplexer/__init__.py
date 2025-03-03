@@ -48,6 +48,12 @@ class Importer(importer.Importer):
 
     def identify(self, filepath):
         """The multiplexer identifies the file if any underlying importer does."""
+
+        # Without this, if there are multiple multiplexer importers in one's CONFIG list passed to
+        # beangulp, then all previous ones that were instantiated will return True for all
+        # subsequent calls
+        self.applicable_importers = None
+
         return bool(self.get_applicable_importers(filepath))
 
     def account(self, filepath):
