@@ -83,7 +83,7 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
         return self.config.get("main_account", "Assets:US:UNINIT:Investments")
 
     def initialize(self, file):
-        if self.initialized:
+        if self.initialized and self.file == file:
             return
 
         self.custom_init()
@@ -111,6 +111,7 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
             self.build_account_map()
 
         self.initialized = True
+        self.file = file
 
     def build_account_map(self):
         # fmt: off

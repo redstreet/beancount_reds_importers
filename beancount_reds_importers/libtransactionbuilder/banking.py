@@ -34,10 +34,11 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
         # }
 
     def initialize(self, file):
-        if not self.initialized:
+        if not self.initialized or self.file != file:
             self.custom_init()
             self.initialize_reader(file)
             self.initialized = True
+            self.file = file
 
     def build_account_map(self):
         # TODO: Not needed for accounts using smart_importer; make this configurable
