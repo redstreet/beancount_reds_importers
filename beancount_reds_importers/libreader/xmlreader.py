@@ -18,7 +18,7 @@ class Importer(reader.Reader, BGImporter):
         if getattr(self, "file", None) != file:
             self.file = file
             self.reader_ready = False
-            self.xmltree = etree.parse(file.name)
+            self.xmltree = etree.parse(file)
             self.reader_ready = self.deep_identify(file)
         if self.reader_ready:
             self.set_currency()
@@ -36,7 +36,7 @@ class Importer(reader.Reader, BGImporter):
         return None
 
     def read_file(self, file):
-        self.xmltree = etree.parse(file.name)
+        self.xmltree = etree.parse(file)
 
     def get_xpath_elements(self, xpath_expr, xml_interpreter=lambda x: x):
         """Extract a list of elements in the XML file at the given XPath expression. Typically,

@@ -26,7 +26,7 @@ class Importer(reader.Reader, BGImporter):
         if getattr(self, "file", None) != file:
             self.file = file
             self.reader_ready = False
-            with open(file.name, "r") as f:
+            with open(file, "r") as f:
                 self.json_data = json.load(f)
             self.reader_ready = self.deep_identify(file)
         if self.reader_ready:

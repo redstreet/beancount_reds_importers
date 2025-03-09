@@ -48,7 +48,7 @@ class Importer(reader.Reader, BGImporter):
         return max(ot.date for ot in self.get_transactions()).date()
 
     def read_file(self, file):
-        with open(file.name) as fh:
+        with open(file) as fh:
             self.rdr = json.load(fh)
 
             # transactions = []
