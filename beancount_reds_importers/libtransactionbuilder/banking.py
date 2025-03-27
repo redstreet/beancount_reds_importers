@@ -3,9 +3,8 @@
 import itertools
 from collections import namedtuple
 
-from beancount.core import amount, data
+from beancount.core import amount, data, flags
 from beangulp import Importer as BGImporter
-from beancount.core import flags
 
 from beancount_reds_importers.libtransactionbuilder import common, transactionbuilder
 

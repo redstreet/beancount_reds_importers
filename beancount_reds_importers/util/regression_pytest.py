@@ -40,16 +40,14 @@ differences.
 __copyright__ = "Copyright (C) 2018  Martin Blais"
 __license__ = "GNU GPLv2"
 
-from os import path
 import io
 import os
 import re
+from os import path
 
 import pytest
-
-from beangulp import cache
-from beangulp import extract
 from beancount.parser import printer
+from beangulp import cache, extract
 
 
 def pytest_addoption(parser):

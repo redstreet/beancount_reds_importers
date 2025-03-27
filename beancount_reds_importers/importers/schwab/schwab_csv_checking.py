@@ -1,8 +1,9 @@
 """Schwab Checking .csv importer."""
 
+from beangulp import cache
+
 from beancount_reds_importers.libreader import csvreader
 from beancount_reds_importers.libtransactionbuilder import banking
-from beangulp import cache
 
 
 class Importer(csvreader.Importer, banking.Importer):

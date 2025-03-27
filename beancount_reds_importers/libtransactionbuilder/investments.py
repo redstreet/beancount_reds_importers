@@ -4,10 +4,9 @@ beancount_reads_importers to work."""
 import itertools
 import sys
 
-from beancount.core import amount, data
+from beancount.core import amount, data, flags
 from beancount.core.position import CostSpec
 from beangulp import Importer as BGImporter
-from beancount.core import flags
 
 from beancount_reds_importers.libtransactionbuilder import common, transactionbuilder
 

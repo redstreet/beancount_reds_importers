@@ -2,9 +2,10 @@
 
 import re
 
+from beangulp import cache
+
 from beancount_reds_importers.libreader import csvreader
 from beancount_reds_importers.libtransactionbuilder import investments
-from beangulp import cache
 
 
 class Importer(csvreader.Importer, investments.Importer):
