@@ -5,7 +5,7 @@ existing downloaded files, running the various importer interface methods on it,
 and comparing the output to an expected text file. (Expected test files can be
 auto-generated using the --generate option). You use it like this:
 
-  from beancount.ingest import regression_pytest
+  from beancount_reds_importer.util import regression_pytest
   ...
   import mymodule
   ...
@@ -26,9 +26,7 @@ auto-generated using the --generate option). You use it like this:
 Also, to add the --generate option to 'pytest', you must create a conftest.py
 somewhere in one of the roots above your importers with this module as a plugin:
 
-  pytest_plugins = "beancount.ingest.regression_pytest"
-
-See beancount/example/ingest for a full working example.
+  pytest_plugins = "beancount_reds_importers.util.regression_pytest"
 
 How to invoke the tests:
 
@@ -49,8 +47,8 @@ import re
 
 import pytest
 
-from beancount.ingest import cache
-from beancount.ingest import extract
+from beangulp import cache
+from beangulp import extract
 from beancount.parser import printer
 
 
@@ -137,11 +135,11 @@ class ImporterTestBase:
         is just assumed it should return True if your test is setup well (the
         importer should always identify the test file).
         """
-        assert importer.identify(file)
+        assert importer.identify(file.name)
 
     def test_extract(self, importer, file, pytestconfig):
         """Extract entries from a test file and compare against expected output."""
-        entries = extract.extract_from_file(file.name, importer, None, None)
+        entries = extract.extract_from_file(importer, file.name, None)
         oss = io.StringIO()
         printer.print_entries(entries, file=oss)
         string = oss.getvalue()
@@ -153,7 +151,7 @@ class ImporterTestBase:
 
     def test_file_date(self, importer, file, pytestconfig):
         """Compute the imported file date and compare to an expected output."""
-        date = importer.file_date(file)
+        date = importer.file_date(file.name)
         string = date.isoformat() if date else ""
         compare_contents_or_generate(
             string,
@@ -163,7 +161,7 @@ class ImporterTestBase:
 
     def test_file_name(self, importer, file, pytestconfig):
         """Compute the imported file name and compare to an expected output."""
-        filename = importer.file_name(file) or ""
+        filename = importer.file_name(file.name) or ""
         compare_contents_or_generate(
             filename,
             "{}.file_name".format(file.name),
@@ -172,7 +170,7 @@ class ImporterTestBase:
 
     def test_file_account(self, importer, file, pytestconfig):
         """Compute the selected filing account and compare to an expected output."""
-        account = importer.file_account(file) or ""
+        account = importer.file_account(file.name) or ""
         compare_contents_or_generate(
             account,
             "{}.file_account".format(file.name),
