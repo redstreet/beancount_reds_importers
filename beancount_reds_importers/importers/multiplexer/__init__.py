@@ -1,4 +1,4 @@
-from beangulp import importer, cache
+from beangulp import importer
 
 class Importer(importer.Importer):
     """Multiplexer Importer: used when multiple accounts exist in a single input file, which is
@@ -40,7 +40,7 @@ class Importer(importer.Importer):
             try:
                 if imp.identify(filepath):
                     applicable.append(imp)
-            except Exception as e:
+            except Exception:
                 # Optionally log or handle exceptions from an importer
                 continue
         self.applicable_importers = applicable
