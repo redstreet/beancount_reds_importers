@@ -2,9 +2,8 @@
 
 from os import path
 
-from beangulp import regression_pytest as regtest
-
 from beancount_reds_importers.importers import dcu
+from beancount_reds_importers.util import regression_pytest as regtest
 
 
 @regtest.with_importer(

@@ -2,9 +2,8 @@
 
 from os import path
 
-from beangulp import regression_pytest as regtest
-
 from beancount_reds_importers.importers.schwab import schwab_csv_brokerage
+from beancount_reds_importers.util import regression_pytest as regtest
 
 fund_data = [
     ("SWVXX", "123", "SCHWAB VALUE ADVANTAGE MONEY INV"),
