@@ -69,7 +69,10 @@ class Importer(csvreader.Importer, investments.Importer):
 
     def deep_identify(self, file):
         last_three = self.config.get("account_number", "")[-3:]
-        return re.match(self.header_identifier, cache.get_file(file).head()) and f"XX{last_three}" in file
+        return (
+            re.match(self.header_identifier, cache.get_file(file).head())
+            and f"XX{last_three}" in file
+        )
 
     def skip_transaction(self, ot):
         return ot.type in ["", "Journal"]

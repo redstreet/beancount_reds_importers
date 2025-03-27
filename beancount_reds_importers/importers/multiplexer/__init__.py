@@ -1,5 +1,6 @@
 from beangulp import importer
 
+
 class Importer(importer.Importer):
     """Multiplexer Importer: used when multiple accounts exist in a single input file, which is
     typical of ofx/qfx files.
@@ -33,7 +34,7 @@ class Importer(importer.Importer):
         """Return a list of importers that identify the file as applicable."""
 
         if self.applicable_importers:
-            return self.applicable_importers # Preserve previously build importer instantiations
+            return self.applicable_importers  # Preserve previously build importer instantiations
 
         applicable = []
         for imp in self.config.get("importers", []):
@@ -59,8 +60,8 @@ class Importer(importer.Importer):
     def account(self, filepath):
         """If one or more importers apply, delegate to the first one."""
 
-        if self.config.get('account', None):
-            return self.config['account']
+        if self.config.get("account", None):
+            return self.config["account"]
 
         applicable = self.get_applicable_importers(filepath)
         if applicable:
@@ -72,8 +73,8 @@ class Importer(importer.Importer):
         return max((d for d in (imp.date(filepath) for imp in imps) if d), default=None)
 
     def filename(self, filepath):
-        if self.config.get('filename', None):
-            return self.config['filename']
+        if self.config.get("filename", None):
+            return self.config["filename"]
 
         # Delegate filename determination to the first applicable importer.
         applicable = self.get_applicable_importers(filepath)
