@@ -55,7 +55,7 @@ class Importer(paycheck.Importer, pdfreader.Importer):
             if label in self.header_map:
                 return self.header_map[header]
 
-            return label.lower().replace(" ", "_")
+            return label.lower().replace(" ", "_").replace(".", "_")
 
         for section, table in self.alltables.items():
             # rename columns
