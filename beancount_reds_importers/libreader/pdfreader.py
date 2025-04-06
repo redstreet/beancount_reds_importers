@@ -117,7 +117,7 @@ class Importer(csv_multitable_reader.Importer):
         cropped_page = page.crop(adjusted_crop)
 
         image = page.crop(adjusted_crop).to_image()  # debug
-        image.debug_tablefinder(tf=self.pdf_table_extraction_settings)  # debug
+        image.debug_tablefinder(self.pdf_table_extraction_settings)  # debug
         self.debug_images[page_idx] = image  # debug
 
         table_refs = cropped_page.find_tables(
