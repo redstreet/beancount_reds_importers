@@ -3,10 +3,10 @@
 import re
 
 from beancount.core.number import D
+from beangulp import cache
 
 from beancount_reds_importers.libreader import csvreader
 from beancount_reds_importers.libtransactionbuilder import banking
-from beangulp import cache
 
 
 class Importer(csvreader.Importer, banking.Importer):
@@ -15,10 +15,10 @@ class Importer(csvreader.Importer, banking.Importer):
     def custom_init(self):
         self.max_rounding_error = 0.04
         self.filename_pattern_def = "AccountTransactions[0-9]*"
-        self.header_identifier = self.config.get(
-            "custom_header", "Account transactions shown:"
+        self.header_identifier = self.config.get("custom_header", "Account transactions shown:")
+        self.column_labels_line = (
+            "Date,Transaction,Currency,Deposit,Withdrawal,Running Balance,SGD Equivalent Balance"
         )
-        self.column_labels_line = "Date,Transaction,Currency,Deposit,Withdrawal,Running Balance,SGD Equivalent Balance"
         self.balance_column_labels_line = (
             "Account Name,Account Number,Currency,Current Balance,Available Balance"
         )

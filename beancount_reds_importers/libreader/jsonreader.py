@@ -9,8 +9,6 @@ the logic will have to be the institution specific readers.
 
 import json
 
-# import re
-
 # import datetime
 # import ofxparse
 # from collections import namedtuple

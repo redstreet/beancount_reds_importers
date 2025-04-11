@@ -3,8 +3,8 @@
 
 import sys
 from os import path
-import beangulp
 
+import beangulp
 from smart_importer import PredictPostings, apply_hooks
 
 sys.path.insert(0, path.join(path.dirname(__file__)))

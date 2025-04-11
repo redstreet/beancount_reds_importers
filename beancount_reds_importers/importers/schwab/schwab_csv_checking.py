@@ -1,8 +1,9 @@
 """Schwab Checking .csv importer."""
 
+from beangulp import cache
+
 from beancount_reds_importers.libreader import csvreader
 from beancount_reds_importers.libtransactionbuilder import banking
-from beangulp import cache
 
 
 class Importer(csvreader.Importer, banking.Importer):
@@ -35,10 +36,7 @@ class Importer(csvreader.Importer, banking.Importer):
 
     def deep_identify(self, file):
         last_three = self.config.get("account_number", "")[-3:]
-        return (
-            self.column_labels_line in cache.get_file(file).head()
-            and f"XX{last_three}" in file
-        )
+        return self.column_labels_line in cache.get_file(file).head() and f"XX{last_three}" in file
 
     def prepare_table(self, rdr):
         rdr = rdr.addfield(
@@ -53,6 +51,4 @@ class Importer(csvreader.Importer, banking.Importer):
 
         date = self.get_balance_assertion_date()
         if date:
-            yield banking.Balance(
-                date, self.rdr.namedtuples()[0].balance, self.currency
-            )
+            yield banking.Balance(date, self.rdr.namedtuples()[0].balance, self.currency)

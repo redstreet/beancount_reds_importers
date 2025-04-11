@@ -130,7 +130,7 @@ def download(config_file, sites, site_types, dry_run, verbose):  # noqa: C901
     print(f"Processing {numsites} institutions.")
 
     async def download_site(i, site):
-        tid = f"[{i+1}/{numsites} {site}]"
+        tid = f"[{i + 1}/{numsites} {site}]"
         pverbose(f"{tid}: Begin")
         try:
             options = config[site]

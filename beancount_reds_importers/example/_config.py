@@ -3,6 +3,7 @@
 
 import sys
 from os import path
+
 import beangulp
 
 sys.path.insert(0, path.join(path.dirname(__file__)))
