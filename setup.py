@@ -21,8 +21,9 @@ setup(
     include_package_data=True,
     extras_require={
         "dev": [
-            "ruff",
             "isort",
+            "pytest",
+            "ruff",
         ]
     },
     install_requires=[
