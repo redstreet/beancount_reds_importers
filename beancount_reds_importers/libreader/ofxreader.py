@@ -8,6 +8,7 @@ from collections import namedtuple
 import ofxparse
 from beangulp import Importer as BGImporter
 from bs4.builder import XMLParsedAsHTMLWarning
+from bs4 import BeautifulSoup
 
 from beancount_reds_importers.libreader import reader
 
@@ -53,8 +54,29 @@ class Importer(reader.Reader, BGImporter):
             return None
 
     def read_file(self, file):
-        with open(file) as fh:
-            return ofxparse.OfxParser.parse(fh)
+        """
+        Read an SGML file, remove all empty tags, and parse it using ofxparse.OfxParser.
+
+        Args:
+            file: A file-like object representing the SGML file.
+
+        Returns:
+            The parsed OFX data.
+        """
+        # Read the SGML file content
+        with open(file.name, 'r', encoding='utf-8') as fh: # TODO use encoding from SGML file 's header
+            sgml_content = fh.read()
+        # Preprocess: Remove empty tags using BeautifulSoup
+        soup = BeautifulSoup(sgml_content, 'html.parser')
+        # Find and remove all empty tags
+        for tag in soup.find_all():
+            if not tag.contents and not tag.attrs:
+                tag.extract()
+        processed_sgml = str(soup)
+        # Parse the processed SGML content using ofxparse.OfxParser
+        from io import StringIO
+        file_like_object = StringIO(processed_sgml)
+        return ofxparse.OfxParser.parse(file_like_object)
 
     def get_transactions(self):
         yield from self.ofx_account.statement.transactions
