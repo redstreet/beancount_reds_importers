@@ -4,6 +4,9 @@
 
 from beancount_reds_importers.libreader import ofxreader
 from beancount_reds_importers.libtransactionbuilder import banking
+from os import path
+from beancount.ingest import regression_pytest as regtest
+
 
 
 class Importer(banking.Importer, ofxreader.Importer):
@@ -14,11 +17,6 @@ class Importer(banking.Importer, ofxreader.Importer):
             self.max_rounding_error = 0.04
             self.filename_pattern_def = '.*n26'
             self.custom_init_run = True
-
-from os import path
-
-from beancount.ingest import regression_pytest as regtest
-
 
 @regtest.with_importer(
     Importer(

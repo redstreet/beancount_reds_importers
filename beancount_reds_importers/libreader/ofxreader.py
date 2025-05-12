@@ -8,12 +8,12 @@ from collections import namedtuple
 import ofxparse
 from beangulp import Importer as BGImporter
 from bs4.builder import XMLParsedAsHTMLWarning
+from bs4 import BeautifulSoup
 
 from beancount_reds_importers.libreader import reader
 
 warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
 
-from bs4 import BeautifulSoup
 
 
 class Importer(reader.Reader, BGImporter):
