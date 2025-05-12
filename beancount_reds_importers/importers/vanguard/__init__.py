@@ -32,7 +32,7 @@ class Importer(investments.Importer, ofxreader.Importer):
         self.price_cost_both_zero_handler = lambda *args: None
 
     def file_name(self, file):
-        return "vanguard-all-{}".format(ntpath.basename(file.name))
+        return "vanguard-all-{}".format(ntpath.basename(file))
 
     def get_target_acct_custom(self, transaction, ticker=None):
         if "LT CAP GAIN" in transaction.memo:

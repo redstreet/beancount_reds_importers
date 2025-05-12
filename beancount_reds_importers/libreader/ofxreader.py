@@ -6,7 +6,7 @@ import warnings
 from collections import namedtuple
 
 import ofxparse
-from beancount.ingest import importer
+from beangulp import Importer as BGImporter
 from bs4.builder import XMLParsedAsHTMLWarning
 from bs4 import BeautifulSoup
 
@@ -15,8 +15,7 @@ from beancount_reds_importers.libreader import reader
 warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
 
 
-
-class Importer(reader.Reader, importer.ImporterProtocol):
+class Importer(reader.Reader, BGImporter):
     FILE_EXTS = ["ofx", "qfx"]
 
     def initialize_reader(self, file):
@@ -190,7 +189,9 @@ class Importer(reader.Reader, importer.ImporterProtocol):
 
         if not return_date:
             return None
-        return return_date + datetime.timedelta(days=1)  # Next day, as defined by Beancount
+        return return_date + datetime.timedelta(
+            days=1
+        )  # Next day, as defined by Beancount
 
     def get_max_transaction_date(self):
         """

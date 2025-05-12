@@ -2,13 +2,13 @@
 importer modules in beancount_reds_importers."""
 
 import petl as etl
-from beancount.ingest import importer
+from beangulp import Importer as BGImporter
 
 from beancount_reds_importers.libreader import csvreader
 
 
-class Importer(csvreader.Importer, importer.ImporterProtocol):
+class Importer(csvreader.Importer, BGImporter):
     FILE_EXTS = ["tsv"]
 
     def read_raw(self, file):
-        return etl.fromtsv(file.name)
+        return etl.fromtsv(file)
