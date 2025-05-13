@@ -19,7 +19,7 @@ import warnings
 # import datetime
 # import ofxparse
 # from collections import namedtuple
-from beancount.ingest import importer
+from beangulp import Importer as BGImporter
 from bs4.builder import XMLParsedAsHTMLWarning
 
 from beancount_reds_importers.libreader import reader
@@ -27,7 +27,7 @@ from beancount_reds_importers.libreader import reader
 warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
 
 
-class Importer(reader.Reader, importer.ImporterProtocol):
+class Importer(reader.Reader, BGImporter):
     FILE_EXTS = ["json"]
 
     def initialize_reader(self, file):
@@ -48,7 +48,7 @@ class Importer(reader.Reader, importer.ImporterProtocol):
         return max(ot.date for ot in self.get_transactions()).date()
 
     def read_file(self, file):
-        with open(file.name) as fh:
+        with open(file) as fh:
             self.rdr = json.load(fh)
 
             # transactions = []

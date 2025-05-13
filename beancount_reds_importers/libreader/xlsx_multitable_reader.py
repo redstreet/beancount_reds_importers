@@ -24,14 +24,14 @@ class Importer(csv_multitable_reader.Importer):
             self.reader_ready = True
 
     def read_raw(self, file):
-        # return etl.fromcsv(file.name)
+        # return etl.fromcsv(file)
 
         in_memory_file = StringIO()
         csv_writer = csv.writer(in_memory_file)
 
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            wb = openpyxl.load_workbook(file.name)
+            wb = openpyxl.load_workbook(file)
             sh = wb.worksheets[0]
 
         for r in sh.rows:

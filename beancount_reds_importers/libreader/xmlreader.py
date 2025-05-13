@@ -5,20 +5,20 @@ the logic will have to be the institution specific readers.
 
 """
 
-from beancount.ingest import importer
+from beangulp import Importer as BGImporter
 from lxml import etree
 
 from beancount_reds_importers.libreader import reader
 
 
-class Importer(reader.Reader, importer.ImporterProtocol):
+class Importer(reader.Reader, BGImporter):
     FILE_EXTS = ["xml"]
 
     def initialize_reader(self, file):
         if getattr(self, "file", None) != file:
             self.file = file
             self.reader_ready = False
-            self.xmltree = etree.parse(file.name)
+            self.xmltree = etree.parse(file)
             self.reader_ready = self.deep_identify(file)
         if self.reader_ready:
             self.set_currency()
@@ -36,7 +36,7 @@ class Importer(reader.Reader, importer.ImporterProtocol):
         return None
 
     def read_file(self, file):
-        self.xmltree = etree.parse(file.name)
+        self.xmltree = etree.parse(file)
 
     def get_xpath_elements(self, xpath_expr, xml_interpreter=lambda x: x):
         """Extract a list of elements in the XML file at the given XPath expression. Typically,

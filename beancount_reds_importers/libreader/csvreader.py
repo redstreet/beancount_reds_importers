@@ -8,7 +8,8 @@ import traceback
 
 import petl as etl
 from beancount.core.number import D
-from beancount.ingest import importer
+from beangulp import Importer as BGImporter
+from beangulp import cache
 
 from beancount_reds_importers.libreader import reader
 
@@ -60,7 +61,7 @@ from beancount_reds_importers.libreader import reader
 # - The table is now ready for use by the importer. petl makes each row available via namedtuples
 
 
-class Importer(reader.Reader, importer.ImporterProtocol):
+class Importer(reader.Reader, BGImporter):
     FILE_EXTS = ["csv"]
 
     def initialize_reader(self, file):
@@ -71,12 +72,12 @@ class Importer(reader.Reader, importer.ImporterProtocol):
                 self.file_read_done = False
             # else:
             #     print("header_identifier failed---------------:")
-            #     print(self.header_identifier, file.head())
+            #     print(self.header_identifier, cache.get_file(file).head())
 
     def deep_identify(self, file):
         return re.match(
             self.header_identifier,
-            file.head(encoding=getattr(self, "file_encoding", None)),
+            cache.get_file(file).head(encoding=getattr(self, "file_encoding", None)),
         )
 
     def file_date(self, file):
@@ -139,7 +140,7 @@ class Importer(reader.Reader, importer.ImporterProtocol):
         return rdr
 
     def read_raw(self, file):
-        return etl.fromcsv(file.name, encoding=getattr(self, "file_encoding", None))
+        return etl.fromcsv(file, encoding=getattr(self, "file_encoding", None))
 
     def skip_until_main_table(self, rdr, col_labels=None):
         """Skip csv lines until the header line is found."""

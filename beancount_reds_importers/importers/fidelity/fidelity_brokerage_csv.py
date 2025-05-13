@@ -45,7 +45,7 @@ class Importer(investments.Importer, csvreader.Importer):
         last_four = self.config.get("account_number", "")[-4:]
         return (
             re.match(self.header_identifier, file.head(), flags=re.DOTALL)
-            and f"{last_four}" in file.name
+            and f"{last_four}" in file
         )
 
     def prepare_table(self, rdr):

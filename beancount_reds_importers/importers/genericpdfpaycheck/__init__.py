@@ -25,6 +25,7 @@ class Importer(paycheck.Importer, pdfreader.Importer):
         self.pdf_table_extraction_settings = {"join_tolerance": 4, "snap_tolerance": 4}
         self.pdf_table_extraction_crop = (0, 0, 0, 0)
         self.pdf_table_title_height = 0
+        self.pdf_page_break_top = 0
         # Set this true as you play with the extraction settings and crop to view images of what the pdf parser detects
         self.debug = True
 
@@ -54,7 +55,7 @@ class Importer(paycheck.Importer, pdfreader.Importer):
             if label in self.header_map:
                 return self.header_map[header]
 
-            return label.lower().replace(" ", "_")
+            return label.lower().replace(" ", "_").replace(".", "_")
 
         for section, table in self.alltables.items():
             # rename columns

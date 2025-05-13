@@ -128,7 +128,7 @@ class Importer(banking.Importer):
         config = self.config
 
         self.read_file(file)
-        metadata = data.new_metadata(file.name, 0)
+        metadata = data.new_metadata(file, 0)
         metadata.update(self.build_metadata(file, metatype="transaction"))
         entry = data.Transaction(
             metadata,
