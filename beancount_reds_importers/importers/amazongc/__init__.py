@@ -27,6 +27,7 @@ import ntpath
 from beancount.core import data
 from beancount.core.number import D
 from beangulp import Importer as BGImporter
+from beancount.core import flags
 
 # account flow                          ingest source
 # ----------------------------------------------------
@@ -36,6 +37,7 @@ from beangulp import Importer as BGImporter
 
 
 class Importer(BGImporter):
+    FLAG = flags.FLAG_OKAY
     def __init__(self, config):
         self.config = config
         self.currency = self.config.get("currency", "CURRENCY_NOT_CONFIGURED")
@@ -59,6 +61,9 @@ class Importer(BGImporter):
             date = datetime.datetime.strptime(f[0], "%B %d, %Y").date()
             maxdate = max(date, maxdate)
         return maxdate
+
+    def account(self, filename):
+        return self.config["main_account"]
 
     def extract(self, file, existing_entries=None):
         config = self.config
