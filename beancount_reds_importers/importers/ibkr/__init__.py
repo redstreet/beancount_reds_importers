@@ -93,6 +93,7 @@ Breakout by Day? No
 """
 
 import datetime
+from loguru import logger
 
 from beancount.core.number import D
 
@@ -140,6 +141,7 @@ class Importer(investments.Importer, xmlreader.Importer):
                 # base check: simply ensure this looks like a valid IBKR Flex Query file
                 return list(self.get_xpath_elements("/FlexQueryResponse"))[0] is not None
         except IndexError:
+            logger.error("The configured account number does not match the statement.")
             return False
 
     def set_currency(self):
