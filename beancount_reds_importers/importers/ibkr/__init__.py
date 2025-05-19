@@ -3,28 +3,28 @@
 TODO:
 - Flex Web Service API to programmatically retrieve data
 
-Activity Flex Query Details
+Create an Activity Flex Query in Flex Queries using the following parameters:
 
 Sections
 Account Information
-1.ClientAccountID
-2.CurrencyPrimary
+1.AccountID
+2.Currency
 
 Cash Report
-1.CurrencyPrimary
+1.Currency
 2.StartingCash
 3.EndingCash
-4.NetCashBalanceSLB
+4.NetCashBalance (SLB)
 5.ToDate
 
 Cash Transactions
-1.Date/Time
-2.Amount
-3.Type
-4.CurrencyPrimary
-5.Symbol
-6.CommodityType
-7.ISIN
+1.Currency
+2.Symbol
+3.ISIN
+4.Date/Time
+5.Amount
+6.Type
+7.CommodityType
 
 Net Stock Position Summary
 1.Symbol
@@ -34,11 +34,11 @@ Net Stock Position Summary
 
 Open Dividend Accruals
 1.Symbol
-2.GrossAmount
-3.NetAmount
-4.PayDate
-5.Quantity
-6.ISIN
+2.ISIN
+3.PayDate
+4.Quantity
+5.GrossAmount
+6.NetAmount
 
 Open Positions
 Options: Summary
@@ -48,21 +48,21 @@ Options: Summary
 
 Trades
 Options: Execution
-1.SecurityID
-2.DateTime
-3.TransactionType
-4.Quantity
-5.TradePrice
-6.TradeMoney
-7.Proceeds
-8.IBCommission
-9.IBCommissionCurrency
-10.NetCash
-11.CostBasis
-12.FifoPnlRealized
-13.Buy/Sell
-14.CurrencyPrimary
-15.ISIN
+- CurrencyPrimary
+- SecurityID
+- ISIN
+- DateTime
+- TransactionType
+- Quantity
+- TradePrice
+- TradeMoney
+- Proceeds
+- IBCommission
+- IBCommissionCurrency
+- NetCash
+- CostBasis
+- Realized P/L
+- Buy/Sell
 
 Transfers
 Options: Transfer
@@ -80,15 +80,15 @@ Number of Days 120
 
 
 General Configuration
+Date Format yyyy-MM-dd
+Time Format HH:mm:ss TimeZone
+Date/Time Separator ' ' (single-space)
 Profit and Loss Default
 Include Canceled Trades? No
 Include Currency Rates? No
 Include Audit Trail Fields? No
 Display Account Alias in Place of Account ID? No
 Breakout by Day? No
-Date Format yyyy-MM-dd
-Time Format HH:mm:ss TimeZone
-Date/Time Separator ' ' (single-space)
 
 """
 
