@@ -24,10 +24,9 @@ import datetime
 import itertools
 import ntpath
 
-from beancount.core import data
+from beancount.core import data, flags
 from beancount.core.number import D
 from beangulp import Importer as BGImporter
-from beancount.core import flags
 
 # account flow                          ingest source
 # ----------------------------------------------------
@@ -38,6 +37,7 @@ from beancount.core import flags
 
 class Importer(BGImporter):
     FLAG = flags.FLAG_OKAY
+
     def __init__(self, config):
         self.config = config
         self.currency = self.config.get("currency", "CURRENCY_NOT_CONFIGURED")
