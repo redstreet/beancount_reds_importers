@@ -1,6 +1,5 @@
 from beangulp import importer
 
-
 class Importer(importer.Importer):
     """Multiplexer Importer: used when multiple accounts exist in a single input file, which is
     typical of ofx/qfx files.
