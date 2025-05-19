@@ -13,3 +13,7 @@ profile = "black"
 # A debug statement is breaking. Temporarily disabling until that can be fixed
 [tool.pytest.ini_options]
 norecursedirs = ["beancount_reds_importers/importers/mercurycards"]
+filterwarnings = [
+  # silence warning in ofxparse
+  "ignore:Call to deprecated method findAll:DeprecationWarning",
+]

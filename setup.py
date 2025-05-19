@@ -21,12 +21,14 @@ setup(
     include_package_data=True,
     extras_require={
         "dev": [
-            "ruff",
             "isort",
+            "pytest",
+            "ruff",
         ]
     },
     install_requires=[
         "click >= 8.1.7",
+        "beangulp >= 0.2.0",
         "beancount >= 3.0.0",
         "click_aliases >= 1.0.4",
         "dateparser >= 1.2.0",

@@ -3,10 +3,10 @@
 import re
 
 from beancount.core.number import D
+from beangulp import cache
 
 from beancount_reds_importers.libreader import xlsreader
 from beancount_reds_importers.libtransactionbuilder import banking
-from beangulp import cache
 
 
 class Importer(xlsreader.Importer, banking.Importer):
@@ -18,9 +18,7 @@ class Importer(xlsreader.Importer, banking.Importer):
         self.header_identifier = self.config.get(
             "custom_header", "United Overseas Bank Limited.*Account Type:SRS Account"
         )
-        self.column_labels_line = (
-            "Transaction Date,Transaction Description,Withdrawal,Deposit"
-        )
+        self.column_labels_line = "Transaction Date,Transaction Description,Withdrawal,Deposit"
         self.date_format = "%Y%m%d"
         # fmt: off
         self.header_map = {
@@ -47,9 +45,7 @@ class Importer(xlsreader.Importer, banking.Importer):
 
         rdr = rdr.addfield(
             "amount",
-            lambda x: (
-                -1 * Ds(x["Withdrawal"]) if x["Withdrawal"] != "" else Ds(x["Deposit"])
-            ),
+            lambda x: (-1 * Ds(x["Withdrawal"]) if x["Withdrawal"] != "" else Ds(x["Deposit"])),
         )
         rdr = rdr.addfield("memo", lambda x: "")
         return rdr
