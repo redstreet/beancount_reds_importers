@@ -1,3 +1,54 @@
+[project]
+name = "beancount_reds_importers"
+#version = "0.1.0"
+dynamic = ["version"]
+license = "GPL-3.0"
+description = "Importers for various institutions for Beancount"
+readme = "README.md"
+authors = [
+  { name = "Red Street", email = "redstreet@users.noreply.github.com" },
+]
+requires-python = ">=3.13"
+keywords = ["importer", "ingestor", "beancount", "accounting"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Financial and Insurance Industry",
+  "Natural Language :: English",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.7",
+  "Topic :: Office/Business :: Financial :: Accounting",
+  "Topic :: Office/Business :: Financial :: Investment",
+]
+dependencies = [
+  "click >= 8.1.7",
+  "beangulp >= 0.2.0",
+  "beancount >= 3.0.0",
+  "click_aliases >= 1.0.4",
+  "dateparser >= 1.2.0",
+  "ofxparse >= 0.21",
+  "openpyxl >= 3.1.2",
+  "packaging >= 23.1",
+  "pdfplumber>=0.11.0",
+  "petl >= 1.7.15",
+  "tabulate >= 0.9.0",
+  "tqdm >= 4.66.2",
+]
+
+[project.urls]
+Repository = "https://github.com/redstreet/beancount_reds_importers"
+
+[project.scripts]
+ofx-summarize = "beancount_reds_importers.util.ofx_summarize:summarize"
+bean-download = "beancount_reds_importers.util.bean_download:cli"
+reds-ibkr-flexquery-download = "beancount_reds_importers.importers.ibkr.flexquery_download:flexquery_download"
+
+[project.optional-dependencies]
+dev = ["isort", "pytest", "ruff"]
+
+[build-system]
+requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
 [tool.ruff]
 line-length = 99
 
@@ -17,3 +68,11 @@ filterwarnings = [
   # silence warning in ofxparse
   "ignore:Call to deprecated method findAll:DeprecationWarning",
 ]
+
+[tool.setuptools_scm]
+# You can add optional configuration keys here, e.g.:
+# write_to = "mypackage/_version.py"
+# local_scheme = "node-and-timestamp"
+
+[tool.setuptools.packages.find]
+where = ["beancount_reds_importers"]
