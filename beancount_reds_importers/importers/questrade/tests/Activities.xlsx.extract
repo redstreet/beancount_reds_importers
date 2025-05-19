@@ -1,0 +1,74 @@
+
+2025-02-18 * "CON 9876543212 TO 1234567811" "xfer"
+  filing_account: "Assets:Questrade:Taxable"
+  Assets:Questrade:Taxable:Cash  -100.00 CAD
+
+2025-02-18 * "CON 9876543212 TO 1234567811" "xfer"
+  filing_account: "Assets:Questrade:FHSA"
+  Assets:Questrade:FHSA:Cash  100.00 CAD
+
+2025-02-21 * "VANGUARD INDEX FUNDS VANGUARD TOTAL STOCK MARKET ETF NOUS AVONS AGI COMME AGENT" "[VTI] Vanguard Total Stock Market"
+  filing_account: "Assets:Questrade:RRSP"
+  settlement_date: "2025-02-24"
+  Assets:Questrade:RRSP:VTI    5.00000 VTI {300.20000000 USD}
+  Assets:Questrade:RRSP:Cash  -1501.00 USD
+
+2025-02-21 * "VANGUARD INDEX FUNDS VANGUARD TOTAL STOCK MARKET ETF NOUS AVONS AGI COMME AGENT" "[VXUS] Vanguard Total Stock Market Ex-US"
+  filing_account: "Assets:Questrade:RRSP"
+  settlement_date: "2025-02-24"
+  todo: "TODO: this entry is incomplete until lots are selected (bean-doctor context <filename> <lineno>)"
+  Assets:Questrade:RRSP:VXUS               -3.00000 VXUS {} @ 160.00000000 USD
+  Income:CapitalGains:Questrade:RRSP:VXUS
+  Assets:Questrade:RRSP:Cash                 479.77 USD
+  Expenses:Fees:Questrade:RRSP                 0.23 USD
+
+2025-02-25 * "9876543210 WIRE DEP" "cash"
+  filing_account: "Assets:Questrade:Taxable"
+  Assets:Questrade:Taxable:Cash                          500.00 USD
+  Assets:Zero-Sum-Accounts:Transfers-Questrade-Taxable  -500.00 USD
+
+2025-03-06 * "VANGUARD BALANCED ETF PORTFOLIO ETF UNIT NOUS AVONS AGI COMME AGENT PRIX MOYEN-DETAILS SUR DEMANDE" "[VBAL] Vanguard Balanced ETF"
+  filing_account: "Assets:Questrade:RRSP"
+  settlement_date: "2025-03-07"
+  Assets:Questrade:RRSP:VBAL  15.00000 VBAL {33.42000000 CAD}
+  Assets:Questrade:RRSP:Cash   -501.30 CAD
+
+2025-03-06 * "ISHARES CORE BALANCED ETF PORTFOLIO INDEX ETF COM UNIT NOUS AVONS AGI COMME AGENT" "[XBAL] IShares Balanced ETF"
+  filing_account: "Assets:Questrade:RRSP"
+  settlement_date: "2025-03-07"
+  todo: "TODO: this entry is incomplete until lots are selected (bean-doctor context <filename> <lineno>)"
+  Assets:Questrade:RRSP:XBAL               -20.00000 XBAL {} @ 30.40000000 CAD
+  Income:CapitalGains:Questrade:RRSP:XBAL
+  Assets:Questrade:RRSP:Cash                  608.00 CAD
+
+2025-03-07 * "CON 5463728112" "cash"
+  filing_account: "Assets:Questrade:RRSP"
+  Assets:Questrade:RRSP:Cash                          200.00 CAD
+  Assets:Zero-Sum-Accounts:Transfers-Questrade-RRSP  -200.00 CAD
+
+2025-03-07 * "GLOBAL X HIGH INT SVGS ETF CL A UNIT DIST ON 8 SHS REC 02/28/25 PAY 03/07/25" "[CASH] Global X High Interest Savings ETF"
+  filing_account: "Assets:Questrade:FHSA"
+  Assets:Questrade:FHSA:Cash             27.89 CAD
+  Income:Dividends:Questrade:FHSA:CASH  -27.89 CAD
+
+2025-03-07 * "ISHARES CORE EQUITY ETF PORTFOLIO UNITS NOUS AVONS AGI COMME AGENT" "[XEQT] IShares Equity ETF"
+  filing_account: "Assets:Questrade:RRSP"
+  settlement_date: "2025-03-10"
+  Assets:Questrade:RRSP:XEQT  6.00000 XEQT {34.13000000 CAD}
+  Assets:Questrade:RRSP:Cash  -204.78 CAD
+
+2025-03-07 * "GLOBAL X US DLR CURRENCY ETF UNIT CL A WE ACTED AS AGENT" "[DLR.U] GLOBAL X US DLR CURRENCY"
+  filing_account: "Assets:Questrade:Taxable"
+  settlement_date: "2025-03-10"
+  Assets:Questrade:Taxable:DLR.U  10.00000 DLR.U {10.20000000 USD}
+  Assets:Questrade:Taxable:Cash    -102.00 USD
+
+2025-03-11 * "GLOBAL X US DLR CURRENCY ETF UNIT CL A JOURNAL POSITION TO CAD" "[DLR] GLOBAL X US DLR CURRENCY"
+  filing_account: "Assets:Questrade:Taxable"
+  Assets:Questrade:Taxable:DLR                          -10.00000 DLR
+  Assets:Zero-Sum-Accounts:Transfers-Questrade-Taxable   10.00000 DLR
+
+2025-03-11 * "GLOBAL X US DLR CURRENCY ETF UNIT CL A JOURNAL POSITION FROM USD BOOK VALUE: $150 CNV@ 1.4442" "[DLR] GLOBAL X US DLR CURRENCY"
+  filing_account: "Assets:Questrade:Taxable"
+  Assets:Questrade:Taxable:DLR                           10.00000 DLR
+  Assets:Zero-Sum-Accounts:Transfers-Questrade-Taxable  -10.00000 DLR

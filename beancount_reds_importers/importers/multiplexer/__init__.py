@@ -68,9 +68,15 @@ class Importer(importer.Importer):
             return applicable[0].account(filepath)
         return "Assets:Uninitialized"
 
+    def file_account(self, filepath):
+        return self.account(filepath)
+
     def date(self, filepath):
         imps = self.get_applicable_importers(filepath)
         return max((d for d in (imp.date(filepath) for imp in imps) if d), default=None)
+
+    def file_date(self, filepath):
+        return self.date(filepath)
 
     def filename(self, filepath):
         if self.config.get("filename", None):
@@ -81,6 +87,9 @@ class Importer(importer.Importer):
         if applicable:
             return applicable[0].filename(filepath)
         return None
+
+    def file_name(self, filepath):
+        return self.filename(filepath)
 
     def extract(self, filepath, existing=None):
         # Run extract on all applicable importers and merge their outputs.
