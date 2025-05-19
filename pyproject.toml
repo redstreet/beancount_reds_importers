@@ -8,7 +8,7 @@ readme = "README.md"
 authors = [
   { name = "Red Street", email = "redstreet@users.noreply.github.com" },
 ]
-requires-python = ">=3.13"
+requires-python = ">=3.11"
 keywords = ["importer", "ingestor", "beancount", "accounting"]
 classifiers = [
   "Development Status :: 4 - Beta",
