@@ -109,7 +109,7 @@ class DictToObject:
 # xml on left, ofx on right
 ofx_type_map = {
     "BUY": "buystock",
-    "SELL": "selltock",
+    "SELL": "sellstock",
 }
 
 
