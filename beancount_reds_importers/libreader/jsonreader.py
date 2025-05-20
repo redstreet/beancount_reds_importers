@@ -36,7 +36,7 @@ class Importer(reader.Reader, BGImporter):
         # default value to False, else jsonreader.initialize_reader fail to execute because missing attribut "config"
         return False
 
-    def file_date(self, file):
+    def date(self, file):
         """Get the ending date of the statement."""
         if not getattr(self, "json_data", None):
             self.initialize(file)
