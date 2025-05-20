@@ -46,8 +46,17 @@ reds-ibkr-flexquery-download = "beancount_reds_importers.importers.ibkr.flexquer
 dev = ["isort", "pytest", "ruff"]
 
 [build-system]
-requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling", "uv-dynamic-versioning"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+sources = ["beancount_reds_importers"]
+
+[tool.hatch.version]
+source = "uv-dynamic-versioning"
+
+[tool.uv-dynamic-versioning]
+fallback-version = "0.0.0"
 
 [tool.ruff]
 line-length = 99
@@ -68,11 +77,3 @@ filterwarnings = [
   # silence warning in ofxparse
   "ignore:Call to deprecated method findAll:DeprecationWarning",
 ]
-
-[tool.setuptools_scm]
-# You can add optional configuration keys here, e.g.:
-# write_to = "mypackage/_version.py"
-# local_scheme = "node-and-timestamp"
-
-[tool.setuptools.packages.find]
-where = ["beancount_reds_importers"]
