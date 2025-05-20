@@ -41,7 +41,7 @@ class Importer(reader.Reader, BGImporter):
         # identify based on filename
         return True
 
-    def file_date(self, file):
+    def date(self, file):
         "Get the maximum date from the file."
         self.initialize(file)  # self.date_format gets set via this
         self.read_file(file)

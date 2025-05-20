@@ -65,9 +65,6 @@ class Importer(csvreader.Importer, investments.Importer):
         }
         # fmt: on
 
-    def account(self, filename):
-        return self.config["main_account"]
-
     def deep_identify(self, file):
         last_three = self.config.get("account_number", "")[-3:]
         return (
