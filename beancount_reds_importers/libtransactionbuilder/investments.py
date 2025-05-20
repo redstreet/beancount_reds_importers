@@ -530,8 +530,8 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
             metadata.update(self.build_metadata(file, metatype="balance_cash"))
             try:
                 bal_date = (
-                    date if date else self.file_date(file).date()
-                )  # unavailable file_date raises AttributeError
+                    date if date else self.date(file).date()
+                )  # unavailable date raises AttributeError
                 balance_entry = data.Balance(
                     metadata,
                     bal_date,

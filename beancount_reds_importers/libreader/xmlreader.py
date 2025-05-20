@@ -28,7 +28,7 @@ class Importer(reader.Reader, BGImporter):
         matches, and oother such things."""
         return True
 
-    def file_date(self, file):
+    def date(self, file):
         """Get the ending date of the statement."""
         if not getattr(self, "xmltree", None):
             self.initialize(file)
