@@ -47,8 +47,8 @@ class Importer(paycheck.Importer, pdfreader.Importer):
         if not self.file_read_done:
             self.read_file(input_file)
         *_, d = self.alltables["table_1"].header()
-        self.date = datetime.datetime.strptime(d, self.date_format)
-        return self.date.date()
+        self.paycheck_date_value = datetime.datetime.strptime(d, self.date_format)
+        return self.paycheck_date_value.date()
 
     def prepare_tables(self):
         def valid_header(label):

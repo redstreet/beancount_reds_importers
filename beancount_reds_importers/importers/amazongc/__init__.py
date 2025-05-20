@@ -46,13 +46,10 @@ class Importer(BGImporter):
     def identify(self, file):
         return self.filename_pattern_def in file
 
-    def file_name(self, file):
+    def filename(self, file):
         return "{}".format(ntpath.basename(file))
 
-    def file_account(self, _):
-        return self.config["main_account"]
-
-    def file_date(self, file):
+    def date(self, file):
         "Get the maximum date from the file."
         maxdate = datetime.date.min
         for line in open(file, "r").readlines()[1:]:
@@ -61,9 +58,6 @@ class Importer(BGImporter):
             date = datetime.datetime.strptime(f[0], "%B %d, %Y").date()
             maxdate = max(date, maxdate)
         return maxdate
-
-    def account(self, filename):
-        return self.config["main_account"]
 
     def extract(self, file, existing_entries=None):
         config = self.config

@@ -36,7 +36,7 @@ class TransactionBuilder:
         }
 
         # Prevent the replacement fields from appearing in the output of
-        # the file_account method
+        # the account method
         if "filing_account" not in self.config:
             kwargs = {k: "" for k in substs}
             filing_account = self.config["main_account"].format(**kwargs)

@@ -84,7 +84,7 @@ def find_input_files(directory):
     for sroot, dirs, files in os.walk(directory):
         for filename in files:
             if re.match(
-                r".*\.(extract|file_date|file_name|file_account|py|pyc|DS_Store)$",
+                r".*\.(extract|date|filename|account|py|pyc|DS_Store)$",
                 filename,
             ):
                 continue
@@ -147,30 +147,30 @@ class ImporterTestBase:
             pytestconfig.getoption("generate", False),
         )
 
-    def test_file_date(self, importer, file, pytestconfig):
+    def test_date(self, importer, file, pytestconfig):
         """Compute the imported file date and compare to an expected output."""
-        date = importer.file_date(file.name)
+        date = importer.date(file.name)
         string = date.isoformat() if date else ""
         compare_contents_or_generate(
             string,
-            "{}.file_date".format(file.name),
+            "{}.date".format(file.name),
             pytestconfig.getoption("generate", False),
         )
 
-    def test_file_name(self, importer, file, pytestconfig):
+    def test_filename(self, importer, file, pytestconfig):
         """Compute the imported file name and compare to an expected output."""
-        filename = importer.file_name(file.name) or ""
+        filename = importer.filename(file.name) or ""
         compare_contents_or_generate(
             filename,
-            "{}.file_name".format(file.name),
+            "{}.filename".format(file.name),
             pytestconfig.getoption("generate", False),
         )
 
-    def test_file_account(self, importer, file, pytestconfig):
+    def test_account(self, importer, file, pytestconfig):
         """Compute the selected filing account and compare to an expected output."""
-        account = importer.file_account(file.name) or ""
+        account = importer.account(file.name) or ""
         compare_contents_or_generate(
             account,
-            "{}.file_account".format(file.name),
+            "{}.account".format(file.name),
             pytestconfig.getoption("generate", False),
         )

@@ -80,7 +80,7 @@ class Importer(reader.Reader, BGImporter):
             cache.get_file(file).head(encoding=getattr(self, "file_encoding", None)),
         )
 
-    def file_date(self, file):
+    def date(self, file):
         "Get the maximum date from the file."
         self.initialize(file)  # self.date_format gets set via this
         self.read_file(file)

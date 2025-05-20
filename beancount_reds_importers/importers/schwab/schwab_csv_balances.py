@@ -48,16 +48,16 @@ class Importer(investments.Importer, csv_multitable_reader.Importer):
 
         return rdr
 
-    def file_date(self, file):
-        return self.date.date()
+    def date(self, file):
+        return self.max_date.date()
 
     def get_max_transaction_date(self):
-        return self.date.date()
+        return self.max_date.date()
 
     def prepare_tables(self):
         # first row has date
         d = self.raw_rdr[0][0].rsplit(" ", 1)[1]
-        self.date = datetime.datetime.strptime(d, self.date_format)
+        self.max_date = datetime.datetime.strptime(d, self.date_format)
 
         for section, table in self.alltables.items():
             if section in self.config["section_headers"]:
@@ -65,7 +65,7 @@ class Importer(investments.Importer, csv_multitable_reader.Importer):
                 table = self.convert_columns(table)
                 table = table.cut("memo", "security", "units", "unit_price")
                 table = table.selectne("memo", "--")  # we don't need total rows
-                table = table.addfield("date", self.date)
+                table = table.addfield("date", self.max_date)
                 self.alltables[section] = table
 
     def get_balance_positions(self):

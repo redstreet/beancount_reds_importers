@@ -45,7 +45,7 @@ class Importer(reader.Reader, BGImporter):
         the full account number. Override this method to handle these cases."""
         return file_account == config_account
 
-    def file_date(self, file):
+    def date(self, file):
         """Get the ending date of the statement."""
         if not getattr(self, "ofx_account", None):
             self.initialize(file)
