@@ -49,9 +49,6 @@ class Importer(BGImporter):
     def filename(self, file):
         return "{}".format(ntpath.basename(file))
 
-    def account(self, _):
-        return self.config["main_account"]
-
     def date(self, file):
         "Get the maximum date from the file."
         maxdate = datetime.date.min

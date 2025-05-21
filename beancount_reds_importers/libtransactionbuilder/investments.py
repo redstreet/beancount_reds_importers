@@ -78,9 +78,6 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
         # For overriding in custom_init()
         self.get_payee = lambda ot: ot.memo
 
-    def account(self, filename):
-        return self.config.get("main_account", "Assets:US:UNINIT:Investments")
-
     def initialize(self, file):
         if self.initialized and self.file == file:
             return
