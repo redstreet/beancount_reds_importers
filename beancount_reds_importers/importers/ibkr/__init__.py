@@ -93,9 +93,9 @@ Breakout by Day? No
 """
 
 import datetime
-from loguru import logger
 
 from beancount.core.number import D
+from loguru import logger
 
 from beancount_reds_importers.libreader import xmlreader
 from beancount_reds_importers.libtransactionbuilder import investments
