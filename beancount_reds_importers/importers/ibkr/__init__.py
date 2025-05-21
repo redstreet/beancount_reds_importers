@@ -182,6 +182,7 @@ class Importer(investments.Importer, xmlreader.Importer):
         return DictToObject(ofx_dict)
 
     def xml_cash_interpreter(self, xml_data):
+        '''Importer for CashTransaction'''
         # map, with ofx fields on the left and xml fields on the right
         ofx_dict = {
             "tradeDate": self.convert_date(xml_data["dateTime"]),
@@ -189,15 +190,21 @@ class Importer(investments.Importer, xmlreader.Importer):
             "security": xml_data.get("isin", None),
             "type": "cash",
             "memo": xml_data["type"],
+            "currency": xml_data["currency"]
         }
 
         if xml_data["type"] == "Dividends":
             ofx_dict["type"] = "dividends"
             ofx_dict["total"] = ofx_dict["amount"]
 
+        if xml_data["type"] == "Withholding Tax":
+            ofx_dict["type"] = "whtax"
+        #     ofx_dict[""]
+
         return DictToObject(ofx_dict)
 
     def get_transactions(self):
+        '''Read transaction records from the XML report'''
         yield from self.get_xpath_elements(
             "/FlexQueryResponse/FlexStatements/FlexStatement/Trades/Trade",
             xml_interpreter=self.xml_trade_interpreter,

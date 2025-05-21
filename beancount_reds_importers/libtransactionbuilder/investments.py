@@ -370,6 +370,7 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
                 "cash",
                 "payment",
                 "check",
+                "whtax",
                 "xfer",
             ]:
                 units = ot.amount
@@ -385,14 +386,20 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
             "dividends",
             "capgainsd_lt",
             "capgainsd_st",
-            "transfer",
+            "transfer"
         ] and (hasattr(ot, "security") and ot.security):
             ticker, ticker_long_name = self.get_ticker_info(ot.security)
             narration = self.security_narration(ot)
             main_acct = self.get_acct("main_account", ot, ticker)
+        elif ot.type == "whtax":
+            # narration = ot.type
+            narration = self.security_narration(ot)
+            ticker = ot.currency
+            main_acct = config["cash_account"]
         else:  # cash transaction
+            ticker, ticker_long_name = self.get_ticker_info(ot.security)
             narration = ot.type
-            ticker = self.currency
+            # ticker = self.currency
             main_acct = config["cash_account"]
 
         # Build transaction entry
@@ -475,6 +482,7 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
                 "payment",
                 "check",
                 "invexpense",
+                "whtax"
             ]:
                 entry = self.generate_transfer_entry(ot, file, counter)
             else:
