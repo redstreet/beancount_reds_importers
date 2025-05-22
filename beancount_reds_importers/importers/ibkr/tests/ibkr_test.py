@@ -32,6 +32,7 @@ fund_info = {
             "capgainsd_st": "Account to book short term capital gains distributions to",
             "interest": "Income:Investment:Interest:IB:{ticker}",
             "fees": "Account to book fees to",
+            "whtax": "Expenses:Tax:WithholdingTax:{currency}",
         }
     )
 )
