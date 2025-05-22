@@ -129,14 +129,17 @@ class Importer(investments.Importer, xmlreader.Importer):
         try:
             if self.config.get("account_number", None):
                 # account number specific matching
-                return (
-                    self.config["account_number"]
+                account_matches = (self.config["account_number"]
                     == list(
                         self.get_xpath_elements(
                             "/FlexQueryResponse/FlexStatements/FlexStatement/AccountInformation"
                         )
                     )[0]["accountId"]
                 )
+                if not account_matches:
+                    logger.warning("The specified account does not match the statement.")
+
+                return account_matches
             else:
                 # base check: simply ensure this looks like a valid IBKR Flex Query file
                 return list(self.get_xpath_elements("/FlexQueryResponse"))[0] is not None
