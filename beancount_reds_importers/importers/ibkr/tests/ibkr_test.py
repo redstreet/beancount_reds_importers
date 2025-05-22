@@ -11,7 +11,7 @@ DIR = path.dirname(__file__)
 
 fund_info = {
     "fund_data": [
-        ("OPI", "US67623C1099", "Ticker long name unavailable"),
+        ("OPI", "US67623C1099", "Office Properties Income Trust"),
     ],
     "money_market": [],
 }
