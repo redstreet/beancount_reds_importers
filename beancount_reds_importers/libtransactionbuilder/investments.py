@@ -128,7 +128,7 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
             "income":       self.config["interest"],
             "fee":          self.config["fees"],
             "invexpense":   self.config.get("invexpense", "ACCOUNT_NOT_CONFIGURED:INVEXPENSE"),
-            "whtax":        self.config["whtax"],
+            "whtax":        self.config.get("whtax", "ACCOUNT_NOT_CONFIGURED:WHTAX"),
         }
         # fmt: on
 
