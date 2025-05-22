@@ -128,6 +128,7 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
             "income":       self.config["interest"],
             "fee":          self.config["fees"],
             "invexpense":   self.config.get("invexpense", "ACCOUNT_NOT_CONFIGURED:INVEXPENSE"),
+            "whtax":        self.config["whtax"],
         }
         # fmt: on
 
@@ -208,6 +209,8 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
             return target
         if transaction.type == "income" and getattr(transaction, "income_type", None) == "DIV":
             return self.target_account_map.get("dividends", None)
+        if transaction.type == "whtax":
+            return self.target_account_map.get("whtax", None)
         return self.target_account_map.get(transaction.type, None)
 
     def security_narration(self, ot):
@@ -346,7 +349,8 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
 
     def generate_transfer_entry(self, ot, file, counter):
         """Cash transactions, or in-kind transfers. One of:
-        [credit, debit, dep, transfer, income, dividends, capgainsd_lt, capgainsd_st, other]
+        [credit, debit, dep, transfer, income, dividends, capgainsd_lt, capgainsd_st,
+         whtax, other]
         """
         config = self.config
         metadata = data.new_metadata(file, next(counter))
@@ -380,6 +384,8 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
             print("Could not determine field for transaction amount")
             # import pdb; pdb.set_trace()
 
+        currency = self.currency
+
         main_acct = None
         if ot.type in [
             "income",
@@ -395,6 +401,7 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
             # narration = ot.type
             narration = self.security_narration(ot)
             ticker = ot.currency
+            currency = ot.currency
             main_acct = config["cash_account"]
         else:  # cash transaction
             ticker, ticker_long_name = self.get_ticker_info(ot.security)
@@ -424,10 +431,11 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
             "capgainsd_st",
             "capgainsd_lt",
             "fee",
+            "whtax"
         ]:  # cash
             amount = ot.total if hasattr(ot, "total") else ot.amount
-            data.create_simple_posting(entry, config["cash_account"], amount, self.currency)
-            data.create_simple_posting(entry, target_acct, -1 * amount, self.currency)
+            data.create_simple_posting(entry, config["cash_account"], amount, currency)
+            data.create_simple_posting(entry, target_acct, -1 * amount, currency)
         else:
             data.create_simple_posting(entry, main_acct, units, ticker)
             if target_acct:
