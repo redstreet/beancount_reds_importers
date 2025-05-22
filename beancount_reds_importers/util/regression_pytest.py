@@ -5,7 +5,7 @@ existing downloaded files, running the various importer interface methods on it,
 and comparing the output to an expected text file. (Expected test files can be
 auto-generated using the --generate option). You use it like this:
 
-  from beancount_reds_importer.util import regression_pytest
+  from beancount_reds_importers.util import regression_pytest
   ...
   import mymodule
   ...
