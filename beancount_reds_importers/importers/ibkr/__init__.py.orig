@@ -96,6 +96,7 @@ import datetime
 
 from loguru import logger
 from beancount.core.number import D
+from loguru import logger
 
 from beancount_reds_importers.libreader import xmlreader
 from beancount_reds_importers.libtransactionbuilder import investments
@@ -140,8 +141,13 @@ class Importer(investments.Importer, xmlreader.Importer):
             else:
                 # base check: simply ensure this looks like a valid IBKR Flex Query file
                 return list(self.get_xpath_elements("/FlexQueryResponse"))[0] is not None
+<<<<<<< HEAD
+        except IndexError:
+            logger.error("The configured account number does not match the statement.")
+=======
         except IndexError as ie:
             logger.error(ie)
+>>>>>>> 869353a (feat: log errors in deep_identify)
             return False
 
     def set_currency(self):
