@@ -20,5 +20,6 @@ class TestIbkr(regtest.ImporterTestBase):
     """
     Tests for the IBKR importer.
     """
+
     pass
-    #assert False
+    # assert False
