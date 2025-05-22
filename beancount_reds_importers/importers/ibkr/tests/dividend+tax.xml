@@ -1,0 +1,31 @@
+<FlexQueryResponse queryName="bean-import" type="AF">
+<FlexStatements count="1">
+<FlexStatement accountId="U1110000" fromDate="2025-01-17" toDate="2025-05-16" period="LastNCalendarDays" whenGenerated="2025-05-18 23:32:08 AEST">
+<AccountInformation accountId="U1110000" currency="EUR" />
+<CashReport>
+<CashReportCurrency currency="BASE_SUMMARY" toDate="2025-05-16" startingCash="10000.00" startingCashSec="10000.00" startingCashCom="0" endingCash="17163.33464882" endingCashSec="10000.00" endingCashCom="0" slbNetCash="10000.00" slbNetCashSec="10000.00" slbNetCashCom="0" />
+<CashReportCurrency currency="EUR" toDate="2025-05-16" startingCash="5000.00" startingCashSec="5000.00" startingCashCom="0" endingCash="5000.00" endingCashSec="5000.00" endingCashCom="0" slbNetCash="5000.00" slbNetCashSec="5000.00" slbNetCashCom="0" />
+<CashReportCurrency currency="USD" toDate="2025-05-16" startingCash="2000.00" startingCashSec="2000.00" startingCashCom="0" endingCash="-0.000000001" endingCashSec="-0.000000001" endingCashCom="0" slbNetCash="-0.000000001" slbNetCashSec="-0.000000001" slbNetCashCom="0" />
+</CashReport>
+<OpenPositions>
+<OpenPosition symbol="OPI" isin="US67623C1099" position="10" />
+</OpenPositions>
+<NetStockPositionSummary>
+</NetStockPositionSummary>
+<Trades>
+</Trades>
+<CashTransactions>
+<CashTransaction currency="USD" symbol="OPI" isin="US67623C1099" dateTime="2024-02-16 12:20:00 AEST" amount="0.08" type="Withholding Tax" commodityType="" />
+<CashTransaction currency="USD" symbol="OPI" isin="US67623C1099" dateTime="2024-05-17 10:20:00 AEST" amount="0.08" type="Withholding Tax" commodityType="" />
+<CashTransaction currency="USD" symbol="OPI" isin="US67623C1099" dateTime="2024-08-16 10:20:00 AEST" amount="0.08" type="Withholding Tax" commodityType="" />
+<CashTransaction currency="USD" symbol="OPI" isin="US67623C1099" dateTime="2024-11-15 12:20:00 AEST" amount="0.08" type="Withholding Tax" commodityType="" />
+<CashTransaction currency="USD" symbol="OPI" isin="US67623C1099" dateTime="2025-02-21 12:20:00 AEST" amount="-0.08" type="Withholding Tax" commodityType="" />
+<CashTransaction currency="USD" symbol="OPI" isin="US67623C1099" dateTime="2025-05-16 10:20:00 AEST" amount="-0.08" type="Withholding Tax" commodityType="" />
+<CashTransaction currency="USD" symbol="OPI" isin="US67623C1099" dateTime="2025-02-21 12:20:00 AEST" amount="0.52" type="Dividends" commodityType="" />
+<CashTransaction currency="USD" symbol="OPI" isin="US67623C1099" dateTime="2025-05-16 10:20:00 AEST" amount="0.52" type="Dividends" commodityType="" />
+</CashTransactions>
+<Transfers>
+</Transfers>
+</FlexStatement>
+</FlexStatements>
+</FlexQueryResponse>
