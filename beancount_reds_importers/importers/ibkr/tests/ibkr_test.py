@@ -20,7 +20,7 @@ fund_info = {
 @regtest.with_importer(
     ibkr.Importer(
         {
-            "filename_pattern": "*.xml",
+            "filename_pattern": ".*.xml",
             "emit_filing_account_metadata": False,
 
             "account_number": "U1110000",
