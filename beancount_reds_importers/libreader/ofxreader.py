@@ -4,17 +4,16 @@ beancount_reds_importers."""
 import datetime
 import warnings
 from collections import namedtuple
+from io import StringIO
 
 import ofxparse
 from beangulp import Importer as BGImporter
-from bs4.builder import XMLParsedAsHTMLWarning
 from bs4 import BeautifulSoup
-from io import StringIO
+from bs4.builder import XMLParsedAsHTMLWarning
 
 from beancount_reds_importers.libreader import reader
 
 warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
-
 
 
 class Importer(reader.Reader, BGImporter):
@@ -66,10 +65,10 @@ class Importer(reader.Reader, BGImporter):
             The parsed OFX data.
         """
         # Read the SGML file content
-        with open(file, 'r', encoding='utf-8') as fh: # TODO use encoding from SGML file 's header
+        with open(file, "r", encoding="utf-8") as fh:  # TODO use encoding from SGML file 's header
             sgml_content = fh.read()
         # Preprocess: Remove empty tags using BeautifulSoup
-        soup = BeautifulSoup(sgml_content, 'html.parser')
+        soup = BeautifulSoup(sgml_content, "html.parser")
         # Find and remove all empty tags
         for tag in soup.find_all():
             if not tag.contents and not tag.attrs:
@@ -78,7 +77,6 @@ class Importer(reader.Reader, BGImporter):
         # Parse the processed SGML content using ofxparse.OfxParser
         file_like_object = StringIO(processed_sgml)
         return ofxparse.OfxParser.parse(file_like_object)
-
 
     def get_transactions(self):
         yield from self.ofx_account.statement.transactions
