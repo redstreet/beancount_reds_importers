@@ -5,8 +5,7 @@
 from beancount_reds_importers.libreader import ofxreader
 from beancount_reds_importers.libtransactionbuilder import banking
 from os import path
-from beancount.ingest import regression_pytest as regtest
-
+from beancount_reds_importers.util import regression_pytest as regtest
 
 
 class Importer(banking.Importer, ofxreader.Importer):

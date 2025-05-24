@@ -66,7 +66,7 @@ class Importer(reader.Reader, BGImporter):
             The parsed OFX data.
         """
         # Read the SGML file content
-        with open(file.name, 'r', encoding='utf-8') as fh: # TODO use encoding from SGML file 's header
+        with open(file, 'r', encoding='utf-8') as fh: # TODO use encoding from SGML file 's header
             sgml_content = fh.read()
         # Preprocess: Remove empty tags using BeautifulSoup
         soup = BeautifulSoup(sgml_content, 'html.parser')
