@@ -9,6 +9,7 @@ import ofxparse
 from beangulp import Importer as BGImporter
 from bs4.builder import XMLParsedAsHTMLWarning
 from bs4 import BeautifulSoup
+from io import StringIO
 
 from beancount_reds_importers.libreader import reader
 
@@ -75,7 +76,6 @@ class Importer(reader.Reader, BGImporter):
                 tag.extract()
         processed_sgml = str(soup)
         # Parse the processed SGML content using ofxparse.OfxParser
-        from io import StringIO
         file_like_object = StringIO(processed_sgml)
         return ofxparse.OfxParser.parse(file_like_object)
 
