@@ -184,8 +184,8 @@ class Importer(investments.Importer, xmlreader.Importer):
         return datetime.datetime.strptime(d, self.date_format)
 
     def get_target_acct_custom(self, transaction, ticker=None):
-        if transaction.memo == "Transfer in kind":
-            return self.config["transfer"]
+        if transaction.memo == IbkrCashTxnType.WHTAX:
+            return self.config["whtax"]
         return None
 
     def xml_transfer_interpreter(self, xml_data):
