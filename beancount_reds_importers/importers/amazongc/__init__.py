@@ -43,8 +43,8 @@ class Importer(BGImporter):
         self.currency = self.config.get("currency", "CURRENCY_NOT_CONFIGURED")
         self.filename_pattern_def = "amazon-gift-card.tsv"
 
-    def identify(self, file):
-        return self.filename_pattern_def in file
+    def identify(self, filepath):
+        return self.filename_pattern_def in filepath
 
     def file_name(self, file):
         return "{}".format(ntpath.basename(file))

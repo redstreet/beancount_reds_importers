@@ -14,7 +14,7 @@ Balance = namedtuple("Balance", ["date", "amount", "currency"])
 class Importer(BGImporter, transactionbuilder.TransactionBuilder):
     FLAG = flags.FLAG_OKAY
 
-    def account(self, filename):
+    def account(self, filepath):
         return self.config.get("main_account", "Assets:US:UNINIT:Bank")
 
     def __init__(self, config):
