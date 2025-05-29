@@ -93,6 +93,7 @@ Breakout by Day? No
 """
 
 import datetime
+from enum import Enum
 
 from beancount.core.number import D
 from loguru import logger
@@ -107,10 +108,24 @@ class DictToObject:
             setattr(self, key, value)
 
 
+class IbkrTxnType(str, Enum):
+    """IBKR transaction types"""
+
+    Buy = "BUY"
+    Sell = "SELL"
+
+
+class OfxTxnType(str, Enum):
+    """OFX transaction types"""
+
+    BuyStock = "buystock"
+    SellStock = "sellstock"
+
+
 # xml on left, ofx on right
 ofx_type_map = {
-    "BUY": "buystock",
-    "SELL": "sellstock",
+    IbkrTxnType.Buy: OfxTxnType.BuyStock,
+    IbkrTxnType.Sell: OfxTxnType.SellStock,
 }
 
 
