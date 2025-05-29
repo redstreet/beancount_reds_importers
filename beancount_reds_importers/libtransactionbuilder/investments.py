@@ -392,7 +392,7 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
             main_acct = self.get_acct("main_account", ot, ticker)
         else:  # cash transaction
             narration = ot.type
-            ticker = self.currency
+            ticker = ot.currency
             main_acct = config["cash_account"]
 
         # Build transaction entry
