@@ -32,9 +32,7 @@ ibkr_importer = ibkr.Importer(
         # transfer account is optional. If left off no target posting will be created.
         # This allows for additional tools to handle this like smart importer.
         "dividends": "Income:Investment:Dividends:IB-{currency}:{ticker}",
-        # "interest": "Income:Interest"
         "interest": "Income:Investment:Interest:IB-{currency}:{ticker}",
-        # "cg": "Account to book capital gains/losses",
         "cg": "Income:Investment:Capital-Gains:IB-{currency}:{ticker}",
         "capgainsd_lt": "Equity:Capgains-Lt",
         "capgainsd_st": "Equity:Capgains-St",
