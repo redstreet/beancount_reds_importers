@@ -156,6 +156,11 @@ class Importer(investments.Importer, xmlreader.Importer):
         d = d.split(" ")[0]
         return datetime.datetime.strptime(d, self.date_format)
 
+    def get_target_acct_custom(self, transaction, ticker=None):
+        if transaction.memo == IbkrCashTxnType.WHTAX:
+            return self.config["whtax"]
+        return None
+
     def xml_transfer_interpreter(self, xml_data):
         # map, with ofx fields on the left and xml fields on the right
         ofx_dict = {
