@@ -9,21 +9,21 @@ class Reader:
     FILE_EXTS = [""]
     IMPORTER_NAME = "NOT SET"
 
-    def identify(self, file):
+    def identify(self, filepath):
         # quick check to filter out files that are not the right format
         # print()
         # print('------------------', self.IMPORTER_NAME, '(' + self.FILE_EXT + ')')
         # print(file.lower())
-        if not any(file.lower().endswith(ext) for ext in self.FILE_EXTS):
+        if not any(filepath.lower().endswith(ext) for ext in self.FILE_EXTS):
             # print("No match on extension")
             return False
         self.custom_init()
         self.filename_pattern = self.config.get("filename_pattern", self.filename_pattern_def)
-        if not re.match(self.filename_pattern, path.basename(file)):
+        if not re.match(self.filename_pattern, path.basename(filepath)):
             # print("No match on filename_pattern", self.filename_pattern, path.basename(file))
             return False
         self.currency = self.config.get("currency", "CURRENCY_NOT_CONFIGURED")
-        self.initialize_reader(file)
+        self.initialize_reader(filepath)
         # print("reader_ready:", self.reader_ready, self.IMPORTER_NAME)
         return self.reader_ready
 
