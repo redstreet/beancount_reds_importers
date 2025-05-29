@@ -185,7 +185,7 @@ class Importer(investments.Importer, xmlreader.Importer):
 
     def get_target_acct_custom(self, transaction, ticker=None):
         if transaction.memo == IbkrCashTxnType.WHTAX:
-            return self.config["whtax"]
+            return self.config["whtax"] if self.config.get("whtax") else None
         return None
 
     def xml_transfer_interpreter(self, xml_data):
