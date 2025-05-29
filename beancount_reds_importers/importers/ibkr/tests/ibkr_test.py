@@ -56,7 +56,7 @@ CONFIG = [
 @regtest.with_importer(ibkr_importer)
 @regtest.with_testdir(path.dirname(__file__))
 class TestIbkr(regtest.ImporterTestBase):
-    pass
+    """Tests for the IBKR importer."""
 
 
 if __name__ == "__main__":
