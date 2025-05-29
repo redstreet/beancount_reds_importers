@@ -46,6 +46,10 @@ ibkr_importer = ibkr.Importer(
     }
 )
 
+CONFIG = [
+    ibkr_importer,
+]
+
 # Tests
 
 
@@ -56,5 +60,5 @@ class TestIbkr(regtest.ImporterTestBase):
 
 
 if __name__ == "__main__":
-    ingest = beangulp.Ingest(ibkr_importer)
+    ingest = beangulp.Ingest(CONFIG)
     ingest()
