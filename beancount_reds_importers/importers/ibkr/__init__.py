@@ -108,11 +108,23 @@ class DictToObject:
             setattr(self, key, value)
 
 
-class IbkrTxnType(str, Enum):
+class IbkrBuySell(str, Enum):
     """IBKR transaction types"""
 
     Buy = "BUY"
     Sell = "SELL"
+
+
+class IbkrCashTxnType(str, Enum):
+    """IBKR cash transaction types"""
+
+    BROKERINT = "Broker Interest Received"
+    COMADJ = "Commission Adjustments"
+    DEPWDRAW = "Deposits/Withdrawals"
+    DIVIDEND = "Dividends"
+    OTHERFEES = "Other Fees"
+    PMTINLIEU = "Payment In Lieu Of Dividends"
+    WHTAX = "Withholding Tax"
 
 
 class OfxTxnType(str, Enum):
@@ -124,8 +136,8 @@ class OfxTxnType(str, Enum):
 
 # xml on left, ofx on right
 ofx_type_map = {
-    IbkrTxnType.Buy: OfxTxnType.BuyStock,
-    IbkrTxnType.Sell: OfxTxnType.SellStock,
+    IbkrBuySell.Buy: OfxTxnType.BuyStock,
+    IbkrBuySell.Sell: OfxTxnType.SellStock,
 }
 
 
