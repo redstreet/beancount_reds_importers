@@ -44,7 +44,7 @@ class Importer(banking.Importer, pdfreader.Importer):
             self.debug = False
             self.custom_init_run = True
 
-    def file_date(self, file):
+    def date(self, file):
         if not self.file_read_done:
             self.read_file(file)
 

@@ -35,7 +35,7 @@ class Importer(csvreader.Importer):
     def initialize_reader(self, file):
         csvreader.Importer.initialize_reader(self, file)
 
-    def file_date(self, file):
+    def date(self, file):
         "Get the maximum date from the file."
         self.read_file(file)
         raise "Not yet implemented"
