@@ -189,6 +189,7 @@ class Importer(investments.Importer, xmlreader.Importer):
             "security": xml_data.get("isin", None),
             "type": "cash",
             "memo": xml_data["type"],
+            "currency": xml_data["currency"],
         }
 
         if xml_data["type"] == "Dividends":
