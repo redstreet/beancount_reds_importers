@@ -1,0 +1,7 @@
+{
+    "python.testing.pytestArgs": [
+        "beancount_reds_importers"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true
+}

@@ -1,0 +1,7 @@
+
+2025-05-08 * "Commission Adjustments" "cash"
+  Assets:Investments:IB-EUR:Cash-EUR   0.37013125 USD
+  Assets:Transfers                    -0.37013125 USD
+
+2025-05-21 balance Assets:Investments:IB-EUR:OPI                   10 OPI
+2025-05-21 balance Assets:Investments:IB-EUR:Cash-EUR              200 EUR

@@ -93,6 +93,7 @@ Breakout by Day? No
 """
 
 import datetime
+from enum import Enum
 
 from beancount.core.number import D
 from loguru import logger
@@ -107,10 +108,36 @@ class DictToObject:
             setattr(self, key, value)
 
 
+class IbkrBuySell(str, Enum):
+    """IBKR transaction types"""
+
+    Buy = "BUY"
+    Sell = "SELL"
+
+
+class IbkrCashTxnType(str, Enum):
+    """IBKR cash transaction types"""
+
+    BROKERINT = "Broker Interest Received"
+    COMADJ = "Commission Adjustments"
+    DEPWDRAW = "Deposits/Withdrawals"
+    DIVIDEND = "Dividends"
+    OTHERFEES = "Other Fees"
+    PMTINLIEU = "Payment In Lieu Of Dividends"
+    WHTAX = "Withholding Tax"
+
+
+class OfxTxnType(str, Enum):
+    """OFX transaction types"""
+
+    BuyStock = "buystock"
+    SellStock = "sellstock"
+
+
 # xml on left, ofx on right
 ofx_type_map = {
-    "BUY": "buystock",
-    "SELL": "sellstock",
+    IbkrBuySell.Buy: OfxTxnType.BuyStock,
+    IbkrBuySell.Sell: OfxTxnType.SellStock,
 }
 
 
@@ -155,6 +182,11 @@ class Importer(investments.Importer, xmlreader.Importer):
     def convert_date(self, d):
         d = d.split(" ")[0]
         return datetime.datetime.strptime(d, self.date_format)
+
+    def get_target_acct_custom(self, transaction, ticker=None):
+        if transaction.memo == IbkrCashTxnType.WHTAX:
+            return self.config["whtax"] if self.config.get("whtax") else None
+        return None
 
     def xml_transfer_interpreter(self, xml_data):
         # map, with ofx fields on the left and xml fields on the right

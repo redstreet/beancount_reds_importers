@@ -1,0 +1,30 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Dbg: identify",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${cwd}\\beancount_reds_importers\\importers\\ibkr\\tests\\ibkr_test.py",
+      "console": "integratedTerminal",
+      "args": [
+        "identify",
+        "${cwd}\\beancount_reds_importers\\importers\\ibkr\\tests\\tax-reversal.xml"
+      ]
+    },
+    {
+      "name": "Dbg: extract",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${cwd}\\beancount_reds_importers\\importers\\ibkr\\tests\\ibkr_test.py",
+      "console": "integratedTerminal",
+      "args": [
+        "extract",
+        "${cwd}\\beancount_reds_importers\\importers\\ibkr\\tests\\tax-reversal.xml"
+      ]
+    }
+  ]
+}

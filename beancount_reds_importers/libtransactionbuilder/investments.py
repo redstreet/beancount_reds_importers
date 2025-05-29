@@ -78,7 +78,7 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
         # For overriding in custom_init()
         self.get_payee = lambda ot: ot.memo
 
-    def account(self, filename):
+    def account(self, filepath):
         return self.config.get("main_account", "Assets:US:UNINIT:Investments")
 
     def initialize(self, file):
@@ -392,7 +392,7 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
             main_acct = self.get_acct("main_account", ot, ticker)
         else:  # cash transaction
             narration = ot.type
-            ticker = self.currency
+            ticker = ot.currency if hasattr(ot, "currency") else self.currency
             main_acct = config["cash_account"]
 
         # Build transaction entry

@@ -1,0 +1,7 @@
+
+2024-11-15 * "Withholding Tax" "cash"
+  Assets:Investments:IB-EUR:Cash-EUR   0.08 USD
+  Expenses:Tax:WithholdingTax:IB-EUR  -0.08 USD
+
+2025-05-21 balance Assets:Investments:IB-EUR:OPI                   10 OPI
+2025-05-21 balance Assets:Investments:IB-EUR:Cash-EUR              200 EUR
