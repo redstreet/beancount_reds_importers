@@ -1,6 +1,7 @@
-'''
+"""
 Tests for the IBKR importer.
-'''
+"""
+
 from os import path
 
 import beangulp
@@ -47,10 +48,12 @@ ibkr_importer = ibkr.Importer(
 
 # Tests
 
+
 @regtest.with_importer(ibkr_importer)
 @regtest.with_testdir(path.dirname(__file__))
 class TestIbkr(regtest.ImporterTestBase):
     pass
+
 
 if __name__ == "__main__":
     ingest = beangulp.Ingest(ibkr_importer)
