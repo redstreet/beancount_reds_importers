@@ -1,7 +1,7 @@
 
 2025-02-21 * "Withholding Tax" "cash"
-  Assets:Investments:IB-EUR:Cash-EUR  -0.08 EUR
-  Assets:Transfers                     0.08 EUR
+  Assets:Investments:IB-EUR:Cash-EUR  -0.08 USD
+  Assets:Transfers                     0.08 USD
 
 2025-02-21 * "Dividends" "[OPI] "
   Assets:Investments:IB-EUR:Cash-EUR       0.52 EUR
