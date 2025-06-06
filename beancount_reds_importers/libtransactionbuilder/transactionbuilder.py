@@ -12,7 +12,7 @@ class TransactionBuilder:
     def get_tags(self, ot=None):
         """For custom importers to override"""
         return data.EMPTY_SET
-        
+
     def get_links(self, ot=None):
         """For custom importers to override"""
         return data.EMPTY_SET
