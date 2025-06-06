@@ -283,7 +283,7 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
             self.get_payee(ot),
             narration,
             self.get_tags(ot),
-            data.EMPTY_SET,
+            self.get_links(ot),
             [],
         )
 
@@ -400,7 +400,7 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
             self.get_payee(ot),
             narration,
             self.get_tags(ot),
-            data.EMPTY_SET,
+            self.get_links(ot),
             [],
         )
         target_acct = self.get_target_acct(ot, ticker)

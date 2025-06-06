@@ -137,7 +137,7 @@ class Importer(banking.Importer):
             None,
             config["desc"],
             self.get_tags(),
-            data.EMPTY_SET,
+            self.get_links(),
             [],
         )
 
