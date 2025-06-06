@@ -134,7 +134,7 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
                 payee=self.get_narration(ot),
                 narration=self.get_payee(ot),
                 tags=self.get_tags(ot),
-                links=data.EMPTY_SET,
+                links=self.get_links(ot),
                 postings=[],
             )
 

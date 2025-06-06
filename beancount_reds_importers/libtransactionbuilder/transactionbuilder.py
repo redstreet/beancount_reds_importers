@@ -13,6 +13,10 @@ class TransactionBuilder:
         """For custom importers to override"""
         return data.EMPTY_SET
 
+    def get_links(self, ot=None):
+        """For custom importers to override"""
+        return data.EMPTY_SET
+
     @staticmethod
     def remove_empty_subaccounts(acct):
         """Translates 'Assets:Foo::Bar' to 'Assets:Foo:Bar'."""
