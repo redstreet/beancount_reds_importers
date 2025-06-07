@@ -87,8 +87,7 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
 
         if self.reader_ready:
             config_subst_vars = {
-                "currency": self.currency,
-                # Leave the other values as is
+                "currency": "{currency}",
                 "ticker": "{ticker}",
                 "source401k": "{source401k}",
             }
@@ -221,8 +220,12 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
     def subst_acct_vars(self, raw_acct, ot, ticker):
         """Resolve variables within an account like {ticker}."""
         ot = ot if ot else {}
+
+        currency = getattr(ot, "currency", self.currency)
+
         # inv401ksource is an ofx field that is 'PRETAX', 'AFTERTAX', etc.
         kwargs = {
+            "currency": currency,
             "ticker": ticker,
             "source401k": getattr(ot, "inv401ksource", "").title(),
         }
@@ -289,6 +292,7 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
 
         # Main posting(s):
         main_acct = self.get_acct("main_account", ot, ticker)
+        currency = getattr(ot, "currency", self.currency)
 
         if is_money_market:  # Use price conversions instead of holding these at cost
             common.create_simple_posting_with_price(
@@ -301,7 +305,7 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
                 units,
                 ticker,
                 price_number=ot.unit_price,
-                price_currency=self.currency,
+                price_currency=currency,
                 costspec=CostSpec(None, None, None, None, None, None),
             )
             cg_acct = self.get_acct("cg", ot, ticker)
@@ -317,7 +321,7 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
                 units,
                 ticker,
                 unit_price,
-                self.currency,
+                currency,
                 self.price_cost_both_zero_handler,
             )
 
@@ -327,13 +331,13 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
             units > 0 and total > 0
         ):  # (ugly) hack for some brokerages with incorrect signs (TODO: remove)
             reverser = -1
-        data.create_simple_posting(entry, target_acct, reverser * total, self.currency)
+        data.create_simple_posting(entry, target_acct, reverser * total, currency)
 
         # Rounding errors posting
         rounding_error = (reverser * total) + (ot.unit_price * units)
         if 0.0005 <= abs(rounding_error) <= self.max_rounding_error:
             data.create_simple_posting(
-                entry, config["rounding_error"], -1 * rounding_error, self.currency
+                entry, config["rounding_error"], -1 * rounding_error, currency
             )
         # if abs(rounding_error) > self.max_rounding_error:
         #     print("Transactions legs do not sum up! Difference: {}. Entry: {}, ot: {}".format(
@@ -389,7 +393,7 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
             main_acct = self.get_acct("main_account", ot, ticker)
         else:  # cash transaction
             narration = ot.type
-            ticker = self.currency
+            ticker = getattr(ot, "currency", self.currency)
             main_acct = config["cash_account"]
 
         # Build transaction entry
@@ -406,6 +410,8 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
         target_acct = self.get_target_acct(ot, ticker)
         if target_acct:
             target_acct = self.subst_acct_vars(target_acct, ot, ticker)
+        if main_acct:
+            main_acct = self.subst_acct_vars(main_acct, ot, ticker)
 
         # Build postings
         if ot.type in [
@@ -415,9 +421,10 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
             "capgainsd_lt",
             "fee",
         ]:  # cash
+            currency = getattr(ot, "currency", self.currency)
             amount = ot.total if hasattr(ot, "total") else ot.amount
-            data.create_simple_posting(entry, config["cash_account"], amount, self.currency)
-            data.create_simple_posting(entry, target_acct, -1 * amount, self.currency)
+            data.create_simple_posting(entry, config["cash_account"], amount, currency)
+            data.create_simple_posting(entry, target_acct, -1 * amount, currency)
         else:
             data.create_simple_posting(entry, main_acct, units, ticker)
             if target_acct:
@@ -439,6 +446,7 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
         # 'settleDate': datetime.datetime(2018, 6, 25, 19, 0),
         # 'commission': Decimal('0'),
         # 'fees': Decimal('0'),
+        # 'currency': 'USD',
 
         new_entries = []
         self.read_file(file)
@@ -545,11 +553,13 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
 
     def add_fee_postings(self, entry, ot):
         config = self.config
+        currency = getattr(ot, "currency", self.currency)
+
         if hasattr(ot, "fees") or hasattr(ot, "commission"):
             if getattr(ot, "fees", 0) != 0:
-                data.create_simple_posting(entry, config["fees"], ot.fees, self.currency)
+                data.create_simple_posting(entry, config["fees"], ot.fees, currency)
             if getattr(ot, "commission", 0) != 0:
-                data.create_simple_posting(entry, config["fees"], ot.commission, self.currency)
+                data.create_simple_posting(entry, config["fees"], ot.commission, currency)
 
     def extract_custom_entries(self, file, counter):
         """For custom importers to override"""
