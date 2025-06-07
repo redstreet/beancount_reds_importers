@@ -140,14 +140,20 @@ class Importer(reader.Reader, BGImporter):
         return rdr
 
     def read_raw(self, file):
-        return etl.fromcsv(file, encoding=getattr(self, "file_encoding", None))
+        return etl.fromcsv(
+            file,
+            encoding=getattr(self, "file_encoding", None),
+            delimiter=getattr(self, "csv_delimiter", ","),
+        )
 
     def skip_until_main_table(self, rdr, col_labels=None):
         """Skip csv lines until the header line is found."""
         # TODO: convert this into an 'extract_table()' method that handles the tail as well
         if not col_labels:
             if hasattr(self, "column_labels_line"):
-                col_labels = self.column_labels_line.replace('"', "").split(",")
+                col_labels = self.column_labels_line.replace('"', "").split(
+                    getattr(self, "csv_delimiter", ",")
+                )
             else:
                 return rdr
         skip = None

@@ -1,0 +1,7 @@
+Semicolon Delimited CSV
+Param;first
+Another;param
+
+date;description;payee;amount;memo
+2025/06/07;A description;A Payee;-123.45;A memo
+2025/06/06;Another description;Another Payee;-678.90;Another memo
