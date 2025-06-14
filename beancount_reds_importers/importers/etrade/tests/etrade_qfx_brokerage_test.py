@@ -28,7 +28,7 @@ def build_config():
     config = {
         "account_number": "555555555",
         "main_account": acct + ":{ticker}",
-        "cash_account": f"{acct}:{{currency}}",
+        "cash_account": f"{acct}:{currency}",
         "transfer": "Assets:Zero-Sum-Accounts:Transfers:Bank-Account",
         "dividends": f"Income:{root}:{taxability}:Dividends:{leaf}:{{ticker}}",
         "interest": f"Income:{root}:{taxability}:Interest:{leaf}:{{ticker}}",
