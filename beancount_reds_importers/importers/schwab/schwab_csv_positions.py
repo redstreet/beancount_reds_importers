@@ -49,17 +49,17 @@ class Importer(investments.Importer, csvreader.Importer):
 
         return rdr
 
-    def file_date(self, file):
+    def date(self, file):
         self.read_file(file)
-        return self.date.date()
+        return self.max_date.date()
 
     def get_max_transaction_date(self):
-        return self.date.date()
+        return self.max_date.date()
 
     def prepare_raw_file(self, rdr):
         # first row has date
         d = rdr[0][0].rsplit(" ", 1)[1]
-        self.date = datetime.datetime.strptime(d, self.date_format)
+        self.max_date = datetime.datetime.strptime(d, self.date_format)
         return rdr
 
     def get_transactions(self):

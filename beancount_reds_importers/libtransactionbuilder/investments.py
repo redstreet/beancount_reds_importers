@@ -286,7 +286,7 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
             self.get_payee(ot),
             narration,
             self.get_tags(ot),
-            data.EMPTY_SET,
+            self.get_links(ot),
             [],
         )
 
@@ -392,7 +392,7 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
             main_acct = self.get_acct("main_account", ot, ticker)
         else:  # cash transaction
             narration = ot.type
-            ticker = self.currency
+            ticker = ot.currency if hasattr(ot, "currency") else self.currency
             main_acct = config["cash_account"]
 
         # Build transaction entry
@@ -403,7 +403,7 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
             self.get_payee(ot),
             narration,
             self.get_tags(ot),
-            data.EMPTY_SET,
+            self.get_links(ot),
             [],
         )
         target_acct = self.get_target_acct(ot, ticker)
@@ -530,8 +530,8 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
             metadata.update(self.build_metadata(file, metatype="balance_cash"))
             try:
                 bal_date = (
-                    date if date else self.file_date(file).date()
-                )  # unavailable file_date raises AttributeError
+                    date if date else self.date(file).date()
+                )  # unavailable date raises AttributeError
                 balance_entry = data.Balance(
                     metadata,
                     bal_date,

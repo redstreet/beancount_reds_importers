@@ -65,6 +65,7 @@ class Importer(csvreader.Importer, investments.Importer):
         }
         # fmt: on
 
+
     def account(self, filepath):
         return self.config["main_account"]
 

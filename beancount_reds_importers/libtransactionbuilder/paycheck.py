@@ -64,7 +64,7 @@ def flip_if_needed(amount, account):
 
 
 class Importer(banking.Importer):
-    def file_date(self, input_file):
+    def date(self, input_file):
         return self.paycheck_date(input_file)
 
     def build_postings(self, entry):
@@ -137,7 +137,7 @@ class Importer(banking.Importer):
             None,
             config["desc"],
             self.get_tags(),
-            data.EMPTY_SET,
+            self.get_links(),
             [],
         )
 

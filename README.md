@@ -164,9 +164,9 @@ transactions may appear to be switched. This is described by
 and the fields can be swapped in a `custom_init`.
 
 ## Testing
-First:
 ```
 pip3 install xlrd
+uv run pytest
 ```
 
 Some importers are tested with

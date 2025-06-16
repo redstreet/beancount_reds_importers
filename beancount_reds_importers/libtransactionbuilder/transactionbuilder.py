@@ -13,6 +13,10 @@ class TransactionBuilder:
         """For custom importers to override"""
         return data.EMPTY_SET
 
+    def get_links(self, ot=None):
+        """For custom importers to override"""
+        return data.EMPTY_SET
+
     @staticmethod
     def remove_empty_subaccounts(acct):
         """Translates 'Assets:Foo::Bar' to 'Assets:Foo:Bar'."""
@@ -36,7 +40,7 @@ class TransactionBuilder:
         }
 
         # Prevent the replacement fields from appearing in the output of
-        # the file_account method
+        # the account method
         if "filing_account" not in self.config:
             kwargs = {k: "" for k in substs}
             filing_account = self.config["main_account"].format(**kwargs)
