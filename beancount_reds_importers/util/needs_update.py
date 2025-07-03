@@ -9,7 +9,7 @@ import click
 import tabulate
 from beancount import loader
 from beancount.core import getters
-from beancount.core.data import Balance, Close, Custom
+from beancount.core.data import Balance, Open, Close, Custom
 
 tbl_options = {"tablefmt": "simple"}
 
@@ -42,7 +42,7 @@ def is_interesting_account(account, closes):
     return account not in closes and included_re.match(account) and not excluded_re.match(account)
 
 
-def handle_commodity_leaf_accounts(last_balance):
+def handle_commodity_leaf_accounts_old(last_balance):
     """
     Handle commodity leaf accounts. If an account ends with all capital letters, it is a
     commodity leaf. Eg: Assets:Investments:Etrade:AAPL
@@ -62,6 +62,35 @@ def handle_commodity_leaf_accounts(last_balance):
                 d[parent] = last_balance[acc]
         else:
             d[acc] = last_balance[acc]
+    return d
+
+pat_ticker = re.compile(r"^[A-Z0-9]+$")
+
+def strip_commodity_leaf(acc):
+    parent, leaf = acc.rsplit(":", 1)
+    if pat_ticker.match(leaf):
+        return parent
+    return acc
+
+def handle_commodity_leaf_accounts(need_updates):
+    """
+    Handle commodity leaf accounts. If an account ends with all capital letters, it is a
+    commodity leaf. Eg: Assets:Investments:Etrade:AAPL
+
+    Commodity leaf accounts are ascribed to their parent. The parent's last updated date is
+    considered to be the latest date of a balance assertion on any child.
+    """
+    d = {}
+    for acc in need_updates:
+        parent, leaf = acc.rsplit(":", 1)
+        if pat_ticker.match(leaf):
+            if parent in d:
+                if d[parent] < need_updates[acc]:
+                    d[parent] = need_updates[acc]
+            else:
+                d[parent] = need_updates[acc]
+        else:
+            d[acc] = need_updates[acc]
     return d
 
 
@@ -94,9 +123,29 @@ def accounts_with_no_balance_entries(entries, closes, last_balance):
 
 def pretty_print_table(not_updated_accounts, sort_by_date):
     field = 0 if sort_by_date else 1
-    output = sorted([(v.date, k) for k, v in not_updated_accounts.items()], key=lambda x: x[field])
+    output = sorted([(v, k) for k, v in not_updated_accounts.items()], key=lambda x: x[field])
     headers = ["Last Updated", "Account"]
     print(click.style(tabulate.tabulate(output, headers=headers, **tbl_options)))
+
+def get_account_thresholds(entries):
+    """
+    If per-account thresholds are specified, get them.
+
+    Propagate children to parent. We only expect one child to have it. Accounts are imported
+    at an account level. So Assets:Investments:Fidelity-Acc-1234 is imported as an account.
+    However, when a commodity leaf based account structure is used
+    (Assets:Investments:Fidelity-Acc-1234:AAPL), we typically specify needs_update_days on
+    one of the leaves (since the parent doesn't exist). We propagate that to the parent here
+
+    """
+
+    return {
+        strip_commodity_leaf(op.account): op.meta['needs_update_days']
+        for op in entries
+        if isinstance(op, Open) and 'needs_update_days' in op.meta
+    }
+
+
 
 
 @click.command("needs-update", context_settings={"show_default": True})
@@ -106,13 +155,15 @@ def pretty_print_table(not_updated_accounts, sort_by_date):
     help="How many days ago should the last balance assertion be to be considered old",
     default=15,
 )
+@click.option("--ignore-metadata", help="Ignore account metadata (`needs_update_days`) and use"
+    "what --recency specifies instead", is_flag=False)
 @click.option("--sort-by-date", help="Sort output by date (instead of account name)", is_flag=True)
 @click.option(
     "--all-accounts",
     help="Show all account (ignore include/exclude in config)",
     is_flag=True,
 )
-def accounts_needing_updates(beancount_file, recency, sort_by_date, all_accounts):
+def accounts_needing_updates(beancount_file, recency, ignore_metadata, sort_by_date, all_accounts):
     """
     Show a list of accounts needing updates, and the date of the last update (which is defined as
     the date of the last balance assertion on the account).
@@ -129,6 +180,18 @@ def accounts_needing_updates(beancount_file, recency, sort_by_date, all_accounts
 
     Accounts matching the criteria above with zero balance entries are also printed out, since by
     definition, they don't have a (recent) balance assertion.
+
+    Recency can either be defined globally (with --recency) or on a per account basis by defining
+    the `needs_update_days` metadata on the account, set to the number of days. Eg:
+
+    2022-11-25 open Assets:Banks:Fidelity
+      needs_update_days: 180
+
+    Note that if commodity leaf accounts are used, defining needs_update_days on any one of the
+    leaves defines it for the parent, like so:
+
+    2022-11-25 open Assets:Banks:Fidelity:AAPL
+      needs_update_days: 180
 
     The BEANCOUNT_FILE environment variable can optionally be set instead of specifying the file on
     the command line.
@@ -158,14 +221,24 @@ def accounts_needing_updates(beancount_file, recency, sort_by_date, all_accounts
         a for a in entries if isinstance(a, Balance) and is_interesting_account(a.account, closes)
     ]
     last_balance = {v.account: v for v in balance_entries}
-    d = handle_commodity_leaf_accounts(last_balance)
+    last_balance = handle_commodity_leaf_accounts_old(last_balance)
 
-    # find accounts with balance assertions older than N days
-    need_updates = {
-        acc: bal
-        for acc, bal in d.items()
-        if ((datetime.now().date() - d[acc].date).days > recency)
-    }
+    account_thresholds = get_account_thresholds(entries)
+
+    need_updates = {}
+    today = datetime.now().date()
+    for acc, bal in last_balance.items():
+        # look for an account-specific override in metadata
+
+        threshold = recency
+        if not ignore_metadata:
+            custom_recency = account_thresholds.get(acc)
+            threshold = custom_recency if custom_recency else recency
+        age = (today - bal.date).days
+        if age > threshold:
+            need_updates[acc] = bal.date
+
+
     if need_updates:
         pretty_print_table(need_updates, sort_by_date)
 
