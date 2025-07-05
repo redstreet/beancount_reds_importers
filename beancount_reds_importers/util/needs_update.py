@@ -6,17 +6,18 @@ import re
 from datetime import datetime
 
 import click
+from click.core import ParameterSource
 import tabulate
 from beancount import loader
 from beancount.core import getters
-from beancount.core.data import Balance, Close, Custom, Open
+from beancount.core.data import Balance, Open, Close, Custom
 
 tbl_options = {"tablefmt": "simple"}
 
 
-def get_config(entries, args):
+def get_config(entries, args, ctx):
     """Get beancount config for the given plugin that can then be used on the command line"""
-    global excluded_re, included_re
+    retval = {}
     _extension_entries = [
         e for e in entries if isinstance(e, Custom) and e.type == "reds-importers"
     ]
@@ -34,11 +35,21 @@ def get_config(entries, args):
     excluded_account_pats = config.get(
         "excluded_account_pats", ["$-^"]
     )  # exclude nothing by default
-    excluded_re = re.compile("|".join(excluded_account_pats))
-    included_re = re.compile("|".join(included_account_pats))
+    retval['excluded_re'] = re.compile("|".join(excluded_account_pats))
+    retval['included_re'] = re.compile("|".join(included_account_pats))
+
+    # what's supplied on the command line must always override what's in the config
+    retval['recency'] = args['recency']
+    recency_source = ctx.get_parameter_source("recency")
+    if recency_source == ParameterSource.DEFAULT and config.get("recency"):
+        retval['recency'] = config.get("recency")
+
+    return retval
 
 
-def is_interesting_account(account, closes):
+def is_interesting_account(account, closes, config):
+    included_re = config['included_re']
+    excluded_re = config['excluded_re']
     return account not in closes and included_re.match(account) and not excluded_re.match(account)
 
 
@@ -64,16 +75,13 @@ def handle_commodity_leaf_accounts_old(last_balance):
             d[acc] = last_balance[acc]
     return d
 
-
 pat_ticker = re.compile(r"^[A-Z0-9]+$")
-
 
 def strip_commodity_leaf(acc):
     parent, leaf = acc.rsplit(":", 1)
     if pat_ticker.match(leaf):
         return parent
     return acc
-
 
 def handle_commodity_leaf_accounts(need_updates):
     """
@@ -97,10 +105,10 @@ def handle_commodity_leaf_accounts(need_updates):
     return d
 
 
-def accounts_with_no_balance_entries(entries, closes, last_balance):
+def accounts_with_no_balance_entries(entries, closes, last_balance, config):
     """Find interesting accounts with zero balance assertion entries."""
     accounts = getters.get_accounts(entries)
-    asset_accounts = [a for a in accounts if is_interesting_account(a, closes)]
+    asset_accounts = [a for a in accounts if is_interesting_account(a, closes, config)]
     accs_no_bal_raw = [a for a in asset_accounts if a not in last_balance]
 
     # Handle commodity leaf accounts
@@ -125,11 +133,10 @@ def accounts_with_no_balance_entries(entries, closes, last_balance):
 
 
 def pretty_print_table(not_updated_accounts, sort_by_date):
-    field = 0 if sort_by_date else 1
-    output = sorted([(v, k) for k, v in not_updated_accounts.items()], key=lambda x: x[field])
-    headers = ["Last Updated", "Account"]
+    field = 0 if sort_by_date else 2
+    output = sorted([(v[0], v[1], k) for k, v in not_updated_accounts.items()], key=lambda x: x[field])
+    headers = ["Last Updated", "Threshold", "Account"]
     print(click.style(tabulate.tabulate(output, headers=headers, **tbl_options)))
-
 
 def get_account_thresholds(entries):
     """
@@ -144,10 +151,12 @@ def get_account_thresholds(entries):
     """
 
     return {
-        strip_commodity_leaf(op.account): op.meta["needs_update_days"]
+        strip_commodity_leaf(op.account): op.meta['needs_update_days']
         for op in entries
-        if isinstance(op, Open) and "needs_update_days" in op.meta
+        if isinstance(op, Open) and 'needs_update_days' in op.meta
     }
+
+
 
 
 @click.command("needs-update", context_settings={"show_default": True})
@@ -157,18 +166,16 @@ def get_account_thresholds(entries):
     help="How many days ago should the last balance assertion be to be considered old",
     default=15,
 )
-@click.option(
-    "--ignore-metadata",
-    help="Ignore account metadata (`needs_update_days`) and usewhat --recency specifies instead",
-    is_flag=False,
-)
+@click.option("--ignore-metadata", help="Ignore account metadata (`needs_update_days`) and use"
+    "what --recency specifies instead", is_flag=False)
 @click.option("--sort-by-date", help="Sort output by date (instead of account name)", is_flag=True)
 @click.option(
     "--all-accounts",
     help="Show all account (ignore include/exclude in config)",
     is_flag=True,
 )
-def accounts_needing_updates(beancount_file, recency, ignore_metadata, sort_by_date, all_accounts):
+@click.pass_context
+def accounts_needing_updates(ctx, beancount_file, recency, ignore_metadata, sort_by_date, all_accounts):
     """
     Show a list of accounts needing updates, and the date of the last update (which is defined as
     the date of the last balance assertion on the account).
@@ -185,18 +192,6 @@ def accounts_needing_updates(beancount_file, recency, ignore_metadata, sort_by_d
 
     Accounts matching the criteria above with zero balance entries are also printed out, since by
     definition, they don't have a (recent) balance assertion.
-
-    Recency can either be defined globally (with --recency) or on a per account basis by defining
-    the `needs_update_days` metadata on the account, set to the number of days. Eg:
-
-    2022-11-25 open Assets:Banks:Fidelity
-      needs_update_days: 180
-
-    Note that if commodity leaf accounts are used, defining needs_update_days on any one of the
-    leaves defines it for the parent, like so:
-
-    2022-11-25 open Assets:Banks:Fidelity:AAPL
-      needs_update_days: 180
 
     The BEANCOUNT_FILE environment variable can optionally be set instead of specifying the file on
     the command line.
@@ -220,10 +215,11 @@ def accounts_needing_updates(beancount_file, recency, ignore_metadata, sort_by_d
     """
 
     entries, _, _ = loader.load_file(beancount_file)
-    get_config(entries, locals())
+    config = get_config(entries, locals(), ctx)
     closes = [a.account for a in entries if isinstance(a, Close)]
     balance_entries = [
-        a for a in entries if isinstance(a, Balance) and is_interesting_account(a.account, closes)
+        a for a in entries if isinstance(a, Balance) and is_interesting_account(a.account, closes,
+                                                                                config)
     ]
     last_balance = {v.account: v for v in balance_entries}
     last_balance = handle_commodity_leaf_accounts_old(last_balance)
@@ -235,19 +231,20 @@ def accounts_needing_updates(beancount_file, recency, ignore_metadata, sort_by_d
     for acc, bal in last_balance.items():
         # look for an account-specific override in metadata
 
-        threshold = recency
+        threshold = config['recency']
         if not ignore_metadata:
             custom_recency = account_thresholds.get(acc)
-            threshold = custom_recency if custom_recency else recency
+            threshold = custom_recency if custom_recency else config['recency']
         age = (today - bal.date).days
         if age > threshold:
-            need_updates[acc] = bal.date
+            need_updates[acc] = bal.date, threshold
+
 
     if need_updates:
         pretty_print_table(need_updates, sort_by_date)
 
     # If there are accounts with zero balance entries, print them
-    accs_no_bal = accounts_with_no_balance_entries(entries, closes, last_balance)
+    accs_no_bal = accounts_with_no_balance_entries(entries, closes, last_balance, config)
     if accs_no_bal:
         headers = ["Accounts without balance entries:"]
         print(
