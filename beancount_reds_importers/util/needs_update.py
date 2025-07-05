@@ -9,7 +9,7 @@ import click
 import tabulate
 from beancount import loader
 from beancount.core import getters
-from beancount.core.data import Balance, Open, Close, Custom
+from beancount.core.data import Balance, Close, Custom, Open
 
 tbl_options = {"tablefmt": "simple"}
 
@@ -64,13 +64,16 @@ def handle_commodity_leaf_accounts_old(last_balance):
             d[acc] = last_balance[acc]
     return d
 
+
 pat_ticker = re.compile(r"^[A-Z0-9]+$")
+
 
 def strip_commodity_leaf(acc):
     parent, leaf = acc.rsplit(":", 1)
     if pat_ticker.match(leaf):
         return parent
     return acc
+
 
 def handle_commodity_leaf_accounts(need_updates):
     """
@@ -127,6 +130,7 @@ def pretty_print_table(not_updated_accounts, sort_by_date):
     headers = ["Last Updated", "Account"]
     print(click.style(tabulate.tabulate(output, headers=headers, **tbl_options)))
 
+
 def get_account_thresholds(entries):
     """
     If per-account thresholds are specified, get them.
@@ -140,12 +144,10 @@ def get_account_thresholds(entries):
     """
 
     return {
-        strip_commodity_leaf(op.account): op.meta['needs_update_days']
+        strip_commodity_leaf(op.account): op.meta["needs_update_days"]
         for op in entries
-        if isinstance(op, Open) and 'needs_update_days' in op.meta
+        if isinstance(op, Open) and "needs_update_days" in op.meta
     }
-
-
 
 
 @click.command("needs-update", context_settings={"show_default": True})
@@ -155,8 +157,11 @@ def get_account_thresholds(entries):
     help="How many days ago should the last balance assertion be to be considered old",
     default=15,
 )
-@click.option("--ignore-metadata", help="Ignore account metadata (`needs_update_days`) and use"
-    "what --recency specifies instead", is_flag=False)
+@click.option(
+    "--ignore-metadata",
+    help="Ignore account metadata (`needs_update_days`) and usewhat --recency specifies instead",
+    is_flag=False,
+)
 @click.option("--sort-by-date", help="Sort output by date (instead of account name)", is_flag=True)
 @click.option(
     "--all-accounts",
@@ -237,7 +242,6 @@ def accounts_needing_updates(beancount_file, recency, ignore_metadata, sort_by_d
         age = (today - bal.date).days
         if age > threshold:
             need_updates[acc] = bal.date
-
 
     if need_updates:
         pretty_print_table(need_updates, sort_by_date)
