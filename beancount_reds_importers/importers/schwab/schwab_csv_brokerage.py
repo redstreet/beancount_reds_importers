@@ -62,6 +62,7 @@ class Importer(csvreader.Importer, investments.Importer):
             "Wire Sent":                    "cash",
             "Misc Cash Entry":              "cash",
             "Service Fee":                  "fee",
+            "Security Transfer":            "transfer",
         }
         # fmt: on
 
