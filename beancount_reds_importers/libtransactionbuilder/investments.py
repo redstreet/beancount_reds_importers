@@ -152,6 +152,12 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
         return security_id, "UNKNOWN"
 
     def get_ticker_info_from_id(self, security_id):
+        if not security_id:
+            # Some input files don't include ticket info for certain types of transactions (eg:
+            # IBKR for certain option trades). Rather than erroring out, we collect all of them
+            # under NOTICKER in case that is useful to the user. If it isn't, this still helps to
+            # make the user aware of the missing tickers
+            return "NOTICKER", "No ticker was specified in the input file"
         try:
             # isin might look like "US293409829" while the ofx use only a substring like "29340982"
             ticker = None
@@ -303,6 +309,8 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
                 price_number=ot.unit_price,
                 price_currency=self.currency,
                 costspec=CostSpec(None, None, None, None, None, None),
+                price_cost_both_zero_handler=self.price_cost_both_zero_handler,
+                ot=ot
             )
             cg_acct = self.get_acct("cg", ot, ticker)
             data.create_simple_posting(entry, cg_acct, None, None)
@@ -319,6 +327,7 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
                 unit_price,
                 self.currency,
                 self.price_cost_both_zero_handler,
+                ot=ot
             )
 
         # "Other" account posting

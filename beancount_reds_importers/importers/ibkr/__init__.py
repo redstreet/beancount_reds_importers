@@ -93,6 +93,7 @@ Breakout by Day? No
 """
 
 import datetime
+from beancount.core import amount, data, flags
 
 from beancount.core.number import D
 from loguru import logger
@@ -124,6 +125,7 @@ class Importer(investments.Importer, xmlreader.Importer):
             self.custom_init_run = True
             self.date_format = "%Y-%m-%d"
             self.get_ticker_info = self.get_ticker_info_from_id
+            self.price_cost_both_zero_handler = self.price_cost_both_zero_handler_booktrades
 
     def deep_identify(self, file):
         try:
@@ -174,10 +176,14 @@ class Importer(investments.Importer, xmlreader.Importer):
             "tradeDate": self.convert_date(xml_data["dateTime"]),
             "memo": xml_data["transactionType"],
             "type": ofx_type_map[xml_data["buySell"]],
+            "type_additional": xml_data["transactionType"],
             "units": D(xml_data["quantity"]),
             "unit_price": D(xml_data["tradePrice"]),
             "commission": -1 * D(xml_data["ibCommission"]),
             "total": D(xml_data["netCash"]),
+
+            "cost": D(xml_data.get("cost")),
+            "fifoPnlRealized": D(xml_data.get("fifoPnlRealized")),
         }
         return DictToObject(ofx_dict)
 
@@ -240,3 +246,13 @@ class Importer(investments.Importer, xmlreader.Importer):
                 "units": D(pos["position"]),
             }
             yield DictToObject(balance)
+
+    def price_cost_both_zero_handler_booktrades(self, entry, ot):
+        """If price and cost are both zero, we assume this is an options expiration"""
+        data.create_simple_posting(entry,
+                                   self.config["cash_account"],
+                                   ot.cost - ot.fifoPnlRealized,
+                                   self.currency)
+
+        # TODO: can't do the following here since entry is not passed by reference
+        # entry = entry._replace(narration='Assumed Box Trade Resolution (Options Expiry)')
