@@ -310,7 +310,7 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
                 price_currency=self.currency,
                 costspec=CostSpec(None, None, None, None, None, None),
                 price_cost_both_zero_handler=self.price_cost_both_zero_handler,
-                ot=ot
+                ot=ot,
             )
             cg_acct = self.get_acct("cg", ot, ticker)
             data.create_simple_posting(entry, cg_acct, None, None)
@@ -327,7 +327,7 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
                 unit_price,
                 self.currency,
                 self.price_cost_both_zero_handler,
-                ot=ot
+                ot=ot,
             )
 
         # "Other" account posting

@@ -33,7 +33,7 @@ def create_simple_posting_with_cost(
     cost_number,
     cost_currency,
     price_cost_both_zero_handler=None,
-    ot=None
+    ot=None,
 ):
     return create_simple_posting_with_cost_or_price(
         entry,
@@ -43,7 +43,7 @@ def create_simple_posting_with_cost(
         cost_number=cost_number,
         cost_currency=cost_currency,
         price_cost_both_zero_handler=price_cost_both_zero_handler,
-        ot=ot
+        ot=ot,
     )
 
 
@@ -58,7 +58,7 @@ def create_simple_posting_with_cost_or_price(
     cost_currency=None,
     costspec=None,
     price_cost_both_zero_handler=None,
-    ot=None
+    ot=None,
 ):
     """Create a simple posting on the entry, with a cost (for purchases) or price (for sell transactions).
 

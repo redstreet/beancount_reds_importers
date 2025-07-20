@@ -93,8 +93,8 @@ Breakout by Day? No
 """
 
 import datetime
-from beancount.core import amount, data, flags
 
+from beancount.core import data
 from beancount.core.number import D
 from loguru import logger
 
@@ -181,7 +181,6 @@ class Importer(investments.Importer, xmlreader.Importer):
             "unit_price": D(xml_data["tradePrice"]),
             "commission": -1 * D(xml_data["ibCommission"]),
             "total": D(xml_data["netCash"]),
-
             "cost": D(xml_data.get("cost")),
             "fifoPnlRealized": D(xml_data.get("fifoPnlRealized")),
         }
@@ -249,10 +248,9 @@ class Importer(investments.Importer, xmlreader.Importer):
 
     def price_cost_both_zero_handler_booktrades(self, entry, ot):
         """If price and cost are both zero, we assume this is an options expiration"""
-        data.create_simple_posting(entry,
-                                   self.config["cash_account"],
-                                   ot.cost - ot.fifoPnlRealized,
-                                   self.currency)
+        data.create_simple_posting(
+            entry, self.config["cash_account"], ot.cost - ot.fifoPnlRealized, self.currency
+        )
 
         # TODO: can't do the following here since entry is not passed by reference
         # entry = entry._replace(narration='Assumed Box Trade Resolution (Options Expiry)')
