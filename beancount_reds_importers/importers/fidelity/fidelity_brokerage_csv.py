@@ -39,8 +39,11 @@ class Importer(investments.Importer, csvreader.Importer):
 
     def deep_identify(self, file):
         last_four = self.config.get("account_number", "")[-4:]
+        header = ''
+        with open(file, 'r', encoding='utf-8') as f:
+            header = f.read(200)
         return (
-            re.match(self.header_identifier, file.head(), flags=re.DOTALL)
+            re.match(self.header_identifier, header, flags=re.DOTALL)
             and f"{last_four}" in file
         )
 
