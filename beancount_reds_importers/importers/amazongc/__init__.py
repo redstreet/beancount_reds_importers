@@ -88,3 +88,8 @@ class Importer(BGImporter):
             new_entries.append(entry)
 
         return new_entries
+
+    def account(self, file):
+        if "filing_account" in self.config:
+            return self.config["filing_account"]
+        return self.config["main_account"]
