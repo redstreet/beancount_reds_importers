@@ -62,3 +62,6 @@ class TransactionBuilder:
             acct = self.config.get("filing_account", self.config.get("main_account", None))
             return {"filing_account": acct}
         return {}
+
+    def custom_entry_mods(self, new_entries):
+        return new_entries

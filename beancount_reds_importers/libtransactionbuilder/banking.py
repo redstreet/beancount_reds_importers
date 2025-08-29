@@ -162,5 +162,6 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
 
         new_entries += self.extract_balance(file, counter)
         new_entries += self.extract_custom_entries(file, counter)
+        new_entries = self.custom_entry_mods(new_entries)
 
         return new_entries
