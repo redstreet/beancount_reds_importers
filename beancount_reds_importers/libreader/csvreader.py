@@ -10,6 +10,7 @@ import petl as etl
 from beancount.core.number import D
 from beangulp import Importer as BGImporter
 from beangulp import cache
+from dateutil import parser
 
 from beancount_reds_importers.libreader import reader
 
@@ -93,7 +94,7 @@ class Importer(reader.Reader, BGImporter):
         return rdr
 
     def fix_column_names(self, rdr):
-        header_map = {k: re.sub("[-/ ]", "_", k) for k in rdr.header()}
+        header_map = {k: re.sub(r"\W|^(?=\d)", "_", k) for k in rdr.header()}
         rdr = rdr.rename(header_map)
         return rdr
 
@@ -130,7 +131,9 @@ class Importer(reader.Reader, BGImporter):
         # fixup dates
         def convert_date(d):
             """Remove spaces and convert to datetime"""
-            return datetime.datetime.strptime(d.strip(), self.date_format)
+            if hasattr(self, "date_format"):
+                return datetime.datetime.strptime(d.strip(), self.date_format)
+            return parser.isoparse(d)
 
         dates = getattr(self, "date_fields", []) + ["date", "tradeDate", "settleDate"]
         for i in dates:
