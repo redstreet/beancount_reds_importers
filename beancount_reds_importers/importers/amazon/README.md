@@ -48,6 +48,7 @@ amazon_gdpr.Importer({
     'account_purchases': "Assets:Zero-Sum-Accounts:Amazon:Purchases",
     'account_returns':   "Assets:Zero-Sum-Accounts:Amazon:Returns",
     'account_returns_other': "Assets:Zero-Sum-Accounts:Returns-and-Temporary",
+    'filing_directory': "Assets:Zero-Sum-Accounts:Amazon",
 }),
 ```
 

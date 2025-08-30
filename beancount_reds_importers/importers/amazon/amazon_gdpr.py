@@ -27,7 +27,7 @@ class Importer(BGImporter):
         'account_purchases': "Assets:Zero-Sum-Accounts:Amazon:Purchases",
         'account_returns':   "Assets:Zero-Sum-Accounts:Amazon:Returns",
         'account_returns_other': "Assets:Zero-Sum-Accounts:Returns-and-Temporary",
-        'filing_directory': "Expenses:Amazon",
+        'filing_directory': "Assets:Zero-Sum-Accounts:Amazon",
     }),
     """
 
@@ -120,6 +120,16 @@ class Importer(BGImporter):
     def account(self, file: str) -> Optional[str]:
         """TODO: this is WIP. Ideally, we only want to save the csv files we imported. That may
         not be possible to do here because that is handled by Beangulp. Currently, we just save the
-        entire zip file"""
+        entire zip file.
+
+        Note that smart_importer calls this same function to do something entirely different: to
+        filter the list of relevant transactions. Given that, the suggestion is to use a common
+        parent of the Purchases and Returns accounts for now:
+
+        'account_purchases': "Assets:Zero-Sum-Accounts:Amazon:Purchases",
+        'account_returns':   "Assets:Zero-Sum-Accounts:Amazon:Returns",
+        'filing_directory': "Assets:Zero-Sum-Accounts:Amazon",
+
+        """
 
         return self.config.get("filing_directory", "Expenses:Amazon")
