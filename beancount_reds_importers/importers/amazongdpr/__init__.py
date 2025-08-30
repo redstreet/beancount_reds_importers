@@ -13,18 +13,22 @@ from beancount_reds_importers.importers.amazongdpr import amazon_orders, amazon_
 
 class AmazonGDPRZipImporter(BGImporter):
     """
-    A delegating importer for Amazon GDPR "container" downloads.
+    A delegating importer for Amazon GDPR downloads. See accompanying README.md for more
 
-    It detects GDPR ZIPs, extracts the CSVs that are interesting, and then runs your existing CSV
-    importers on those CSVs.
+    Amazon lets you download your entire order data to meet GDPR requirements. The download is in
+    the form of a zip file that contains many csv files among other things. This importer detects
+    GDPR ZIPs, extracts the CSVs that are interesting, and then runs separate CSV importers on
+    those CSVs.
 
-    Usage (add amazon_importer to your list of beangulp importers):
-    amazon_importer = amazongdpr.AmazonGDPRZipImporter({
-        'importers' : {
-            'orders': amazon_importer_orders(),
-            'returns': amazon_importer_returns(),
-        }
-    })
+    Usage (to be added to your list of beangulp importers):
+
+    from beancount_reds_importers.importers import amazongdpr
+    amazongdpr.AmazonGDPRZipImporter({
+        'account_purchases': "Assets:Zero-Sum-Accounts:Amazon:Purchases",
+        'account_returns':   "Assets:Zero-Sum-Accounts:Amazon:Returns",
+        'account_returns_other': "Assets:Zero-Sum-Accounts:Returns-and-Temporary",
+        'filing_directory': "Expenses:Amazon",
+    }),
     """
 
     def __init__(self, config) -> None:
@@ -43,6 +47,7 @@ class AmazonGDPRZipImporter(BGImporter):
                 }
             ),
         }
+        self.config = config
 
     def identify(self, file: str) -> bool:
         """Return True if this looks like an Amazon GDPR ZIP."""
@@ -113,8 +118,8 @@ class AmazonGDPRZipImporter(BGImporter):
         return os.path.basename(file)
 
     def account(self, file: str) -> Optional[str]:
-        # ZIP itself is just a container; Let's save the individual .csv files
-        return "Assets:Zero-Sum-Accounts:Amazon"
-        # for kind, path in self.unzip_and_yield(file):
-        #     self.importers[kind].file(path, existing_entries)
-        # return entries
+        """TODO: this is WIP. Ideally, we only want to save the csv files we imported. That may
+        not be possible to do here because that is handled by Beangulp. Currently, we just save the
+        entire zip file"""
+
+        return self.config.get("filing_directory", "Expenses:Amazon")
