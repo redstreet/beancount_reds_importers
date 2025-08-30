@@ -1,4 +1,4 @@
-# Beancount Importer: Amazon GDPR Downloads
+# Amazon GDPR Download Importers
 
 This directory provides [Beancount Reds Importers](https://github.com/redstreet/beancount_reds_importers) for
 processing your **Amazon GDPR data export**.
@@ -128,3 +128,8 @@ automatically for the most part. Returns are credits while orders are debits:
 
 * The amount matches the order, but no description is available.
 * In the future, the return importer will join against the Orders CSV to pull in product details.
+
+# Amazon Gift Card Screenscraper Importer
+
+This is a simple importer to import gift card transactions, screen scraped from Amazon.
+See `amazon_giftcard.py` for documentation on this.
