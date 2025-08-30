@@ -43,8 +43,8 @@ To be added to your list of beangulp importers:
 
 ```python
 # Example ingest script snippet
-from beancount_reds_importers.importers import amazongdpr
-amazongdpr.AmazonGDPRZipImporter({
+from beancount_reds_importers.importers.amazon import amazon_gdpr
+amazon_gdpr.Importer({
     'account_purchases': "Assets:Zero-Sum-Accounts:Amazon:Purchases",
     'account_returns':   "Assets:Zero-Sum-Accounts:Amazon:Returns",
     'account_returns_other': "Assets:Zero-Sum-Accounts:Returns-and-Temporary",
@@ -56,6 +56,7 @@ amazongdpr.AmazonGDPRZipImporter({
 
 ## Roadmap
 
+* [ ] Add unit tests with AI generated data
 * [ ] Remove smart importer hardcoding
 * [ ] Join **returns** with **orders** to recover descriptions.
 * [ ] Add support for additional Amazon GDPR CSVs (e.g., seller account, payments).
@@ -63,7 +64,12 @@ amazongdpr.AmazonGDPRZipImporter({
 
 ## Workflow Example - Orders
 
-A typical flow looks like this:
+
+You can book your workflow in any way you want.
+[This article](https://reds-rants.netlify.app/personal-finance/booking-amazon-purchases/)
+shows you a way using zero sum accounts, to make reconciliation easy. A typical flow
+using that method looks like this:
+
 
 ### Step 1. Credit Card Transaction
 
@@ -106,7 +112,16 @@ return CSV does not contain product descriptions. For now, each return is
 booked into a fixed **target account** you configure (e.g.,
 `Assets:Amazon:Returns`):
 
-### Step 1. Credit Card Transaction
+### Step 1. The original Amazon Order
+
+```beancount
+2022-09-03 * "Soap"
+  card: "Gift Certificate/Card and Visa - 1234"
+  Assets:Zero-Sum-Accounts:Amazon:Purchases   -20.02 USD
+  Assets:Zero-Sum-Accounts:Stuff-Returned-To-Retailer
+```
+
+### Step 2. Credit Card Transaction
 
 Your credit card transaction is first imported into a **Zero-Sum Account**. The
 [smart\_importer](https://github.com/beancount/smart_importer) does this
@@ -114,17 +129,19 @@ automatically for the most part. Returns are credits while orders are debits:
 
 ```beancount
 2022-09-02 * "AMZN Mktp US*1FASU238B"
-  Liabilities:Credit-Cards:MyCard             -18.92 USD
+  Liabilities:Credit-Cards:MyCard             20.02 USD
   Assets:Zero-Sum-Accounts:Amazon:Returns
 ```
 
-### Step 2. Return Transaction
+
+### Step 3. Return Transaction
 
 ```beancount
 2022-09-10 * "Return for Order 111-3961666-5760248"
-  Assets:Zero-Sum-Accounts:Amazon:Purchases    18.92 USD
-  Assets:Amazon:Returns
+  Assets:Zero-Sum-Accounts:Amazon:Returns    20.02 USD
+  Assets:Zero-Sum-Accounts:Stuff-Returned-To-Retailer
 ```
+
 
 * The amount matches the order, but no description is available.
 * In the future, the return importer will join against the Orders CSV to pull in product details.
@@ -133,3 +150,6 @@ automatically for the most part. Returns are credits while orders are debits:
 
 This is a simple importer to import gift card transactions, screen scraped from Amazon.
 See `amazon_giftcard.py` for documentation on this.
+
+This plays well with the GDPR workflow above: simply replace the credit card account
+with the gift card account.

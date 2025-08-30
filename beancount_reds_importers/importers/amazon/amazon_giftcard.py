@@ -13,7 +13,8 @@ Date 	Description 	Amount
 
 Config looks like this:
 
-amazongc.Importer({
+from beancount_reds_importers.importers.amazon import amazon_giftcard
+amazon_giftcard.Importer({
     'main_account'    : 'Assets:Gift-Cards-and-Credits:Amazon-com-Gift-Cards',
     'target_account'  : 'Assets:Zero-Sum-Accounts:Amazon-Purchases',
     })

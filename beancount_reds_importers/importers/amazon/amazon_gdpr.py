@@ -11,7 +11,7 @@ from smart_importer import PredictPostings
 from beancount_reds_importers.importers.amazongdpr import amazon_orders, amazon_returns
 
 
-class AmazonGDPRZipImporter(BGImporter):
+class Importer(BGImporter):
     """
     A delegating importer for Amazon GDPR downloads. See accompanying README.md for more
 
@@ -23,7 +23,7 @@ class AmazonGDPRZipImporter(BGImporter):
     Usage (to be added to your list of beangulp importers):
 
     from beancount_reds_importers.importers import amazongdpr
-    amazongdpr.AmazonGDPRZipImporter({
+    amazongdpr.Importer({
         'account_purchases': "Assets:Zero-Sum-Accounts:Amazon:Purchases",
         'account_returns':   "Assets:Zero-Sum-Accounts:Amazon:Returns",
         'account_returns_other': "Assets:Zero-Sum-Accounts:Returns-and-Temporary",
