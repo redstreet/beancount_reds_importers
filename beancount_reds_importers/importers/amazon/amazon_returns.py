@@ -29,7 +29,7 @@ class Importer(csvreader.Importer, banking.Importer):
         self.skip_transaction_types = []
 
     def skip_transaction(self, row):
-        return row.currency == 'Not Available'
+        return row.currency == "Not Available"
 
     def deep_identify(self, file):
         return self.column_labels_line in cache.get_file(file).head()

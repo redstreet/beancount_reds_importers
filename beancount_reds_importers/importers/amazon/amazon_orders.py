@@ -1,7 +1,8 @@
+from beangulp import cache
+
 from beancount_reds_importers.libreader import csvreader
 from beancount_reds_importers.libtransactionbuilder import banking
 
-from beangulp import cache
 
 class Importer(csvreader.Importer, banking.Importer):
     IMPORTER_NAME = "Amazon Retail Orders Importer"
@@ -36,8 +37,8 @@ class Importer(csvreader.Importer, banking.Importer):
     def build_metadata(self, file, metatype=None, data={}):
         default = super().build_metadata(file, metatype, data)
 
-        if metatype == 'transaction':
-            payment = {'payment_instrument': data['transaction'].Payment_Instrument_Type}
+        if metatype == "transaction":
+            payment = {"payment_instrument": data["transaction"].Payment_Instrument_Type}
             return {**default, **payment}
 
         return default
