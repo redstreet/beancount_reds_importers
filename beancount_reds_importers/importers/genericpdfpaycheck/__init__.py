@@ -68,6 +68,3 @@ class Importer(paycheck.Importer, pdfreader.Importer):
             table = self.convert_columns(table)
 
             self.alltables[section] = table
-
-    def build_metadata(self, file, metatype=None, data={}):
-        return {"filing_account": self.config["main_account"]}
