@@ -54,6 +54,7 @@ amazon_gdpr.Importer({
 
 * Place your GDPR ZIP(s) in your ingest folder.
 * Run Beangulp as usual, and the importers will detect and process the relevant CSVs.
+* Use `def build_metadata()` to extract any other piece of metadata you want
 
 ## Roadmap
 

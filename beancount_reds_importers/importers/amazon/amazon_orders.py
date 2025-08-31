@@ -26,13 +26,18 @@ class Importer(csvreader.Importer, banking.Importer):
         # fmt: on
         self.skip_transaction_types = []
 
-
-    # Payment Instrument Type
-    #             config={ Col.LAST4: "Payment Instrument Type", },
-
     def deep_identify(self, file):
         return self.column_labels_line in cache.get_file(file).head()
 
     def prepare_processed_table(self, rdr):
         rdr = rdr.convert("amount", lambda i: -i)
         return rdr
+
+    def build_metadata(self, file, metatype=None, data={}):
+        default = super().build_metadata(file, metatype, data)
+
+        if metatype == 'transaction':
+            payment = {'payment_instrument': data['transaction'].Payment_Instrument_Type}
+            return {**default, **payment}
+
+        return default
