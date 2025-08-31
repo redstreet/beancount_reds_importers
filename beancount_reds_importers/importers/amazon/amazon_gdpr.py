@@ -8,7 +8,7 @@ from beancount.core.data import Directive  # Beancount v3 core entries
 from beangulp import Importer as BGImporter
 from smart_importer import PredictPostings
 
-from beancount_reds_importers.importers.amazongdpr import amazon_orders, amazon_returns
+from beancount_reds_importers.importers.amazon import amazon_orders, amazon_returns
 
 
 class Importer(BGImporter):

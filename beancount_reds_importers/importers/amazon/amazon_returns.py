@@ -14,7 +14,6 @@ class Importer(csvreader.Importer, banking.Importer):
         self.filename_pattern_def = "CustomerReturns"
         self.header_identifier = ""
         self.column_labels_line = '"OrderId","ContractId","DateOfReturn","ReturnAmount","ReturnAmountCurrency","ReturnReason","Resolution"'
-        self.date_format = "%m/%d/%Y"
         self.file_encoding = "utf-8-sig"  # Amazon files have BOM
         # fmt: off
         self.header_map = {
@@ -28,6 +27,9 @@ class Importer(csvreader.Importer, banking.Importer):
         }
         # fmt: on
         self.skip_transaction_types = []
+
+    def skip_transaction(self, row):
+        return row.currency == 'Not Available'
 
     def deep_identify(self, file):
         return self.column_labels_line in cache.get_file(file).head()
