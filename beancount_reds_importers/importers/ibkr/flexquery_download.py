@@ -3,6 +3,8 @@
 
 import click
 import requests
+import sys
+import time
 
 
 @click.command()
@@ -25,15 +27,23 @@ def flexquery_download(token, query_id):
         # Construct URL to get the query result
         result_url = f"https://gdcdyn.interactivebrokers.com/Universal/servlet/FlexStatementService.GetStatement?q={request_id}&t={token}&v=3"
 
-        result_response = requests.get(result_url)
-
-        if result_response.status_code == 200:
-            print(result_response.text)
-        else:
-            print(f"Failed to get the query result. Status Code: {result_response.status_code}")
-            return None
+        # Try up to 10 times (roughly 100 seconds total)
+        for attempt in range(10):
+            result_response = requests.get(result_url)
+            if result_response.status_code == 200:
+                text = result_response.text
+                if "Statement generation in progress" in text:
+                    print("Statement generation in progress, waiting 10 seconds...", file=sys.stderr)
+                    time.sleep(10)
+                    continue
+                else:
+                    print(text)
+                    return
+            else:
+                print(f"Failed to get the query result. Status Code: {result_response.status_code}", file=sys.stderr)
+                return None
     else:
-        print(f"Failed to request the query. Status Code: {response.status_code}")
+        print(f"Failed to request the query. Status Code: {response.status_code}", file=sys.stderr)
         return None
 
 
