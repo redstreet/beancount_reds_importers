@@ -133,7 +133,9 @@ class Importer(investments.Importer, xmlreader.Importer):
                 # account number specific matching
                 return any(
                     elem["accountId"] == self.config["account_number"]
-                    for elem in self.get_xpath_elements("/FlexQueryResponse/FlexStatements/FlexStatement/AccountInformation")
+                    for elem in self.get_xpath_elements(
+                        "/FlexQueryResponse/FlexStatements/FlexStatement/AccountInformation"
+                    )
                 )
             else:
                 # base check: simply ensure this looks like a valid IBKR Flex Query file
@@ -145,10 +147,11 @@ class Importer(investments.Importer, xmlreader.Importer):
     def set_currency(self):
         self.currency = next(
             item["currency"]
-            for item in self.get_xpath_elements("/FlexQueryResponse/FlexStatements/FlexStatement/AccountInformation")
+            for item in self.get_xpath_elements(
+                "/FlexQueryResponse/FlexStatements/FlexStatement/AccountInformation"
+            )
             if item["accountId"] == self.config["account_number"]
         )
-
 
     # fixup dates
     def convert_date(self, d):
@@ -217,16 +220,12 @@ class Importer(investments.Importer, xmlreader.Importer):
             xml_interpreter=self.xml_transfer_interpreter,
         )
 
-
     def get_balance_assertion_date(self):
         account_id = self.config["account_number"]
         base_path = f"/FlexQueryResponse/FlexStatements/FlexStatement[@accountId='{account_id}']"
 
-        ac = list(
-            self.get_xpath_elements(f"{base_path}/CashReport/CashReportCurrency")
-        )[0]
+        ac = list(self.get_xpath_elements(f"{base_path}/CashReport/CashReportCurrency"))[0]
         return self.convert_date(ac["toDate"]).date()
-
 
     def get_available_cash(self, settlement_fund_balance=0):
         """Assumes there's only one cash currency.
@@ -235,11 +234,8 @@ class Importer(investments.Importer, xmlreader.Importer):
         account_id = self.config["account_number"]
         base_path = f"/FlexQueryResponse/FlexStatements/FlexStatement[@accountId='{account_id}']"
 
-        ac = list(
-            self.get_xpath_elements(f"{base_path}/CashReport/CashReportCurrency")
-        )[0]
+        ac = list(self.get_xpath_elements(f"{base_path}/CashReport/CashReportCurrency"))[0]
         return D(ac["slbNetCash"])
-
 
     def get_balance_positions(self):
         account_id = self.config["account_number"]
@@ -251,7 +247,6 @@ class Importer(investments.Importer, xmlreader.Importer):
                 "units": D(pos["position"]),
             }
             yield DictToObject(balance)
-
 
     def price_cost_both_zero_handler_booktrades(self, entry, ot):
         """If price and cost are both zero, we assume this is an options expiration"""

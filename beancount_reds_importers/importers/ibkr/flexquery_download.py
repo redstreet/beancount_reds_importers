@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """IBKR Flex Query Downloader"""
 
-import click
-import requests
 import sys
 import time
+
+import click
+import requests
 
 
 @click.command()
@@ -33,14 +34,19 @@ def flexquery_download(token, query_id):
             if result_response.status_code == 200:
                 text = result_response.text
                 if "Statement generation in progress" in text:
-                    print("Statement generation in progress, waiting 10 seconds...", file=sys.stderr)
+                    print(
+                        "Statement generation in progress, waiting 10 seconds...", file=sys.stderr
+                    )
                     time.sleep(10)
                     continue
                 else:
                     print(text)
                     return
             else:
-                print(f"Failed to get the query result. Status Code: {result_response.status_code}", file=sys.stderr)
+                print(
+                    f"Failed to get the query result. Status Code: {result_response.status_code}",
+                    file=sys.stderr,
+                )
                 return None
     else:
         print(f"Failed to request the query. Status Code: {response.status_code}", file=sys.stderr)
