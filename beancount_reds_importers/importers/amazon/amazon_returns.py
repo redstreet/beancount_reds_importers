@@ -38,3 +38,12 @@ class Importer(csvreader.Importer, banking.Importer):
         rdr = rdr.addfield("memo", "Amazon Return")
         rdr = rdr.convert("amount", lambda i: i.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP))
         return rdr
+
+    def get_transactions(self):
+        """We do a database join on the order ID between the returns and orders tables, to obtain
+        the item description for the order"""
+        for ot in self.rdr.namedtuples():
+            if self.skip_transaction(ot):
+                continue
+            # TODO: Do a lookup on payee + amount, and add to the description
+            yield ot

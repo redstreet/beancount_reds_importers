@@ -132,4 +132,4 @@ class Importer(BGImporter):
 
         """
 
-        return self.config.get("filing_directory", "Expenses:Amazon")
+        return self.config.get("filing_directory", "Assets:Zero-Sum-Accounts:Amazon")
