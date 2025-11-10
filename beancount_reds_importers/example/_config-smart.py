@@ -5,7 +5,7 @@ import sys
 from os import path
 
 import beangulp
-from smart_importer import PredictPostings, apply_hooks
+from smart_importer import PredictPostings
 
 sys.path.insert(0, path.join(path.dirname(__file__)))
 
@@ -15,17 +15,16 @@ from beancount_reds_importers.importers import ally
 CONFIG = [
     # Banks and credit cards
     # --------------------------------------------------------------------------------------
-    apply_hooks(
-        ally.Importer(
-            {
-                "account_number": "23456",
-                "main_account": "Assets:Banks:Checking",
-            }
-        ),
-        [PredictPostings()],
-    ),
+    ally.Importer(
+        {
+            "account_number": "23456",
+            "main_account": "Assets:Banks:Checking",
+        }
+    )
 ]
 
+HOOKS = [PredictPostings().hook]
+
 if __name__ == "__main__":
-    ingest = beangulp.Ingest(CONFIG)
+    ingest = beangulp.Ingest(CONFIG, HOOKS)
     ingest()
