@@ -138,10 +138,10 @@ Choices for the date of the generated balance assertion can be specified as a ke
 the importer config, `balance_assertion_date_type`, which can be set to:
 - `smart`:            smart date (default; see below)
 - `ofx_date`:         date specified in ofx file
-- `last_transaction`: max transaction date
+- `last_transaction`: latest transaction date (the "tightest" assertion)
 - `today`:            today's date
 
-If you want something else, simply override this method in individual importer
+If you need something else, simply override this method in individual importer.
 
 `smart` dates: Banks and credit cards typically have pending transactions that are not
 included in downloads. When we download the next statement, new transactions may appear
@@ -154,7 +154,6 @@ To minimize this, we set the balance assertion date to either two days (fudge fa
 account for pending transactions) before the statement's end date or the last
 transaction's date, whichever is later. To choose a different fudge factor, simply set
 `balance_assertion_date_fudge` in your config.
-
 
 ### Note
 
