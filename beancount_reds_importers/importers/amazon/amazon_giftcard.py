@@ -25,7 +25,7 @@ import datetime
 import itertools
 import ntpath
 
-from beancount.core import data, flags
+from beancount.core import amount, data, flags
 from beancount.core.number import D
 from beangulp import Importer as BGImporter
 
@@ -64,16 +64,19 @@ class Importer(BGImporter):
         config = self.config
 
         new_entries = []
+        balance_date = datetime.date.min
+        balance_amount = 0
 
-        counter = itertools.count()
+        self.counter = itertools.count()
         for line in open(file, "r").readlines()[1:]:
             f = line.split("\t")
             f = [i.strip() for i in f]
             date = datetime.datetime.strptime(f[0], "%B %d, %Y").date()
             description = f[1].encode("ascii", "ignore").decode()
             number = D(f[2].replace("$", ""))
+            balance = D(f[3].replace("$", ""))
 
-            metadata = data.new_metadata(file, next(counter))
+            metadata = data.new_metadata(file, next(self.counter))
             entry = data.Transaction(
                 metadata,
                 date,
@@ -88,7 +91,27 @@ class Importer(BGImporter):
             data.create_simple_posting(entry, config["target_account"], None, None)
             new_entries.append(entry)
 
+            if date > balance_date:
+                balance_date = date
+                balance_amount = balance
+
+        balance_assertion = self.construct_balance_entry(balance_date, balance_amount)
+        new_entries.append(balance_assertion)
         return new_entries
+
+    def construct_balance_entry(self, balance_date, balance_amount):
+        if not balance_amount or (balance_date == datetime.date.min):
+            return
+        metadata = data.new_metadata(None, next(self.counter))
+        balance_entry = data.Balance(
+            metadata,
+            balance_date,
+            self.config["main_account"],
+            amount.Amount(balance_amount, self.currency),
+            None,
+            None,
+        )
+        return balance_entry
 
     def account(self, file):
         if "filing_account" in self.config:
