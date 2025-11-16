@@ -1,13 +1,20 @@
 #!/bin/bash
 
-file=$1
 beancount_main=my.beancount
 
-python _config.py identify $file
-python _config.py extract -e $beancount_main $file
+echo "---------------------------------------------------------------------"
+echo "Import of investment accounts (without smart-importer)"
+echo "---------------------------------------------------------------------"
 
-python _config-smart.py identify $file
-python _config-smart.py extract -e $beancount_main $file
+file=OfxDownload.qfx
+./import.py identify $file
+./import.py extract -e $beancount_main $file
 
-# mkdir -pv filed
-# bean-file -o filed my.import $file
+
+echo "---------------------------------------------------------------------"
+echo "With smart-importer"
+echo "---------------------------------------------------------------------"
+file=transactions.qfx
+./import-smart.py identify $file
+./import-smart.py extract -e $beancount_main $file
+

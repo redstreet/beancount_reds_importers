@@ -15,16 +15,16 @@ from beancount_reds_importers.importers import ally
 CONFIG = [
     # Banks and credit cards
     # --------------------------------------------------------------------------------------
-    ally.Importer(
-        {
-            "account_number": "23456",
-            "main_account": "Assets:Banks:Checking",
-        }
+    PredictPostings().wrap(
+        ally.Importer(
+            {
+                "account_number": "23456",
+                "main_account": "Assets:Banks:Checking",
+            }
+        )
     )
 ]
 
-HOOKS = [PredictPostings().hook]
-
 if __name__ == "__main__":
-    ingest = beangulp.Ingest(CONFIG, HOOKS)
+    ingest = beangulp.Ingest(CONFIG)
     ingest()
