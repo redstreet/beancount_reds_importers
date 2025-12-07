@@ -32,6 +32,10 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
             'invexpense'    : 'Account to book expenses (like foreign taxes) to',
             'rounding_error': 'Account to book rounding errors to',
             'fund_info '    : 'dictionary of fund info (by_id, money_market)',
+            'use_sale_price_as_cost': 'Boolean (optional, default False). If True, sells are recorded '
+                                      'with the sale price as cost basis (e.g. -40 STOCK {400 USD}) '
+                                      'instead of using an empty cost spec (e.g. -40 STOCK {} @ 400 USD). '
+                                      'This mimics booking method "NONE".',
         }
 
         Certian variables in the config are resolved by this transaction builder.
@@ -301,14 +305,28 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
                 entry, main_acct, units, ticker, ot.unit_price, self.currency
             )
         elif "sell" in ot.type:
+            # Check if we should use sale price as cost basis (booking method NONE)
+            use_sale_price_as_cost = self.config.get("use_sale_price_as_cost", False)
+            # Only use sale price as cost if we actually have a valid price
+            if use_sale_price_as_cost and ot.unit_price:
+                # Record sale with sale price as cost basis: -40 STOCK {400 USD}
+                costspec = CostSpec(ot.unit_price, None, self.currency, None, None, None)
+                price_number = None
+                price_currency = None
+            else:
+                # Standard behavior: use empty cost spec to let beancount resolve lots
+                costspec = CostSpec(None, None, None, None, None, None)
+                price_number = ot.unit_price
+                price_currency = self.currency
+
             common.create_simple_posting_with_cost_or_price(
                 entry,
                 main_acct,
                 units,
                 ticker,
-                price_number=ot.unit_price,
-                price_currency=self.currency,
-                costspec=CostSpec(None, None, None, None, None, None),
+                price_number=price_number,
+                price_currency=price_currency,
+                costspec=costspec,
                 price_cost_both_zero_handler=self.price_cost_both_zero_handler,
                 ot=ot,
             )
