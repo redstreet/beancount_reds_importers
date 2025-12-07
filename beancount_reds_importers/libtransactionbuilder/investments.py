@@ -269,10 +269,6 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
         # special cases
         if "sell" in ot.type:
             units = -1 * abs(ot.units)
-            if not is_money_market:
-                metadata["todo"] = (
-                    "TODO: this entry is incomplete until lots are selected (bean-doctor context <filename> <lineno>)"  # noqa: E501
-                )
         if ot.type in [
             "reinvest"
         ]:  # dividends are booked to commodity_leaf. Eg: Income:Dividends:HOOLI
