@@ -21,13 +21,14 @@ class Importer(investments.Importer, csvreader.Importer):
         self.get_ticker_info = self.get_ticker_info_from_id
         self.date_format = "%Y/%m/%d"
         self.funds_db_txt = "funds_by_ticker"
-        self.column_labels_line = '"Symbol","Description","Quantity","Price","Price Change %","Price Change $","Market Value","Day Change %","Day Change $","Cost Basis","Gain/Loss %","Gain/Loss $","Ratings","Reinvest Dividends?","Capital Gains?","% Of Account","Security Type"'  #
+        # self.column_labels_line = '"Symbol","Description","Quantity","Price","Price Change %","Price Change $","Market Value","Day Change %","Day Change $","Cost Basis","Gain/Loss %","Gain/Loss $","Ratings","Reinvest Dividends?","Capital Gains?","% Of Account","Security Type"'  #
+        self.column_labels_line = '"Symbol","Description","","Price","Qty (Quantity)","Price Chng $ (Price Change $)","Price Chng % (Price Change %)","Mkt Val (Market Value)","Day Chng $ (Day Change $)","Day Chng % (Day Change %)","Cost Basis","Gain $ (Gain/Loss $)","Gain % (Gain/Loss %)","Ratings","Reinvest?","Reinvest Capital Gains?","% of Acct (% of Account)","Security Type"' # noqa: #501
         # fmt: off
         self.header_map = {
-            "Description":  "memo",
-            "Symbol":       "security",
-            "Quantity":     "units",
-            "Price":        "unit_price",
+            "Description":     "memo",
+            "Symbol":          "security",
+            "Qty (Quantity)":  "units",
+            "Price":           "unit_price",
         }
         # fmt: on
         self.skip_transaction_types = []
@@ -60,6 +61,7 @@ class Importer(investments.Importer, csvreader.Importer):
         # first row has date
         d = rdr[0][0].rsplit(" ", 1)[1]
         self.max_date = datetime.datetime.strptime(d, self.date_format)
+        rdr = rdr.select(lambda row: "Account Total" not in row and "Cash & Cash Investments" not in row)
         return rdr
 
     def get_transactions(self):
