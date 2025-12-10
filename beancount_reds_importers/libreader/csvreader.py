@@ -119,6 +119,8 @@ class Importer(reader.Reader, BGImporter):
         currencies = getattr(self, "currency_fields", []) + [
             "unit_price",
             "fees",
+            "commission",
+            "fees",
             "total",
             "amount",
             "balance",
