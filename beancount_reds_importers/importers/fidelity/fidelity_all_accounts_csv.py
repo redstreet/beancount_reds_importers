@@ -4,6 +4,8 @@ import math
 import re
 from datetime import datetime
 
+from beangulp import cache
+
 from beancount_reds_importers.libreader import csvreader
 from beancount_reds_importers.libtransactionbuilder import investments
 
@@ -129,7 +131,7 @@ class Importer(csvreader.Importer, investments.Importer):
         return date
 
     def deep_identify(self, file):
-        return re.search(self.header_identifier, file.head(), flags=re.MULTILINE)
+        return re.search(self.header_identifier, cache.get_file(file).head(), flags=re.MULTILINE)
 
     def skip_transaction(self, ot):
         if ot.account_number != self.config["account_number"]:
