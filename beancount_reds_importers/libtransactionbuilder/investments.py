@@ -166,20 +166,30 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
                     v for k, v in self.funds_db.items() if security_id == k
                 ][0]
             except IndexError:
-                ticker, ticker_long_name = [
-                    v for k, v in self.funds_db.items() if security_id in k
-                ][0]
+                if getattr(self, "funds_db_txt", "funds_by_id") == "funds_by_ticker":
+                    # searching for a substring when report is set to funds_by_ticker
+                    # generates false positives e.g. 'V' matches 'VGK'
+                    raise IndexError('list index out of range')
+                else:
+                    ticker, ticker_long_name = [
+                        v for k, v in self.funds_db.items() if security_id in k
+                    ][0]
         except IndexError:
             print(f"Error: fund info not found for {security_id}", file=sys.stderr)
             securities = self.get_security_list()
-            if "" in securities:
-                securities.remove("")
+            for s in securities.copy():
+                if s.replace(" ", "") == "":
+                    # strip out any security_id that are empty or just spaces
+                    securities.remove(s)
             securities_missing = list(securities)
             for s in securities:
                 for k in self.funds_db:
-                    if s in k:
-                        securities_missing.remove(s)
-
+                    if getattr(self, "funds_db_txt", "funds_by_id") == "funds_by_ticker":
+                        if s == k:
+                            securities_missing.remove(s)
+                    else:
+                        if s in k:
+                            securities_missing.remove(s)
             # try to extract security info from ofx
             ofx_securities = {}
             try:
@@ -555,9 +565,12 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
     def add_fee_postings(self, entry, ot):
         config = self.config
         if hasattr(ot, "fees") or hasattr(ot, "commission"):
-            if getattr(ot, "fees", 0) != 0:
+            # do not compare fees/commission to 0 b/c in a csv import the empty
+            # field will be set as "" which does not equal 0 and will trigger
+            # a fee entry of 0.00 for every transaction
+            if getattr(ot, "fees", 0):
                 data.create_simple_posting(entry, config["fees"], ot.fees, self.currency)
-            if getattr(ot, "commission", 0) != 0:
+            if getattr(ot, "commission", 0):
                 data.create_simple_posting(entry, config["fees"], ot.commission, self.currency)
 
     def extract_custom_entries(self, file, counter):
