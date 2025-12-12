@@ -44,6 +44,7 @@ class Importer(csvreader.Importer, investments.Importer):
             "REINVESTMENT": "buymf",
             "REDEMPTION FROM": "sellmf",
             "DIVIDEND RECEIVED": "dividends",
+            "DIVIDENDS": "dividends",
             "TRANSFERRED FROM": "cash",
             "YOU BOUGHT": "buystock",
             "YOU SOLD": "sellstock",
