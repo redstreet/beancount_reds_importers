@@ -44,6 +44,7 @@ class Importer(csvreader.Importer, investments.Importer):
             "REINVESTMENT": "buymf",
             "REDEMPTION FROM": "sellmf",
             "DIVIDEND RECEIVED": "dividends",
+            "DIVIDENDS": "dividends",
             "TRANSFERRED FROM": "cash",
             "YOU BOUGHT": "buystock",
             "YOU SOLD": "sellstock",
@@ -77,6 +78,10 @@ class Importer(csvreader.Importer, investments.Importer):
             "PART CONTRIB": "dep",
             "ROLLOVER SHARES": "buystock",  # rollover from closed account...almost certainly needs to be edited manually
             "CONVERSION as": "buymf",  # conversion of mutual fund class...almost certainly needs to be edited manually
+            "Exchange Out": "sellmf",
+            "Exchange In": "buymf",
+            "Change on": "capgainsd_lt",
+            "Withdrawal": "sellmf",
         }
         # fmt: on
 
