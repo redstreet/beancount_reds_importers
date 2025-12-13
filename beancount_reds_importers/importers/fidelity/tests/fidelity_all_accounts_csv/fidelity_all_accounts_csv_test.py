@@ -3,10 +3,13 @@
 from os import path
 import sys
 
-from beancount.ingest import regression_pytest as regtest
-
 # hack to use testing code
 sys.path.insert(0, path.normpath(path.join(path.dirname(__file__), "../../../../..")))
+
+try:
+    from beancount.ingest import regression_pytest as regtest
+except ModuleNotFoundError:
+    from beancount_reds_importers.util import regression_pytest as regtest
 
 from beancount_reds_importers.importers.fidelity import fidelity_all_accounts_csv
 
@@ -20,9 +23,15 @@ fund_data = [
     ('VVV', '92047W101', 'VALVOLINE INC COM'),
     ("ZTS", "98978V103", "ZOETIS INC"),
     ("CUSIP44244CCF2", "44244CCF2", "44244CCF2 HOUSTON TEX UTIL SYS REV REF BDS SER. 05.00000% 11/15/2025 2015D"),
-    ('CUSIP412003AD7', '412003AD7', 'HARDIN CNTY OHIO ECONOMIC DEV FACS 05.50000% 05/01/2050 REV REF IMPT BDS OHIO NORTHERN UNIV SER. 2020'),
     ('TSM', '874039100', 'TAIWAN SEMICONDUCTOR MANUFACTURING SPON ADS EACH REP 5 ORD TWD10'),
     ('COR', '03073E105', 'AMERISOURCEBERGEN CORPORATION COM USD0.01'),
+    ('VGK', '922042874', 'VANGUARD INTL EQUITY INDEX FDS FTSE EUROPE ETF'),
+    # test a bond where chosen symbol fails on substring match
+    ('CUSIP412003AD7', '412003AD7', 'HARDIN CNTY OHIO ECONOMIC DEV FACS 05.50000% 05/01/2050 REV REF IMPT BDS OHIO NORTHERN UNIV SER. 2020'),
+    # test mapping a security to different symbol
+    # ("V-V", "92826C839", "VISA INC"),
+    # test a security with a symbol as a substring
+    ("G", "G3922B107", "GENPACT LIMITED COM STK USD0.01"),
 ]
 
 # list of money_market accounts. These will not be held at cost, and instead will use price conversions
