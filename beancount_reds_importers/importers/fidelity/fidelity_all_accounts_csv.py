@@ -129,7 +129,7 @@ class Importer(csvreader.Importer, investments.Importer):
                 ot.tradeDate if hasattr(ot, "tradeDate") else ot.date
                 for ot in self.get_transactions()
             ).date()
-        except Exception as err:
+        except Exception:
             date = datetime.today().date()
 
         return date
