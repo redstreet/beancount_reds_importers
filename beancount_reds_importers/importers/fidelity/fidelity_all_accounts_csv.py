@@ -72,6 +72,7 @@ class Importer(csvreader.Importer, investments.Importer):
         else:
             self.header_map["Price"] = "unit_price"
         self.transaction_type_map = {
+            # NOTE: the keys here should all be upper case
             "REINVESTMENT": "buymf",
             "REDEMPTION FROM": "sellmf",
             "DIVIDEND RECEIVED": "dividends",
@@ -92,9 +93,9 @@ class Importer(csvreader.Importer, investments.Importer):
             "DIVIDEND ADJUSTMENT": "fee",  # longer text here is FOREIGN TAX PAID as of May-05-2025...
             "BILL PAYMENT": "payment",
             "DEBIT CARD": "payment",
-            "Check Paid": "payment",
+            "CHECK PAID": "payment",
             "DIRECT DEBIT": "payment",
-            "Electronic Funds": "payment",
+            "ELECTRONIC FUNDS": "payment",
             "CHECK RECEIVED": "dep",
             "CASH ADVANCE": "debit",
             "SHORT-TERM CAP": "capgainsd_st",
@@ -108,11 +109,11 @@ class Importer(csvreader.Importer, investments.Importer):
             "TRANSFER OF": "dep",
             "PART CONTRIB": "dep",
             "ROLLOVER SHARES": "buystock",  # rollover from closed account...almost certainly needs to be edited manually
-            "CONVERSION as": "buymf",  # conversion of mutual fund class...almost certainly needs to be edited manually
+            "CONVERSION AS": "buymf",  # conversion of mutual fund class...almost certainly needs to be edited manually
             "EXCHANGE OUT": "sellmf",
             "EXCHANGE IN": "buymf",
             "CHANGE ON": "capgainsd_lt",
-            "WITHDRAWAL": "sellmf",
+            "WITHDRAWALS": "sellmf",
         }
         self.skip_transaction_types = []
         # fmt: on
@@ -269,5 +270,6 @@ class Importer(csvreader.Importer, investments.Importer):
             ["type"],
             include_original=True,
         )
+        rdr.convert("type", 'upper')
 
         return rdr
