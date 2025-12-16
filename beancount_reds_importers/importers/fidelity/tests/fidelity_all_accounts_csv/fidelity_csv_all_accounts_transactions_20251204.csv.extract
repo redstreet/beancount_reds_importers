@@ -1,25 +1,26 @@
-
 2025-10-09 * "FOREIGN TAX PAID TAIWAN SEMICONDUCTOR MANUFACTURING S... (TSM) (Cash)" "fee"
   Assets:Investments:Fidelity:USD                            -32.93 USD
   Expenses:Fees-and-Charges:Brokerage-Fees:Taxable:Fidelity   32.93 USD
 
 2025-11-17 * "YOU BOUGHT WASTE MANAGEMENT INC (WM) (Margin)" "[WM] WASTE MANAGEMENT INC"
   settlement_date: "2025-11-18"
-  Assets:Investments:Fidelity:WM         18 WM {208.64 USD}
-  Assets:Investments:Fidelity:USD  -3755.44 USD
+  Assets:Investments:Fidelity:WM       18.00 WM {208.6356 USD}
+  Assets:Investments:Fidelity:USD   -3755.44 USD
+  Equity:Rounding-Errors:Imports   -0.000800 USD
 
 2025-11-17 * "REDEMPTION PAYOUT HOUSTON TEX UTIL SYS REV REF BDS SER. 05.00000% 11/15/2025 2015D (Cash)" "[CUSIP44244CCF2] 44244CCF2 HOUSTON TEX UTIL SYS REV REF BDS SER. 05.00000% 11/15/2025 2015D"
   todo: "TODO: this entry is incomplete until lots are selected (bean-doctor context <filename> <lineno>)"
-  Assets:Investments:Fidelity:CUSIP44244CCF2                        -25000 CUSIP44244CCF2 {} @ 1 USD
+  Assets:Investments:Fidelity:CUSIP44244CCF2                        -25000.00 CUSIP44244CCF2 {} @ 1.0 USD
   Income:Investments:Taxable:Capital-Gains:Fidelity:CUSIP44244CCF2
-  Assets:Investments:Fidelity:USD                                    25000 USD
+  Assets:Investments:Fidelity:USD                                    25000.00 USD
 
 2025-11-24 * "YOU SOLD EXEC ON MULT EXCHG DETAILS ON REQUEST AVERAGE PRICE TRADE VALVOLINE INC COM (VVV) (Margin)" "[VVV] VALVOLINE INC COM"
   settlement_date: "2025-11-25"
   todo: "TODO: this entry is incomplete until lots are selected (bean-doctor context <filename> <lineno>)"
-  Assets:Investments:Fidelity:VVV                            -341 VVV {} @ 30.44 USD
+  Assets:Investments:Fidelity:VVV                          -341.00 VVV {} @ 30.4351 USD
   Income:Investments:Taxable:Capital-Gains:Fidelity:VVV
-  Assets:Investments:Fidelity:USD                        10378.37 USD
+  Assets:Investments:Fidelity:USD                         10378.37 USD
+  Equity:Rounding-Errors:Imports                         -0.000900 USD
 
 2025-12-01 * "DIVIDEND RECEIVED OSHKOSH CORP (OSK) (Margin)" "[OSK] OSHKOSH CORP"
   Assets:Investments:Fidelity:USD                     103.19 USD
@@ -30,25 +31,26 @@
   Income:Investments:Taxable:Dividends:Fidelity:COR  -182.97 USD
 
 2025-12-01 * "MUNI EXEMPT INT WHEAT RIDGE COLO SALES & USE TAX REV 05.00000% 12/01/2041 REF IMPT BDS SER. 2024 (Cash)" "[CUSIP96255NBE8] 96255NBE8 WHEAT RIDGE COLO SALES & USE TAX REV 05.00000% 12/01/2041 REF IMPT BDS SER. 2024"
-  Assets:Investments:Fidelity:USD                               1250 USD
-  Income:Investments:Taxable:Interest:Fidelity:CUSIP96255NBE8  -1250 USD
+  Assets:Investments:Fidelity:USD                               1250.00 USD
+  Income:Investments:Taxable:Interest:Fidelity:CUSIP96255NBE8  -1250.00 USD
 
 2025-12-02 * "DIVIDEND RECEIVED ZOETIS INC (ZTS) (Cash)" "[ZTS] ZOETIS INC"
-  Assets:Investments:Fidelity:USD                     588 USD
-  Income:Investments:Taxable:Dividends:Fidelity:ZTS  -588 USD
+  Assets:Investments:Fidelity:USD                     588.00 USD
+  Income:Investments:Taxable:Dividends:Fidelity:ZTS  -588.00 USD
 
 2025-12-03 * "DIVIDEND RECEIVED VANGUARD MUN BD FDS TAX EXEMPT BD (VTEB) (Cash)" "[VTEB] VANGUARD MUN BD FDS TAX EXEMPT BD"
   Assets:Investments:Fidelity:USD                      3688.33 USD
   Income:Investments:Taxable:Dividends:Fidelity:VTEB  -3688.33 USD
 
 2025-12-03 * "REINVESTMENT VANGUARD MUN BD FDS TAX EXEMPT BD (VTEB) (Cash)" "[VTEB] VANGUARD MUN BD FDS TAX EXEMPT BD"
-  Assets:Investments:Fidelity:VTEB    73.459 VTEB {50.21 USD}
-  Assets:Investments:Fidelity:USD   -3688.33 USD
+  Assets:Investments:Fidelity:VTEB      73.459 VTEB {50.2094 USD}
+  Assets:Investments:Fidelity:USD     -3688.33 USD
+  Equity:Rounding-Errors:Imports    -0.0023146 USD
 
 2025-12-03 * "DIVIDEND RECEIVED J P MORGAN EXCHANGE TRADED FD EQUITY... (JEPI) (Cash)" "[JEPI] J P MORGAN EXCHANGE TRADED FD EQUITY PREMIUM"
   Assets:Investments:Fidelity:USD                      2268.26 USD
   Income:Investments:Taxable:Dividends:Fidelity:JEPI  -2268.26 USD
 
 2025-12-04 * "YOU BOUGHT TRD EXECUTED BY PERT HARDIN CNTY OHIO ECONOMIC DEV FACS 05.50000% 05/01/2050 REV REF IMPT BDS OHIO NORTHERN UNIV SER. 2020 (Cash)" "[CUSIP412003AD7] HARDIN CNTY OHIO ECONOMIC DEV FACS 05.50000% 05/01/2050 REV REF IMPT BDS OHIO NORTHERN UNIV SER. 2020"
-  Assets:Investments:Fidelity:CUSIP412003AD7      55000 CUSIP412003AD7 {90.67 USD}
+  Assets:Investments:Fidelity:CUSIP412003AD7      55000.00 CUSIP412003AD7 {0.9066 USD}
   Assets:Investments:Fidelity:USD             -50151.44 USD
