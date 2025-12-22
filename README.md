@@ -155,6 +155,21 @@ account for pending transactions) before the statement's end date or the last
 transaction's date, whichever is later. To choose a different fudge factor, simply set
 `balance_assertion_date_fudge` in your config.
 
+### Configuring currency precision
+For Excel files (.xls/.xlsx), currency amounts are quantized to 2 decimal places by 
+default. For currencies requiring different precision (e.g., JPY with 0 decimals, or 
+cryptocurrencies with 8 decimals), set `currency_precision` in your importer's 
+`custom_init()`:
+
+```python
+def custom_init(self):
+    self.currency_precision = 0  # For JPY
+    # or self.currency_precision = 8  # For cryptocurrencies
+```
+
+Note: .xlsx files honor Excel cell number formats when available; this setting is used
+as a fallback.
+
 ### Note
 
 Depending on the institution, the `payee` and `narration` fields in generated
