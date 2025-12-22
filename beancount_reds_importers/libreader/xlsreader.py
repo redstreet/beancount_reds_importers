@@ -2,9 +2,11 @@
 beancount_reds_importers."""
 
 import re
+from decimal import ROUND_HALF_UP, Decimal
 from os import devnull
 
 import petl as etl
+from beancount.core.number import D
 
 from beancount_reds_importers.libreader import csvreader
 
@@ -36,3 +38,29 @@ class Importer(csvreader.Importer):
     def read_raw(self, file):
         # set logfile to ignore WARNING *** file size (92598) not 512 + multiple of sector size (512)
         return etl.fromxls(file, logfile=open(devnull, "w"))
+
+    def convert_columns(self, rdr):
+        """Override to apply default quantization for .xls files (which can't read formatting)"""
+        # First, call parent's convert_columns to do standard conversions
+        rdr = super().convert_columns(rdr)
+
+        # Apply default quantization to currency fields
+        # Modern xlrd (2.0+) doesn't support reading cell formatting, so we default to 2 decimals
+        currencies = getattr(self, "currency_fields", []) + [
+            "unit_price",
+            "fees",
+            "total",
+            "amount",
+            "balance",
+        ]
+
+        precision = getattr(self, "currency_precision", 2)
+        quantizer = Decimal("0." + "0" * precision) if precision > 0 else Decimal("1")
+
+        for field in currencies:
+            if field in rdr.header():
+                rdr = rdr.convert(
+                    field, lambda x: D(x).quantize(quantizer, rounding=ROUND_HALF_UP) if x else x
+                )
+
+        return rdr
