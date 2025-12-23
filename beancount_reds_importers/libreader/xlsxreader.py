@@ -2,11 +2,9 @@
 beancount_reds_importers."""
 
 import re
-from decimal import ROUND_HALF_UP, Decimal
 
 import openpyxl
 import petl as etl
-from beancount.core.number import D
 
 from beancount_reds_importers.libreader import xlsreader
 
@@ -46,33 +44,17 @@ class Importer(xlsreader.Importer):
 
         return rdr
 
-    def convert_columns(self, rdr):
-        """Override to apply formatting-aware quantization for currency fields"""
-        # First, call parent's convert_columns to do standard conversions
-        rdr = super().convert_columns(rdr)
+    def get_precision_for_field(self, rdr, field_name):
+        """Override to provide Excel format-based precision for currency fields.
 
-        # Now apply Excel formatting-aware quantization to currency fields
-        currencies = getattr(self, "currency_fields", []) + [
-            "unit_price",
-            "fees",
-            "total",
-            "amount",
-            "balance",
-        ]
-
-        for field in currencies:
-            if field in rdr.header():
-                rdr = self._quantize_currency_field(rdr, field)
-
-        return rdr
-
-    def _quantize_currency_field(self, rdr, field_name):
-        """Quantize a currency field based on Excel number formatting"""
+        Reads Excel cell number formats and extracts precision from format strings.
+        Falls back to default precision if format is unavailable or unparseable.
+        """
         # Get column index for this field
         try:
             col_idx = rdr.header().index(field_name)
         except (ValueError, AttributeError):
-            return rdr
+            return super().get_precision_for_field(rdr, field_name)
 
         # Get formatting info if available
         formatting_info = getattr(rdr, "_xlsx_formatting", {})
@@ -82,26 +64,17 @@ class Importer(xlsreader.Importer):
         for row_idx in range(len(rdr)):
             fmt = formatting_info.get((row_idx, col_idx))
             if fmt:
-                precision = self._get_precision_from_format(fmt)
+                precision = self.get_precision_from_format(fmt)
                 if precision is not None:
                     precisions.append(precision)
 
-        # Use most common precision, or default to 2
+        # Use most common precision, or fall back to parent's default
         if precisions:
-            precision = max(set(precisions), key=precisions.count)
+            return max(set(precisions), key=precisions.count)
         else:
-            precision = getattr(self, "currency_precision", 2)
+            return super().get_precision_for_field(rdr, field_name)
 
-        quantizer = Decimal("0." + "0" * precision) if precision > 0 else Decimal("1")
-
-        # Apply quantization
-        rdr = rdr.convert(
-            field_name, lambda x: D(x).quantize(quantizer, rounding=ROUND_HALF_UP) if x else x
-        )
-
-        return rdr
-
-    def _get_precision_from_format(self, fmt):
+    def get_precision_from_format(self, fmt):
         """Extract decimal places from Excel number format string
 
         Examples:
