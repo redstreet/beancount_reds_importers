@@ -1,0 +1,12 @@
+
+2024-01-02 * "Trade 100 shares" "TSTK"
+  filing_account: "Assets:Brokerage:TestAccount"
+  Assets:Brokerage:TestAccount  100.50 USD
+
+2024-02-02 * "Trade 50 shares" "TSTK"
+  filing_account: "Assets:Brokerage:TestAccount"
+  Assets:Brokerage:TestAccount  100.00 USD
+
+2024-03-02 * "Trade 75 shares" "TSTK"
+  filing_account: "Assets:Brokerage:TestAccount"
+  Assets:Brokerage:TestAccount  150.86 USD
