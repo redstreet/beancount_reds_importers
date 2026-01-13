@@ -84,6 +84,11 @@ class Importer(csvreader.Importer, investments.Importer):
             "EXCHANGED TO": "buymf",
             "CHANGE ON": "capgainsd_lt",
             "WITHDRAWALS": "sellmf",
+            "CO CONTR": "dep",
+            "DIVIDEND": "reinvest",
+            "CONTRIBUTIONS": "buystock",
+            "TRANSFER": "xfer",
+            "PURCHASE INTO": "buystock",
         }
         # fmt: on
 
