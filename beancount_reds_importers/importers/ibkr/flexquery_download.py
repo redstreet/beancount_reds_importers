@@ -22,7 +22,12 @@ def flexquery_download(token, query_id):
     response = requests.post(url, data=request_payload)
 
     if response.status_code == 200:
-        request_id = response.text.split("<ReferenceCode>")[1].split("</ReferenceCode>")[0]
+        try:
+            request_id = response.text.split("<ReferenceCode>")[1].split("</ReferenceCode>")[0]
+        except IndexError:
+            print("Error: couldn't parse:\n", file=sys.stderr)
+            print(response.text, file=sys.stderr)
+            sys.exit(1)
         # print(f"Request ID: {request_id}")
 
         # Construct URL to get the query result
