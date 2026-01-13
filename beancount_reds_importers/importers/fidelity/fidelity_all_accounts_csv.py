@@ -134,26 +134,29 @@ class Importer(csvreader.Importer, investments.Importer):
 
             return value
 
+        def compute_inferred_price(row):
+            qty = float(row["Quantity"])
+            amt = float(row["Amount"])
+            acc = float(row["Accrued Interest"] if row["Accrued Interest"] else 0)
+            comm = float(row["Commission"] if row["Commission"] else 0)
+
+            # quantity effectively zero → return empty string
+            if math.isclose(qty, 0, rel_tol=1e-9, abs_tol=1e-9):
+                return ""
+
+            # base price calculation...subtract out accrued interest and commissions
+            # fidelity csv prices are always positive, so base (the numerator here) must
+            # be positive
+            base = abs(amt) - abs(acc if acc else 0) - abs(comm if comm else 0)
+
+            # inferred price...fidelity csv prices are always positive
+            # amount or quantity can be negatgive
+            price = round(abs(base) / abs(qty), 4)
+
+            return str(price)
+
         # add an inferred price column b/c csv prices are only to two decimals
-        rdr = rdr.addfield(
-            "inferred_price",
-            lambda row: str(
-                round(
-                    (abs(float(row["Amount"])) - float(row["Accrued Interest"]))
-                    / abs(float(row["Quantity"])),
-                    4,
-                )
-                if row["Accrued Interest"]
-                else round(abs(float(row["Amount"])) / abs(float(row["Quantity"])), 4)
-            )
-            if not math.isclose(
-                float(row["Quantity"]),
-                0,
-                rel_tol=1e-09,
-                abs_tol=1e-09,
-            )
-            else "",
-        )
+        rdr = rdr.addfield("inferred_price", compute_inferred_price)
 
         rdr = rdr.addfield("total", lambda x: x["Amount"])
         rdr = rdr.addfield("tradeDate", lambda x: x["Run Date"])
