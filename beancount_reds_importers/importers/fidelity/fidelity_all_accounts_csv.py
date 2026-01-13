@@ -81,6 +81,7 @@ class Importer(csvreader.Importer, investments.Importer):
             "CONVERSION AS": "buymf",  # conversion of mutual fund class...almost certainly needs to be edited manually
             "EXCHANGE OUT": "sellmf",
             "EXCHANGE IN": "buymf",
+            "EXCHANGED TO": "buymf",
             "CHANGE ON": "capgainsd_lt",
             "WITHDRAWALS": "sellmf",
         }
@@ -130,6 +131,6 @@ class Importer(csvreader.Importer, investments.Importer):
             ["type"],
             include_original=True,
         )
-        rdr.convert("type", 'upper')
+        rdr = rdr.convert("type", 'upper')
 
         return rdr
