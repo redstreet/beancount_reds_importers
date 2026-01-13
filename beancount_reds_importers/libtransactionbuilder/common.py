@@ -81,12 +81,12 @@ def create_simple_posting_with_cost_or_price(
         number = D(number)
     units = Amount(number, currency)
 
-    if not (price_number or cost_number):
+    if not (price_number or cost_number or costspec):
         if price_cost_both_zero_handler:
             price_cost_both_zero_handler(entry, ot)
         else:
             print(
-                "WARNING: Either price ({}) or cost ({}) must be specified ({})".format(
+                "WARNING: Either price ({}) or cost ({}) or costspec must be specified ({})".format(
                     price_number, cost_number, entry
                 )
             )
