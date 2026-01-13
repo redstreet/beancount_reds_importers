@@ -85,7 +85,10 @@ class Importer(reader.Reader, BGImporter):
         "Get the maximum date from the file."
         self.initialize(file)  # self.date_format gets set via this
         self.read_file(file)
-        return max(ot.date for ot in self.get_transactions()).date()
+        try:
+            return max(ot.date for ot in self.get_transactions()).date()
+        except ValueError:
+            return None
 
     def prepare_table(self, rdr):
         return rdr
