@@ -135,23 +135,36 @@ class Importer(csvreader.Importer, investments.Importer):
             return value
 
         def compute_inferred_price(row):
+            if row["Quantity"] is None or row["Quantity"].strip() == "":
+                # can''t do anything if quantity is empty
+                return ""
+
             qty = float(row["Quantity"])
             amt = float(row["Amount"])
             acc = float(row["Accrued Interest"] if row["Accrued Interest"] else 0)
             comm = float(row["Commission"] if row["Commission"] else 0)
+            fees = float(row["Fees"] if row["Fees"] else 0)
 
             # quantity effectively zero → return empty string
             if math.isclose(qty, 0, rel_tol=1e-9, abs_tol=1e-9):
                 return ""
 
-            # base price calculation...subtract out accrued interest and commissions
+            # base price calculation...subtract out accrued interest, fees, and commissions
             # fidelity csv prices are always positive, so base (the numerator here) must
             # be positive
-            base = abs(amt) - abs(acc if acc else 0) - abs(comm if comm else 0)
+            base = abs(amt) - abs(acc if acc else 0) - abs(comm if comm else 0) - abs(fees if fees else 0)
 
             # inferred price...fidelity csv prices are always positive
             # amount or quantity can be negatgive
             price = round(abs(base) / abs(qty), 4)
+
+            # validate that the inferred price rounds to what fidelity stated
+            # the price to be.  In some cases there will be no price even though one
+            # can be inferred...these seem to be things like 1:1 reorgs or stock splits
+            # in either case these will need to be handled manually (and they cannot be
+            # properly created w/o the inferred price either)
+            if row["Price"] and not math.isclose(round(price, 2), float(row["Price"]), rel_tol=1e-9, abs_tol=1e-9):
+                return row["Price"]
 
             return str(price)
 
