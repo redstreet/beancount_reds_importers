@@ -89,6 +89,7 @@ class Importer(BGImporter):
             )
             data.create_simple_posting(entry, config["main_account"], number, self.currency)
             data.create_simple_posting(entry, config["target_account"], None, None)
+            # print(entry.date, entry.postings[0].units)
             new_entries.append(entry)
 
             if date > balance_date:
@@ -100,7 +101,7 @@ class Importer(BGImporter):
         return new_entries
 
     def construct_balance_entry(self, balance_date, balance_amount):
-        if not balance_amount or (balance_date == datetime.date.min):
+        if balance_amount is None or (balance_date == datetime.date.min):
             return
         metadata = data.new_metadata(None, next(self.counter))
         balance_entry = data.Balance(
