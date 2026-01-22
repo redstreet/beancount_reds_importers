@@ -3,7 +3,7 @@
 !!! This is WIP and not yet ready for general use !!!
 
 """
-
+import math
 import re
 from datetime import datetime
 
@@ -25,7 +25,12 @@ class Importer(csvreader.Importer, investments.Importer):
         self.get_ticker_info = self.get_ticker_info_from_id
         self.date_format = "%m/%d/%Y"
         self.funds_db_txt = "funds_by_ticker"
-
+        self.use_inferred_price = self.config.get(
+            # calculate price to 4 decimal places rather than using csv price
+            "use_inferred_price",
+            False,
+        )
+        self.add_precision = self.config.get("add_precision", False)  # add some decimal precision to quantity and value fields if none is present
         # fmt: off
         self.header_map = {
             "Account Number": "account_number",
@@ -38,8 +43,11 @@ class Importer(csvreader.Importer, investments.Importer):
             "Settlement Date": "settleDate",
             "Fees": "fees",
             "Commission": "commission",
-            "Price": "unit_price",
         }
+        if self.use_inferred_price:
+            self.header_map["inferred_price"] = "unit_price"
+        else:
+            self.header_map["Price"] = "unit_price"
         self.transaction_type_map = {
             # NOTE: the keys here should all be upper case
             "REINVESTMENT": "buymf",
@@ -123,8 +131,57 @@ class Importer(csvreader.Importer, investments.Importer):
         if "" in rdr.fieldnames():
             rdr = rdr.cutout("")  # clean up last column
 
+        def add_precision(value):
+            # add decimal places if none are present because
+            # beancount treats values with no decimal places
+            # as infinitely precise
+            if "." not in value:
+                return value + ".00"
+
+            return value
+
+        def compute_inferred_price(row):
+            if row["Quantity"] is None or row["Quantity"].strip() == "":
+                # can''t do anything if quantity is empty
+                return ""
+
+            qty = float(row["Quantity"])
+            amt = float(row["Amount"])
+            acc = float(row["Accrued Interest"] if row["Accrued Interest"] else 0)
+            comm = float(row["Commission"] if row["Commission"] else 0)
+            fees = float(row["Fees"] if row["Fees"] else 0)
+
+            # quantity effectively zero → return empty string
+            if math.isclose(qty, 0, rel_tol=1e-9, abs_tol=1e-9):
+                return ""
+
+            # base price calculation...subtract out accrued interest, fees, and commissions
+            # fidelity csv prices are always positive, so base (the numerator here) must
+            # be positive
+            base = abs(amt) - abs(acc if acc else 0) - abs(comm if comm else 0) - abs(fees if fees else 0)
+
+            # inferred price...fidelity csv prices are always positive
+            # amount or quantity can be negatgive
+            price = round(abs(base) / abs(qty), 4)
+
+            # validate that the inferred price rounds to what fidelity stated
+            # the price to be.  In some cases there will be no price even though one
+            # can be inferred...these seem to be things like 1:1 reorgs or stock splits
+            # in either case these will need to be handled manually (and they cannot be
+            # properly created w/o the inferred price either)
+            if row["Price"] and not math.isclose(round(price, 2), float(row["Price"]), rel_tol=1e-9, abs_tol=1e-9):
+                return row["Price"]
+
+            return str(price)
+
+        # add an inferred price column b/c csv prices are only to two decimals
+        rdr = rdr.addfield("inferred_price", compute_inferred_price)
+
         rdr = rdr.addfield("total", lambda x: x["Amount"])
         rdr = rdr.addfield("tradeDate", lambda x: x["Run Date"])
+        if self.add_precision:
+            for f in ["Amount", "Quantity", "total"]:
+                rdr = rdr.convert(f, add_precision)
 
         # the REINVESTMENT action will include a fund symbol as the 2nd word,
         # so only use the first word for mapping
