@@ -485,6 +485,7 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
                 entry = self.generate_transfer_entry(ot, file, counter)
             else:
                 print("ERROR: unknown entry type:", ot.type)
+                # import pdb; pdb.set_trace()
                 raise Exception("Unknown entry type")
             self.add_fee_postings(entry, ot)
             self.add_custom_postings(entry, ot)
