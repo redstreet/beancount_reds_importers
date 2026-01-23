@@ -1,5 +1,17 @@
 """Collective insurance EOBs importer.
 Also see https://reds-rants.netlify.app/personal-finance/double-entry-bookkeeping-for-us-healthcare/
+
+Variable substitutions are available.Sample Beangulp config:
+
+CONFIG = [
+    collective.Importer({
+        'main_account': 'Liabilities:Healthcare:Covered:{Claim_Type}:{Name}',
+        'target_account': 'Expenses:Healthcare:Covered:{Claim_Type}:{Name}',
+        'filing_account': 'Liabilities:Healthcare:Covered',
+        'account_leaf': {'John Doe': 'JD', 'Jane Doe': 'JnD', 'Kid Doe': 'KD', 'Doe Doe': 'DD'}
+        }),
+        # The names map the data in the .csv to the account leafs in Beancount
+]
 """
 
 from beancount_reds_importers.libreader import csvreader
