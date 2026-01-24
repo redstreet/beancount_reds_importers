@@ -94,6 +94,10 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
             }
             self.set_config_variables(config_subst_vars)
             self.money_market_funds = self.config["fund_info"]["money_market"]
+            self.settlement_fund = self.config["fund_info"].get(
+                "settlement_fund",
+                self.money_market_funds[0] if self.money_market_funds else None,
+            )
             self.fund_data = self.config["fund_info"][
                 "fund_data"
             ]  # [(ticker, id, long_name), ...]
@@ -515,7 +519,7 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
                 None,
             )
             new_entries.append(balance_entry)
-            if ticker in self.money_market_funds:
+            if ticker == self.settlement_fund:
                 settlement_fund_balance = pos.units
 
             # extract price info if available
