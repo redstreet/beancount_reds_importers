@@ -12,6 +12,7 @@ class Importer(importer.Importer):
     ```
     #!/usr/bin/env python3
     CONFIG = [multiplexer.Importer({
+        'account': 'Assets:Investments:Vanguard',  # <-- directory used for beangulp `archive`
         'importers': [
             vanguard.Importer({'account_number': 123, ...}),
             vanguard.Importer({'account_number': 456, ...}),
@@ -88,3 +89,11 @@ class Importer(importer.Importer):
         for imp in self.get_applicable_importers(filepath):
             extracted += imp.extract(filepath, existing)
         return extracted
+
+    def deduplicate(self, entries, existing):
+        # run deduplication through all the importers
+        for imp in self.config.get("importers", []):
+            try:
+                imp.deduplicate(entries, existing)
+            except Exception:
+                continue
