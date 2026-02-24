@@ -216,7 +216,10 @@ class Importer(reader.Reader, BGImporter):
             rdr = self.prepare_table(rdr)
 
             # process table
-            rdr = rdr.rename(self.header_map)
+            # petl.rename() is strict. So only include headers that actually exist
+            header_map = {k: v for k, v in self.header_map.items() if k in rdr.header()}
+            rdr = rdr.rename(header_map)
+
             rdr = self.convert_columns(rdr)
             rdr = self.fix_column_names(rdr)
             rdr = self.prepare_processed_table(rdr)

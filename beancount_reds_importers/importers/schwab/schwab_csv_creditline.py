@@ -11,7 +11,9 @@ class Importer(schwab_csv_checking.Importer):
         super().custom_init()
         self.filename_pattern_def = ".*_Transactions_"
         self.column_labels_line = (
-            '"Date","Type","CheckNumber","Description","Withdrawal","Deposit","RunningBalance"'
+            # used to be:
+            # '"Date","Type","CheckNumber","Description","Withdrawal","Deposit","RunningBalance"'
+            '"Date","TransactionType","CheckNumber","Description","Credits","Debits","RunningBalance"'
         )
 
     def get_balance_statement(self, file=None):

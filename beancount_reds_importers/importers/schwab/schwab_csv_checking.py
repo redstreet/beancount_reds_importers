@@ -6,6 +6,29 @@ from beancount_reds_importers.libreader import csvreader
 from beancount_reds_importers.libtransactionbuilder import banking
 
 
+def normalize_amount(tbl, neg_names, pos_names, out="amount"):
+    """Banks split amounts across positive and negative columns. This function takes these and
+    creates a single column with a positive/negative number. It accepts a list of column names for
+    the positive and the negative column to accommodate csv variances.
+
+    TODO: refacor by moving this into a common library and using it across importers
+    """
+    hdr = set(tbl.header())
+
+    neg = next((c for c in neg_names if c in hdr), None)
+    pos = next((c for c in pos_names if c in hdr), None)
+
+    if not neg and not pos:
+        raise ValueError("No amount columns found")
+
+    def fn(row, n=neg, p=pos):
+        vneg = row.get(n) if n else None
+        vpos = row.get(p) if p else None
+        return "-" + vneg if vneg not in ("", None) else vpos
+
+    return tbl.addfield(out, fn)
+
+
 class Importer(csvreader.Importer, banking.Importer):
     IMPORTER_NAME = "Schwab Checking account CSV"
 
@@ -20,8 +43,11 @@ class Importer(csvreader.Importer, banking.Importer):
         self.header_map = {
             "Date":             "date",
             "Type":             "type",
+            "TransactionType":  "type",
             "CheckNumber":      "checknum",
             "Description":      "payee",
+            "Credits":          "deposit",
+            "Debits":           "withdrawal",
             "Withdrawal":       "withdrawal",
             "Deposit":          "deposit",
             "RunningBalance":   "balance",
@@ -39,9 +65,10 @@ class Importer(csvreader.Importer, banking.Importer):
         return self.column_labels_line in cache.get_file(file).head() and f"XX{last_three}" in file
 
     def prepare_table(self, rdr):
-        rdr = rdr.addfield(
-            "amount",
-            lambda x: "-" + x["Withdrawal"] if x["Withdrawal"] != "" else x["Deposit"],
+        rdr = normalize_amount(
+            rdr,
+            ["Withdrawal", "Debits"],
+            ["Deposit", "Credits"],
         )
         rdr = rdr.addfield("memo", lambda x: "")
         return rdr
