@@ -1,0 +1,99 @@
+OFXHEADER:100
+DATA:OFXSGML
+VERSION:102
+SECURITY:NONE
+ENCODING:USASCII
+CHARSET:1252
+COMPRESSION:NONE
+OLDFILEUID:NONE
+NEWFILEUID:NONE
+
+<OFX>
+  <SIGNONMSGSRSV1>
+    <SONRS>
+      <STATUS>
+        <CODE>0
+        <SEVERITY>INFO
+      </STATUS>
+      <DTSERVER>20260316150323[-5:EST]
+      <LANGUAGE>ENG
+    </SONRS>
+  </SIGNONMSGSRSV1>
+  <INVSTMTMSGSRSV1>
+    <INVSTMTTRNRS>
+      <TRNUID>0
+      <STATUS>
+        <CODE>0
+        <SEVERITY>INFO
+      </STATUS>
+      <INVSTMTRS>
+        <DTASOF>20260316160000.000[-5:EST]
+        <CURDEF>USD
+        <INVACCTFROM>
+          <BROKERID>vanguard.com
+          <ACCTID>444555
+        </INVACCTFROM>
+        <INVTRANLIST>
+          <DTSTART>20260101160000.000[-5:EST]
+          <DTEND>20260316150323.000[-5:EST]
+          <BUYMF>
+            <INVBUY>
+              <INVTRAN>
+                <FITID>TEST001
+                <DTTRADE>20260316160000.000[-5:EST]
+                <DTSETTLE>20260316160000.000[-5:EST]
+                <MEMO>Price as of date based on closing price
+              </INVTRAN>
+              <SECID>
+                <UNIQUEID>92202E862
+                <UNIQUEIDTYPE>CUSIP
+              </SECID>
+              <UNITS>10.0
+              <UNITPRICE>58.85
+              <TOTAL>-588.50
+              <SUBACCTSEC>CASH
+              <SUBACCTFUND>OTHER
+              <INV401KSOURCE>PRETAX
+            </INVBUY>
+            <BUYTYPE>BUY
+          </BUYMF>
+        </INVTRANLIST>
+        <INVPOSLIST>
+          <POSMF>
+            <INVPOS>
+              <SECID>
+                <UNIQUEID>92202E862
+                <UNIQUEIDTYPE>CUSIP
+              </SECID>
+              <HELDINACCT>OTHER
+              <POSTYPE>LONG
+              <UNITS>10.0
+              <UNITPRICE>58.85
+              <MKTVAL>588.50
+              <DTPRICEASOF>20260316160000.000[-5:EST]
+              <MEMO>Price as of date based on closing price
+              <INV401KSOURCE>OTHERNONVEST
+            </INVPOS>
+            <REINVDIV>Y
+            <REINVCG>Y
+          </POSMF>
+        </INVPOSLIST>
+        <INV401K>
+          <EMPLOYERNAME>TEST 401(K) PLAN
+          <CURRENTVESTPCT>100.0
+        </INV401K>
+        <INV401KBAL>
+          <CASHBAL>0.0
+          <PRETAX>0.0
+          <AFTERTAX>0.0
+          <MATCH>0.0
+          <PROFITSHARING>0.0
+          <ROLLOVER>0.0
+          <OTHERVEST>0.0
+          <OTHERNONVEST>0.0
+          <TOTAL>0.0
+        </INV401KBAL>
+      </INVSTMTRS>
+    </INVSTMTTRNRS>
+  </INVSTMTMSGSRSV1>
+</OFX>
