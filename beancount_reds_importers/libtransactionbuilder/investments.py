@@ -100,6 +100,18 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
             self.funds_by_id = {i: (ticker, desc) for ticker, i, desc in self.fund_data}
             self.funds_by_ticker = {ticker: (ticker, desc) for ticker, _, desc in self.fund_data}
 
+            # Augment fund_info from OFX SECLIST if available; config-provided entries take precedence
+            try:
+                for sec in self.ofx.security_list or []:
+                    uid = getattr(sec, "uniqueid", None)
+                    ticker = getattr(sec, "ticker", None)
+                    name = getattr(sec, "name", "")
+                    if uid and ticker:
+                        self.funds_by_id.setdefault(uid, (ticker, name))
+                        self.funds_by_ticker.setdefault(ticker, (ticker, name))
+            except AttributeError:
+                pass
+
             # Most ofx/csv files refer to funds by id (cusip/isin etc.) Some use tickers instead
             self.funds_db = getattr(self, getattr(self, "funds_db_txt", "funds_by_id"))
             self.build_account_map()
