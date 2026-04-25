@@ -166,7 +166,7 @@ class Importer(investments.Importer, xmlreader.Importer):
             "type": "transfer",
         }
 
-        if xml_data['symbol'] == '--': # cash transfer
+        if xml_data["symbol"] == "--":  # cash transfer
             ofx_dict["units"] = D(xml_data["cashTransfer"])
             ofx_dict["memo"] = "Transfer Cash"
         else:
