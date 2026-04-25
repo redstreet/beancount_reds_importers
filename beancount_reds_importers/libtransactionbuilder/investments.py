@@ -308,39 +308,41 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
         # Main posting(s):
         main_acct = self.get_acct("main_account", ot, ticker)
 
+        # annoyingly, vanguard reinvests have ot.unit_price set to zero. so manually compute it
+        unit_price = getattr(ot, "unit_price", 0)
+        if ot.units and not unit_price:
+            unit_price = round(abs(ot.total) / ot.units, 6)
+
         if is_money_market:  # Use price conversions instead of holding these at cost
             common.create_simple_posting_with_price(
-                entry, main_acct, units, ticker, ot.unit_price, self.currency
+                entry, main_acct, units, ticker, unit_price, self.currency
             )
-        elif "sell" in ot.type:
-            common.create_simple_posting_with_cost_or_price(
-                entry,
-                main_acct,
-                units,
-                ticker,
-                price_number=ot.unit_price,
-                price_currency=self.currency,
-                costspec=CostSpec(None, None, None, None, None, None),
-                price_cost_both_zero_handler=self.price_cost_both_zero_handler,
-                ot=ot,
-            )
-            cg_acct = self.get_acct("cg", ot, ticker)
-            data.create_simple_posting(entry, cg_acct, None, None)
-        else:  # buy stock/fund
-            unit_price = getattr(ot, "unit_price", 0)
-            # annoyingly, vanguard reinvests have ot.unit_price set to zero. so manually compute it
-            if (hasattr(ot, "security") and ot.security) and ot.units and not ot.unit_price:
-                unit_price = round(abs(ot.total) / ot.units, 4)
-            common.create_simple_posting_with_cost(
-                entry,
-                main_acct,
-                units,
-                ticker,
-                unit_price,
-                self.currency,
-                self.price_cost_both_zero_handler,
-                ot=ot,
-            )
+        else:
+            if "sell" in ot.type:
+                common.create_simple_posting_with_cost_or_price(
+                    entry,
+                    main_acct,
+                    units,
+                    ticker,
+                    price_number=unit_price,
+                    price_currency=self.currency,
+                    costspec=CostSpec(None, None, None, None, None, None),
+                    price_cost_both_zero_handler=self.price_cost_both_zero_handler,
+                    ot=ot,
+                )
+                cg_acct = self.get_acct("cg", ot, ticker)
+                data.create_simple_posting(entry, cg_acct, None, None)
+            else:  # buy stock/fund
+                common.create_simple_posting_with_cost(
+                    entry,
+                    main_acct,
+                    units,
+                    ticker,
+                    unit_price,
+                    self.currency,
+                    self.price_cost_both_zero_handler,
+                    ot=ot,
+                )
 
         # "Other" account posting
         reverser = 1
@@ -351,7 +353,7 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
         data.create_simple_posting(entry, target_acct, reverser * total, self.currency)
 
         # Rounding errors posting
-        rounding_error = (reverser * total) + (ot.unit_price * units)
+        rounding_error = (reverser * total) + (unit_price * units)
         if 0.0005 <= abs(rounding_error) <= self.max_rounding_error:
             data.create_simple_posting(
                 entry, config["rounding_error"], -1 * rounding_error, self.currency
@@ -497,7 +499,9 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
                 entry = self.generate_transfer_entry(ot, file, counter)
             else:
                 print("ERROR: unknown entry type:", ot.type)
-                # import pdb; pdb.set_trace()
+                import pdb
+
+                pdb.set_trace()
                 raise Exception("Unknown entry type")
             self.add_fee_postings(entry, ot)
             self.add_custom_postings(entry, ot)
