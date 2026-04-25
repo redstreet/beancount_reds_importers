@@ -163,10 +163,16 @@ class Importer(investments.Importer, xmlreader.Importer):
         ofx_dict = {
             "security": xml_data["isin"],
             "tradeDate": self.convert_date(xml_data["dateTime"]),
-            "units": D(xml_data["quantity"]),
-            "memo": "Transfer in kind",
             "type": "transfer",
         }
+
+        if xml_data['symbol'] == '--': # cash transfer
+            ofx_dict["units"] = D(xml_data["cashTransfer"])
+            ofx_dict["memo"] = "Transfer Cash"
+        else:
+            ofx_dict["units"] = D(xml_data["quantity"])
+            ofx_dict["memo"] = "Transfer in kind"
+
         return DictToObject(ofx_dict)
 
     def xml_trade_interpreter(self, xml_data):
