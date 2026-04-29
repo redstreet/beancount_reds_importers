@@ -7,6 +7,7 @@
 import re
 from datetime import datetime
 
+from beancount.core import data
 from beangulp import cache
 
 from beancount_reds_importers.libreader import csvreader
@@ -139,3 +140,30 @@ class Importer(csvreader.Importer, investments.Importer):
         rdr = rdr.convert("type", "upper")
 
         return rdr
+
+    def sort(self, entries: data.Entries, reverse=False) -> None:
+        """Sorter for fidelity_all_accounts_csv. Fidelity csv files implicitly order rows by when a
+        transaction was placed within a day. The default Beancount sort considers lineno, and
+        therefore inverts the sort order we want. If you want to retain the sort order in the
+        importerd file, use this sorter instead.
+
+        This sorter is meant to be called from within the multiplexer importer. Example:
+
+            multiplexer.Importer({
+                'account': 'Assets:Investments:Fidelity',
+                'importers': [
+                    invst(fidelity_all_accounts_csv, 'ABCDEF', 'Assets:Investments:Individual'),
+                    invst(fidelity_all_accounts_csv, 'PQRSTU', 'Assets:Investments:Roth'),
+                ],
+                'sorter': fidelity_all_accounts_csv
+            }),
+
+        """
+        return entries.sort(
+            key=lambda entry: (
+                entry.date,
+                data.SORT_ORDER.get(type(entry), 0),
+                -entry.meta["lineno"],
+            ),
+            reverse=reverse,
+        )

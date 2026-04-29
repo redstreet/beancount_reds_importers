@@ -1,3 +1,4 @@
+from beancount.core import data
 from beangulp import importer
 
 
@@ -5,9 +6,10 @@ class Importer(importer.Importer):
     """Multiplexer Importer: used when multiple accounts exist in a single input file, which is
     typical of ofx/qfx files.
 
-    This is a quick and dirty version. Note that picks the first importer's account, filename etc.,
-    if not specified in the multiplexer config. Example instantiation, assuming multiple vanguard
-    accounts with different account numbers are all expected to be contained in a single ofx file:
+    This is a quick and dirty version. Note that it picks the first importer's account, filename
+    etc., if not specified in the multiplexer config. Example instantiation, assuming multiple
+    vanguard accounts with different account numbers are all expected to be contained in a single
+    ofx file:
 
     ```
     #!/usr/bin/env python3
@@ -97,3 +99,20 @@ class Importer(importer.Importer):
                 imp.deduplicate(entries, existing)
             except Exception:
                 continue
+
+    def sort(self, entries: data.Entries, reverse=False) -> None:
+        """An optional sorter can be specified for the multiplexer. Configure it like so:
+
+        multiplexer.Importer({
+            'account': 'Assets:Investments:Fidelity',
+            'importers': [
+                invst(fidelity_all_accounts_csv, 'ABCDEF', 'Assets:Investments:Individual'),
+                invst(fidelity_all_accounts_csv, 'PQRSTU', 'Assets:Investments:Roth'),
+            ],
+            'sorter': fidelity_all_accounts_csv
+        }),
+        """
+
+        if self.config.get("sorter"):
+            return self.config.get("sorter").Importer.sort(self, entries, reverse)
+        return super().sort(entries, reverse)
