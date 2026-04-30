@@ -48,7 +48,9 @@ class Importer(csvreader.Importer, investments.Importer):
             "DIVIDEND RECEIVED": "dividends",
             "DIVIDENDS": "dividends",
             "TRANSFERRED FROM": "cash",
+            "NORMAL DISTR": "cash",          # HSA distributions
             "YOU BOUGHT": "buystock",
+            "LOAN REPAYMENTS": "buystock",   # May not be a stock transaction if it's held in cash
             "YOU SOLD": "sellstock",
             "REDEMPTION PAYOUT": "sellother",
             "DIRECT DEPOSIT": "dep",
@@ -59,6 +61,8 @@ class Importer(csvreader.Importer, investments.Importer):
             "ADVISOR FEE": "fee",
             "FOREIGN TAX": "fee",
             "ADJ FOREIGN": "fee",
+            "RECORDKEEPING FEE": "sellstock",
+            "LOAN MAINT.": "sellstock",
             "BUY CANCEL": "fee",  # longer text here is BUY CANCEL TAX PAID as of May-05-2025...
             "DIVIDEND ADJUSTMENT": "fee",  # longer text here is FOREIGN TAX PAID as of May-05-2025...
             "BILL PAYMENT": "payment",
@@ -90,6 +94,7 @@ class Importer(csvreader.Importer, investments.Importer):
             "CONTRIBUTIONS": "buystock",
             "TRANSFER": "xfer",
             "PURCHASE INTO": "buystock",
+            # "REALIZED GAIN/LOSS": "sellstock",
         }
         # fmt: on
 
@@ -115,7 +120,13 @@ class Importer(csvreader.Importer, investments.Importer):
     def skip_transaction(self, ot):
         if ot.account_number != self.config["account_number"]:
             return True
-        return ot.type in ["MERGER MER", "ADJUST FEE", "DISTRIBUTION", "JOURNALED JNL"]
+        return ot.type in [
+            "MERGER MER",
+            "ADJUST FEE",
+            "DISTRIBUTION",
+            "JOURNALED JNL",
+            "REALIZED GAIN/LOSS",
+        ]
         # this sort of transaction must be handled manually
         # ADJUST FEE sounds like a fee, but has been used for a 1:1 reorg
         # DISTRIBUTION is for splits
