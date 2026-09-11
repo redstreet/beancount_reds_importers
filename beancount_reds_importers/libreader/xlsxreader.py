@@ -34,15 +34,13 @@ class Importer(xlsreader.Importer):
                 row_data.append(value)
             data.append(row_data)
 
-        # Store formatting info for use in convert_columns
-        rdr = etl.wrap(data)
+        # Store formatting metadata so convert_columns can access it. It is kept on the
+        # importer and not on the petl table: petl transformations (skip, rename,
+        # convert, ...) each return a fresh table object, so an attribute set here would
+        # not survive the trip from read_raw() to convert_columns().
+        self.xlsx_formatting = formatting_info
 
-        # Store formatting metadata so convert_columns can access it
-        # This is a bit of a hack, but petl doesn't have a clean way to pass metadata
-        rdr._xlsx_formatting = formatting_info
-        rdr._xlsx_header_row = 0  # Will be updated after we find the actual header
-
-        return rdr
+        return etl.wrap(data)
 
     def get_precision_for_field(self, rdr, field_name):
         """Override to provide Excel format-based precision for currency fields.
@@ -57,7 +55,7 @@ class Importer(xlsreader.Importer):
             return super().get_precision_for_field(rdr, field_name)
 
         # Get formatting info if available
-        formatting_info = getattr(rdr, "_xlsx_formatting", {})
+        formatting_info = getattr(self, "xlsx_formatting", {})
 
         # Analyze formats in this column to determine precision
         precisions = []
