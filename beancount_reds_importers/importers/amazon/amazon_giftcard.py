@@ -74,7 +74,10 @@ class Importer(BGImporter):
             date = datetime.datetime.strptime(f[0], "%B %d, %Y").date()
             description = f[1].encode("ascii", "ignore").decode()
             number = D(f[2].replace("$", ""))
-            balance = D(f[3].replace("$", ""))
+            try:
+                balance = D(f[3].replace("$", ""))
+            except:
+                import pdb; pdb.set_trace()
 
             metadata = data.new_metadata(file, next(self.counter))
             entry = data.Transaction(
