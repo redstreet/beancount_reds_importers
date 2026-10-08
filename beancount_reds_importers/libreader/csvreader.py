@@ -76,9 +76,9 @@ class Importer(reader.Reader, BGImporter):
             #     print(self.header_identifier, cache.get_file(file).head())
 
     def deep_identify(self, file):
-        return re.match(
-            self.header_identifier,
-            cache.get_file(file).head(encoding=getattr(self, "file_encoding", None)),
+        return re.search(self.header_identifier,
+                         cache.get_file(file).head(encoding=getattr(self, "file_encoding", None)),
+                         re.I
         )
 
     def date(self, file):
@@ -169,7 +169,8 @@ class Importer(reader.Reader, BGImporter):
             # We only check if each element in col_labels shows up in the line in the file, and not
             # the other way around. This allows additional fields to show up anywhere, case the csv
             # format changes
-            if all(i in list(r) for i in col_labels):
+            row = {x.casefold() if isinstance(x, str) else x for x in r}
+            if all(i.casefold() in row for i in col_labels):
                 skip = n
         if skip is None:
             print("Error: expected columns not found:")
