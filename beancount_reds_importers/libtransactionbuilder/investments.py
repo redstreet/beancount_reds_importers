@@ -186,11 +186,7 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
             securities = self.get_security_list()
             if "" in securities:
                 securities.remove("")
-            securities_missing = list(securities)
-            for s in securities:
-                for k in self.funds_db:
-                    if s in k:
-                        securities_missing.remove(s)
+            securities_missing = [s for s in securities if s not in self.funds_db]
 
             # try to extract security info from ofx
             ofx_securities = {}
@@ -499,10 +495,9 @@ class Importer(BGImporter, transactionbuilder.TransactionBuilder):
                 entry = self.generate_transfer_entry(ot, file, counter)
             else:
                 print("ERROR: unknown entry type:", ot.type)
-                import pdb
-
-                pdb.set_trace()
+                import pdb; pdb.set_trace()
                 raise Exception("Unknown entry type")
+                # continue
             self.add_fee_postings(entry, ot)
             self.add_custom_postings(entry, ot)
             new_entries.append(entry)
