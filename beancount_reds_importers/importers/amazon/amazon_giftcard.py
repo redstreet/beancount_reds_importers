@@ -76,8 +76,10 @@ class Importer(BGImporter):
             number = D(f[2].replace("$", ""))
             try:
                 balance = D(f[3].replace("$", ""))
-            except:
-                import pdb; pdb.set_trace()
+            except (ValueError, TypeError, IndexError, AttributeError):
+                import pdb
+
+                pdb.set_trace()
 
             metadata = data.new_metadata(file, next(self.counter))
             entry = data.Transaction(

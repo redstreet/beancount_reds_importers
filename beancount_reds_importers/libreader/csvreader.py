@@ -76,9 +76,10 @@ class Importer(reader.Reader, BGImporter):
             #     print(self.header_identifier, cache.get_file(file).head())
 
     def deep_identify(self, file):
-        return re.search(self.header_identifier,
-                         cache.get_file(file).head(encoding=getattr(self, "file_encoding", None)),
-                         re.I
+        return re.search(
+            self.header_identifier,
+            cache.get_file(file).head(encoding=getattr(self, "file_encoding", None)),
+            re.I,
         )
 
     def date(self, file):
