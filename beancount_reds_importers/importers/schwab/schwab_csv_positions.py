@@ -63,7 +63,9 @@ class Importer(investments.Importer, csvreader.Importer):
         d = rdr[0][0].rsplit(" ", 1)[1]
         self.max_date = datetime.datetime.strptime(d, self.date_format)
         rdr = rdr.select(
-            lambda row: "Account Total" not in row and "Cash & Cash Investments" not in row
+            lambda row: "Account Total" not in row
+            and "Cash & Cash Investments" not in row
+            and "Positions Total" not in row
         )
         return rdr
 
