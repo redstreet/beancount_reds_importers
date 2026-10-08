@@ -48,6 +48,7 @@ class Importer(csvreader.Importer, investments.Importer):
             "DIVIDEND RECEIVED": "dividends",
             "DIVIDENDS": "dividends",
             "TRANSFERRED FROM": "cash",
+            "RECEIVED FROM": "transfer",  # In-kind security transfer
             "NORMAL DISTR": "cash",          # HSA distributions
             "YOU BOUGHT": "buystock",
             "LOAN REPAYMENTS": "buystock",   # May not be a stock transaction if it's held in cash

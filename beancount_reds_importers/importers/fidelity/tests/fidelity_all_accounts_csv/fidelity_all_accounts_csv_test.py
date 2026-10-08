@@ -1,7 +1,12 @@
 # flake8: noqa
 
 import sys
+from datetime import date
 from os import path
+
+from beancount.core import data
+from beancount.core.amount import Amount
+from beancount.core.number import D
 
 # hack to use testing code
 sys.path.insert(0, path.normpath(path.join(path.dirname(__file__), "../../../../..")))
@@ -84,3 +89,30 @@ config = {
 @regtest.with_testdir(path.dirname(__file__))
 class TestFidelityAllAccountsCsv(regtest.ImporterTestBase):
     pass
+
+
+def test_received_from_is_in_kind_transfer(tmp_path):
+    importer = fidelity_all_accounts_csv.Importer(config)
+    csv_file = tmp_path / "fidelity_csv_all_accounts_transactions_received.csv"
+    csv_file.write_text(
+        "\ufeff\n\n"
+        "Run Date,Account,Account Number,Action,Symbol,Description,Type,Exchange Quantity,"
+        "Exchange Currency,Currency,Price,Quantity,Exchange Rate,Commission,Fees,"
+        "Accrued Interest,Amount,Settlement Date\n"
+        "09/29/2026,Test Account,333333333,RECEIVED FROM YOU WASTE MANAGEMENT INC (WM) "
+        '(Cash),WM,WASTE MANAGEMENT INC,Cash,0,"",USD,"",100,0,"","","",10000,00,""\n'
+        "\n",
+        encoding="utf-8",
+    )
+
+    assert importer.identify(str(csv_file))
+    entries = importer.extract(str(csv_file))
+    transactions = [entry for entry in entries if isinstance(entry, data.Transaction)]
+    assert len(transactions) == 1
+    transaction = transactions[0]
+    assert transaction.date == date(2026, 9, 29)
+    assert [(posting.account, posting.units) for posting in transaction.postings] == [
+        ("Assets:Investments:Fidelity:WM", Amount(D("100"), "WM")),
+        (config["transfer"], Amount(D("-100"), "WM")),
+    ]
+    assert all(posting.cost is None and posting.price is None for posting in transaction.postings)
