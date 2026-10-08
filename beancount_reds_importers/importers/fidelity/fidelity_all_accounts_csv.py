@@ -55,6 +55,7 @@ class Importer(csvreader.Importer, investments.Importer):
             "REDEMPTION PAYOUT": "sellother",
             "DIRECT DEPOSIT": "dep",
             "TRANSFERRED TO": "xfer",
+            "DIR ROLL": "xfer",              # Direct Rollover
             "MUNI EXEMPT": "income",
             "INTEREST EARNED": "income",
             "FEE CHARGED": "fee",
