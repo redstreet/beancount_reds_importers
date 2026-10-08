@@ -33,8 +33,8 @@ class Importer(BGImporter):
 
     def __init__(self, config) -> None:
         self.interesting_files = {
-            "orders": "Retail.OrderHistory.1/Retail.OrderHistory.1.csv",
-            "returns": "Retail.CustomerReturns.1.1/Retail.CustomerReturns.1.1.csv",
+            "orders": "Your Orders/Your Amazon Orders/Order History.csv",
+            "returns": "Your Returns & Refunds/Returns Status.csv",
         }
         self.importers = {
             "orders": PredictPostings().wrap(
