@@ -42,7 +42,7 @@ class Importer(csvreader.Importer, banking.Importer):
         return rdr.convert("amount", lambda x: -1 * x)
 
     def skip_transaction(self, ot):
-        return not ot.amount
+        return ot.Status == 'ADJUSTED' or not ot.amount
 
     @staticmethod
     def claim_type_map(claim_type):
