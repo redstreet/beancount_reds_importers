@@ -12,13 +12,14 @@ class Importer(csvreader.Importer, banking.Importer):
         self.filename_pattern_def = ""
         self.header_identifier = ""
         # fmt: off
-        self.column_labels_line = '"Website","Order ID","Order Date","Purchase Order Number","Currency","Unit Price","Unit Price Tax","Shipping Charge","Total Discounts","Total Owed","Shipment Item Subtotal","Shipment Item Subtotal Tax","ASIN","Product Condition","Quantity","Payment Instrument Type","Order Status","Shipment Status","Ship Date"'
+        self.column_labels_line = '"ASIN","Billing Address","Carrier Name & Tracking Number","Currency","Department","Gift Message","Gift Recipient Contact","Gift Sender Name","Item Serial Number","Order Date","Order ID","Order Status","Original Quantity","Payment Method Type","Product Condition","Product Name","Purchase Order Number","Ship Date","Shipment Item Subtotal","Shipment Item Subtotal Tax","Shipment Status","Shipping Address","Shipping Charge","Shipping Option","Total Amount","Total Discounts","Unit Price","Unit Price Tax","Website"'
+
         self.file_encoding = "utf-8-sig"  # Amazon files have BOM
         self.header_map = {
             "Order Date":     "date",
             "Product Name":   "payee",
-            "Order ID":        "memo",
-            "Total Owed":     "amount",
+            "Order ID":       "memo",
+            "Total Amount":   "amount",
             "Currency": "currency",
         }
         self.transaction_type_map = {
@@ -38,7 +39,8 @@ class Importer(csvreader.Importer, banking.Importer):
         default = super().build_metadata(file, metatype, data)
 
         if metatype == "transaction":
-            payment = {"payment_instrument": data["transaction"].Payment_Instrument_Type}
-            return {**default, **payment}
+            payment = {"payment_method": data["transaction"].Payment_Method_Type}
+            discounts = {"total_discounts": data["transaction"].Total_Discounts}
+            return {**default, **payment, **discounts}
 
         return default
