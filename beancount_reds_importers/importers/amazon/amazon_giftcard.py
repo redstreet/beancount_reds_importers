@@ -93,7 +93,11 @@ class Importer(BGImporter):
                 [],
             )
             data.create_simple_posting(entry, config["main_account"], number, self.currency)
-            data.create_simple_posting(entry, config["target_account"], None, None)
+
+            if "Refund from" in description and number > 0:
+                data.create_simple_posting(entry, config["returns_account"], None, None)
+            else:
+                data.create_simple_posting(entry, config["purchases_account"], None, None)
             # print(entry.date, entry.postings[0].units)
             new_entries.append(entry)
 
