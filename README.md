@@ -175,6 +175,12 @@ transactions may appear to be switched. This is described by
 [libtransactionbuilder/banking.py](https://github.com/redstreet/beancount_reds_importers/blob/main/beancount_reds_importers/libtransactionbuilder/banking.py),
 and the fields can be swapped in a `custom_init`.
 
+## Customizing
+
+See [Customizing Your Importer](https://reds-rants.netlify.app/personal-finance/customizing-your-importer/)
+for how to customize each imported transaction.
+
+
 ## Testing
 ```
 pip3 install xlrd
