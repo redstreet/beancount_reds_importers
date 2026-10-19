@@ -22,11 +22,11 @@ from your existing ledger:
 import beangulp
 from smart_importer import PredictPostings
 
-from beancount_reds_importers.importers import hsa
+from beancount_reds_importers.importers import healthequity
 
 CONFIG = [
     PredictPostings().wrap(
-        hsa.Importer({
+        healthequity.Importer({
             "main_account": "Assets:HSA:Cash",
             "currency": "USD",
             "filename_pattern": r"hsa\.(txt|tsv)$",

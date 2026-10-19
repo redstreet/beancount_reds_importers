@@ -7,7 +7,7 @@ from beancount_reds_importers.libtransactionbuilder import banking
 from beancount_reds_importers.util import regression_pytest as regtest
 
 
-class TestXLSXImporter(xlsxreader.Importer, banking.Importer):
+class XLSXTestImporter(xlsxreader.Importer, banking.Importer):
     """Simple test importer for XLSX files"""
 
     IMPORTER_NAME = "Test XLSX Importer"
@@ -40,7 +40,7 @@ class TestXLSXImporter(xlsxreader.Importer, banking.Importer):
 
 
 @regtest.with_importer(
-    TestXLSXImporter(
+    XLSXTestImporter(
         {
             "main_account": "Assets:Brokerage:TestAccount",
             "currency": "USD",

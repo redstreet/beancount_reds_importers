@@ -3,7 +3,7 @@ from decimal import Decimal
 
 from beancount.core import data
 
-from beancount_reds_importers.importers.hsa import Importer
+from beancount_reds_importers.importers.healthequity import Importer
 
 
 def test_hsa_history(tmp_path):
@@ -22,10 +22,9 @@ def test_hsa_history(tmp_path):
     transactions = [entry for entry in entries if isinstance(entry, data.Transaction)]
     assert [entry.postings[0].units.number for entry in transactions] == [
         Decimal("0.04"),
-        Decimal("260.41"),
         Decimal("-1110.51"),
     ]
-    assert transactions[1].narration == "Employee Contribution (Tax year: 2026)"
+    assert [entry.narration for entry in transactions] == ["Interest for Sep-26", "EFT to broker"]
     assert all(entry.postings[0].account == "Assets:HSA" for entry in transactions)
     balance = entries[-1]
     assert isinstance(balance, data.Balance)
