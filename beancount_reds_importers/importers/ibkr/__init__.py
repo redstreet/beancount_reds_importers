@@ -93,6 +93,7 @@ Breakout by Day? No
 """
 
 import datetime
+from enum import Enum
 
 from beancount.core import data
 from beancount.core.number import D
@@ -106,6 +107,18 @@ class DictToObject:
     def __init__(self, dictionary):
         for key, value in dictionary.items():
             setattr(self, key, value)
+
+
+class IbkrCashTxnType(str, Enum):
+    """IBKR cash transaction types"""
+
+    BROKERINT = "Broker Interest Received"
+    COMADJ = "Commission Adjustments"
+    DEPWDRAW = "Deposits/Withdrawals"
+    DIVIDEND = "Dividends"
+    OTHERFEES = "Other Fees"
+    PMTINLIEU = "Payment In Lieu Of Dividends"
+    WHTAX = "Withholding Tax"
 
 
 # xml on left, ofx on right
@@ -157,6 +170,11 @@ class Importer(investments.Importer, xmlreader.Importer):
     def convert_date(self, d):
         d = d.split(" ")[0]
         return datetime.datetime.strptime(d, self.date_format)
+
+    def get_target_acct_custom(self, transaction, ticker=None):
+        if transaction.memo == IbkrCashTxnType.WHTAX:
+            return self.config["whtax"] if self.config.get("whtax") else None
+        return None
 
     def xml_transfer_interpreter(self, xml_data):
         # map, with ofx fields on the left and xml fields on the right
