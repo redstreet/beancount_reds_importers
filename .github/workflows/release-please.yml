@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: main
           persist-credentials: false
@@ -35,24 +35,24 @@ jobs:
           if [ -z "$VALIDATED_SHA" ] || [ "$(git rev-parse HEAD)" = "$VALIDATED_SHA" ]; then
             echo 'current=true' >> "$GITHUB_OUTPUT"
           fi
-      - uses: actions/create-github-app-token@v2
+      - uses: actions/create-github-app-token@v3
         if: steps.current.outputs.current == 'true'
         id: app
         with:
           app-id: ${{ vars.RELEASE_APP_ID }}
           private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
-      - uses: googleapis/release-please-action@v4
+      - uses: googleapis/release-please-action@v5
         if: steps.current.outputs.current == 'true'
         id: release
         with:
           token: ${{ steps.app.outputs.token }}
           target-branch: main
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         if: steps.release.outputs.prs_created == 'true'
         with:
           ref: ${{ fromJSON(steps.release.outputs.pr).headBranchName }}
           token: ${{ steps.app.outputs.token }}
-      - uses: astral-sh/setup-uv@v6
+      - uses: astral-sh/setup-uv@v7
         if: steps.release.outputs.prs_created == 'true'
         with:
           version: '0.13.1'
