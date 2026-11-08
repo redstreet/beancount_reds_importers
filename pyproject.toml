@@ -46,7 +46,7 @@ bean-download = "beancount_reds_importers.util.bean_download:cli"
 reds-ibkr-flexquery-download = "beancount_reds_importers.importers.ibkr.flexquery_download:flexquery_download"
 
 [project.optional-dependencies]
-dev = ["isort", "pytest", "ruff"]
+dev = ["isort", "pytest", "pytest-cov", "ruff"]
 
 [build-system]
 requires = ["hatchling", "uv-dynamic-versioning"]
@@ -66,6 +66,9 @@ fallback-version = "0.0.0"
 [tool.ruff]
 line-length = 99
 
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]
+
 [tool.ruff.format]
 docstring-code-format = true
 indent-style = "space"
@@ -76,7 +79,17 @@ quote-style = "double"
 profile = "black"
 
 [tool.pytest.ini_options]
+addopts = "--strict-markers --strict-config"
+xfail_strict = true
 filterwarnings = [
   # silence warning in ofxparse
   "ignore:Call to deprecated method findAll:DeprecationWarning",
 ]
+
+[tool.coverage.run]
+branch = true
+source = ["beancount_reds_importers"]
+omit = ["*/tests/*", "*/example/*", "*/fidelity_cma_csv_examples/*"]
+
+[tool.coverage.report]
+show_missing = true
