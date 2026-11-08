@@ -45,7 +45,7 @@ class Importer(xlsreader.Importer, banking.Importer):
 
         rdr = rdr.addfield(
             "amount",
-            lambda x: (-1 * Ds(x["Withdrawal"]) if x["Withdrawal"] != "" else Ds(x["Deposit"])),
+            lambda x: -1 * Ds(x["Withdrawal"]) if x["Withdrawal"] != "" else Ds(x["Deposit"]),
         )
         rdr = rdr.addfield("memo", lambda x: "")
         return rdr

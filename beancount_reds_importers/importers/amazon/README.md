@@ -44,12 +44,17 @@ To be added to your list of beangulp importers:
 ```python
 # Example ingest script snippet
 from beancount_reds_importers.importers.amazon import amazon_gdpr
-amazon_gdpr.Importer({
-    'account_purchases': "Assets:Zero-Sum-Accounts:Amazon:Purchases",
-    'account_returns':   "Assets:Zero-Sum-Accounts:Amazon:Returns",
-    'account_returns_other': "Assets:Zero-Sum-Accounts:Returns-and-Temporary",
-    'filing_directory': "Assets:Zero-Sum-Accounts:Amazon",
-}),
+
+(
+    amazon_gdpr.Importer(
+        {
+            "account_purchases": "Assets:Zero-Sum-Accounts:Amazon:Purchases",
+            "account_returns": "Assets:Zero-Sum-Accounts:Amazon:Returns",
+            "account_returns_other": "Assets:Zero-Sum-Accounts:Returns-and-Temporary",
+            "filing_directory": "Assets:Zero-Sum-Accounts:Amazon",
+        }
+    ),
+)
 ```
 
 * Place your GDPR ZIP(s) in your ingest folder.

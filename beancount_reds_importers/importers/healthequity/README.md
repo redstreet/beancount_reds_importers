@@ -26,11 +26,13 @@ from beancount_reds_importers.importers import healthequity
 
 CONFIG = [
     PredictPostings().wrap(
-        healthequity.Importer({
-            "main_account": "Assets:HSA:Cash",
-            "currency": "USD",
-            "filename_pattern": r"hsa\.(txt|tsv)$",
-        })
+        healthequity.Importer(
+            {
+                "main_account": "Assets:HSA:Cash",
+                "currency": "USD",
+                "filename_pattern": r"hsa\.(txt|tsv)$",
+            }
+        )
     ),
 ]
 
