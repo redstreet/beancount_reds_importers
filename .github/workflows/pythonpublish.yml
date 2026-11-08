@@ -1,32 +1,84 @@
-# This workflows will upload a Python Package using Twine when a release is created
-# For more information see: https://help.github.com/en/actions/language-and-framework-guides/using-python-with-github-actions#publishing-to-package-registries
-
-name: Upload Python Package
+name: Publish Python package
 
 on:
   release:
-    types: [created]
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing stable tag; leave empty to dry-run main
+        type: string
+        default: ''
+      publish:
+        description: Publish the tested artifacts (requires a stable tag)
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pypi-publication
+  cancel-in-progress: false
 
 jobs:
-  deploy:
-
+  validate:
+    if: github.event_name == 'workflow_dispatch' || !github.event.release.prerelease
     runs-on: ubuntu-latest
-
+    outputs:
+      sha: ${{ steps.validate.outputs.sha }}
+      tag: ${{ steps.validate.outputs.tag }}
+      version: ${{ steps.validate.outputs.version }}
+      publish: ${{ steps.validate.outputs.publish }}
     steps:
-    - uses: actions/checkout@v4
-    - name: Install uv
-      uses: astral-sh/setup-uv@v5
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.x'
-    - name: Install dependencies
-      run: |
-        uv sync --all-extras --dev
-    - name: Build and publish
-      env:
-        UV_PUBLISH_TOKEN: ${{ secrets.PYPI_PASSWORD }}
-        # UV_PUBLISH_URL
-      run: |
-        uv build
-        uv publish
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name || inputs.tag || 'main' }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Validate release identity and ancestry
+        id: validate
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name || inputs.tag }}
+          PUBLISH: ${{ github.event_name == 'release' || inputs.publish }}
+        run: python scripts/release_checks.py
+
+  checks:
+    needs: validate
+    uses: ./.github/workflows/pythonpackage.yml
+    with:
+      ref: ${{ needs.validate.outputs.sha }}
+
+  publish:
+    needs: [validate, checks]
+    if: needs.validate.outputs.publish == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: pypi
+      url: https://pypi.org/p/beancount-reds-importers
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.validate.outputs.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          name: distributions
+          path: dist
+      - name: Preserve release artifacts and verify any existing PyPI files
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.validate.outputs.tag }}
+          RELEASE_VERSION: ${{ needs.validate.outputs.version }}
+        run: python scripts/release_assets.py
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          # Existing files are accepted only after their SHA256 hashes match above.
+          skip-existing: true

@@ -1,0 +1,70 @@
+name: Release PR
+
+on:
+  workflow_run:
+    workflows: [Python package]
+    branches: [main]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-please
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: >-
+      vars.RELEASE_APP_ID != '' &&
+      (github.event_name == 'workflow_dispatch' ||
+       (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+      - name: Ignore superseded CI runs
+        id: current
+        env:
+          VALIDATED_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          if [ -z "$VALIDATED_SHA" ] || [ "$(git rev-parse HEAD)" = "$VALIDATED_SHA" ]; then
+            echo 'current=true' >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/create-github-app-token@v2
+        if: steps.current.outputs.current == 'true'
+        id: app
+        with:
+          app-id: ${{ vars.RELEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+      - uses: googleapis/release-please-action@v4
+        if: steps.current.outputs.current == 'true'
+        id: release
+        with:
+          token: ${{ steps.app.outputs.token }}
+          target-branch: main
+      - uses: actions/checkout@v4
+        if: steps.release.outputs.prs_created == 'true'
+        with:
+          ref: ${{ fromJSON(steps.release.outputs.pr).headBranchName }}
+          token: ${{ steps.app.outputs.token }}
+      - uses: astral-sh/setup-uv@v6
+        if: steps.release.outputs.prs_created == 'true'
+        with:
+          version: '0.13.1'
+          python-version: '3.12'
+      - name: Include the updated lockfile in the release PR
+        if: steps.release.outputs.prs_created == 'true'
+        run: |
+          uv lock
+          if ! git diff --quiet -- uv.lock; then
+            git config user.name 'release-bot[bot]'
+            git config user.email 'release-bot[bot]@users.noreply.github.com'
+            git add uv.lock
+            git commit -m 'chore(release): sync package version in lockfile'
+            git push
+          fi

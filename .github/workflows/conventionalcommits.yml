@@ -2,14 +2,21 @@ name: Conventional Commits
 
 on:
   pull_request:
-    branches: [ main ]
+    branches: [main]
     types: [opened, reopened, edited, synchronize]
 
+permissions:
+  contents: read
+
 jobs:
-  build:
-    name: Conventional Commits
+  title:
+    name: PR title
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-
-      - uses: webiny/action-conventional-commits@v1.1.0
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const title = context.payload.pull_request.title;
+            if (!/^(feat|fix|perf|refactor|docs|doc|test|build|ci|chore|style|revert|deps)(\([^)]+\))?!?: .+/.test(title)) {
+              core.setFailed('Use a Conventional Commit PR title, e.g. fix(schwab): handle missing fees');
+            }

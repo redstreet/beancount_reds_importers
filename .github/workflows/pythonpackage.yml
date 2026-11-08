@@ -1,45 +1,118 @@
-# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
-
 name: Python package
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
-    types: [opened, reopened, edited, synchronize]
+    branches: [main]
+  schedule:
+    - cron: '23 8 * * 1'
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      ref:
+        description: Exact commit to validate
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+env:
+  UV_VERSION: '0.13.1'
 
 jobs:
-  build:
-
+  lint:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || github.sha }}
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: ${{ env.UV_VERSION }}
+          python-version: '3.12'
+      - run: uv sync --locked --all-extras
+      - run: uv run --no-sync ruff check .
+      - run: uv run --no-sync ruff format --check
+      - run: uv run --no-sync isort --check .
+
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.11", "3.12"]
-
+        python: ['3.11', '3.12', '3.13', '3.14', '3.15']
     steps:
-    - uses: actions/checkout@v4
-    - name: Install uv
-      uses: astral-sh/setup-uv@v5
-      #with:
-        # Optional: specify uv version
-        #version: "0.7.6"
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        uv sync --all-extras --dev
-    - name: Lint with ruff
-      run: |
-        uv run ruff check . --statistics
-    - name: Test with pytest
-      run: |
-        uv run pytest
-    - name: Check formatting is applied
-      run: |
-        uv run ruff format --check
-        uv run isort --profile black --check .
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || github.sha }}
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: ${{ env.UV_VERSION }}
+          python-version: ${{ matrix.python }}
+      - name: Check current upstream dependencies weekly
+        if: github.event_name == 'schedule'
+        run: uv lock --upgrade
+      - name: Ensure Beancount's native build prerequisite is available
+        if: matrix.python == '3.15'
+        run: |
+          if ! command -v m4 >/dev/null; then
+            sudo apt-get update
+            sudo apt-get install --yes m4
+          fi
+      - run: uv sync --locked --all-extras
+      - run: uv run --no-sync pytest --cov --cov-report=xml --cov-report=term:skip-covered
+      - name: Enforce shared-library coverage
+        run: >-
+          uv run --no-sync coverage report
+          --include='*/libreader/*.py,*/libtransactionbuilder/*.py' --fail-under=85
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-${{ matrix.python }}
+          path: coverage.xml
+
+  package:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || github.sha }}
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: ${{ env.UV_VERSION }}
+          python-version: '3.12'
+      - run: uv sync --locked --all-extras
+      - name: Build repeatable artifacts, including a wheel rebuilt from the source archive
+        run: |
+          export SOURCE_DATE_EPOCH=$(git log -1 --format=%ct)
+          uv run --no-sync python -m build --no-isolation
+      - run: uv run --no-sync twine check dist/*
+      - run: uv run --no-sync python scripts/check_distribution.py dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: distributions
+          path: dist/*
+          if-no-files-found: error
+
+  checks:
+    name: All checks
+    if: always()
+    needs: [lint, tests, package]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require every check to pass
+        env:
+          RESULTS: ${{ toJSON(needs) }}
+        run: |
+          python - <<'PY'
+          import json, os
+          assert all(job['result'] == 'success' for job in json.loads(os.environ['RESULTS']).values())
+          PY

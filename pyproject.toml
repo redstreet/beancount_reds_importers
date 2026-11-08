@@ -52,7 +52,7 @@ bean-download = "beancount_reds_importers.util.bean_download:cli"
 reds-ibkr-flexquery-download = "beancount_reds_importers.importers.ibkr.flexquery_download:flexquery_download"
 
 [project.optional-dependencies]
-dev = ["isort", "pytest", "pytest-cov", "ruff", "build", "twine"]
+dev = ["isort", "pytest", "pytest-cov", "ruff", "build", "twine", "hatchling>=1.27,<2"]
 
 [build-system]
 requires = ["hatchling>=1.27,<2"]
