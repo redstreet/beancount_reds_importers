@@ -1,11 +1,13 @@
-## Transitioning to Beangulp
+## Beancount and Python compatibility
 
-beancount_reds_importers is being transitioned from Beancount v2 to Beangulp (Beancount
-v3's importer framework). The Beangulp version is not yet ready for release. So:
-- if you want v2, use version 0.10.0: `pip3 install beancount-reds-importers`
-- if you want v3 (beangulp), use the head (`pip3 install
-  git+https://github.com/redstreet/beancount_reds_importers`), but be warned that you'll
-  run into breakages (please file bug reports!)
+Development on `main` targets Beancount v3 and Beangulp, with Python 3.11–3.15.
+The first stable release of this line is planned as **1.0.0**. Until it is published,
+use the development installation below for Beancount v3.
+
+For Beancount v2, pin the historical release:
+`pip3 install beancount-reds-importers==0.10.0`. The v2 line is no longer maintained.
+The 1.0 transition requires updating old `beancount.ingest` configurations to Beangulp;
+see the included [example configuration](beancount_reds_importers/example/import.py).
 
 # Beancount Red's Importers
 
@@ -109,8 +111,7 @@ for f in ~/.zcomplete/*; do source $f; done
 pip3 install beancount-reds-importers
 ```
 
-Or to install the bleeding edge version from git (which I recommend, as long as you are
-willing to understand there might be a bug or two):
+To install development code from `main` (which can temporarily have failing tests):
 ```
 pip3 install git+https://github.com/redstreet/beancount_reds_importers
 ```
@@ -183,13 +184,20 @@ for how to customize each imported transaction.
 
 ## Testing
 ```
-pip3 install xlrd
-uv run pytest
+uv sync --locked --all-extras
+uv run --no-sync pytest --cov
+uv run --no-sync coverage report --include='*/libreader/*.py,*/libtransactionbuilder/*.py' --fail-under=85
 ```
 
-Some importers are tested with
-[regression_pytest.py](https://github.com/beancount/beancount/blob/v2/beancount/ingest/regression_pytest.py).
-Run `pytest --generate` then `pytest`.
+Unit tests exercise shared parsing and accounting behavior. Importer regression tests
+compare anonymized statements against reviewed expected output. To add a fixture, run
+`uv run pytest path/to/that/test --generate`, review every generated amount, posting,
+and date, then run the test normally. CI never regenerates expected output.
+
+CI also builds the wheel and source archive, installs each into a clean environment,
+and exercises real banking and investment imports with ledger balance assertions.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for local checks and
+[RELEASING.md](RELEASING.md) for the automated release process.
 
 Anonymized data to increase regression test coverage is most welcome. Please submit a
 PR if you can. See [here](beancount_reds_importers/importers/schwab/tests/schwab_csv_checking)
