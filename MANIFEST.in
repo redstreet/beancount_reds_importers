@@ -1,3 +1,0 @@
-include *.md
-include LICENSE
-include beancount_reds_importers/example/*
