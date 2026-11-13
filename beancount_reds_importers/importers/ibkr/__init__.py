@@ -1,5 +1,9 @@
 """IBKR Flex Query importer for beancount.
 
+Optional config: preserve_source_fields (default False) retains original XML
+trade attributes on interpreted trade objects for local extensions. It does
+not add fields to the default Beancount output.
+
 TODO:
 - Flex Web Service API to programmatically retrieve data
 
@@ -190,6 +194,8 @@ class Importer(investments.Importer, xmlreader.Importer):
             "cost": D(xml_data.get("cost")),
             "fifoPnlRealized": D(xml_data.get("fifoPnlRealized")),
         }
+        if self.config.get("preserve_source_fields", False):
+            ofx_dict["source_fields"] = dict(xml_data)
         return DictToObject(ofx_dict)
 
     def xml_cash_interpreter(self, xml_data):
