@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/redstreet/beancount_reds_importers/compare/1.0.0...1.0.1) (2026-11-19)
+
+
+### Bug Fixes
+
+* **deps:** remove vulnerable Soup Sieve fallback ([7a3f7c7](https://github.com/redstreet/beancount_reds_importers/commit/7a3f7c73bac42696b5fb82d53030cf5dad241419))
+
 ## [1.0.0](https://github.com/redstreet/beancount_reds_importers/compare/0.10.0...1.0.0) (2026-11-08)
 
 
