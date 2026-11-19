@@ -1,6 +1,6 @@
 ## Beancount and Python compatibility
 
-Development on `main` targets Beancount v3 and Beangulp, with Python 3.11–3.15.
+Development on `main` targets Beancount v3 and Beangulp, with Python 3.11.5–3.15.
 The first stable release of this line is planned as **1.0.0**. Until it is published,
 use the development installation below for Beancount v3.
 
